@@ -18,6 +18,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import permission_required, user_passes_test
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Max
+import fitz
 
 @user_passes_test(lambda user: Group.objects.get(name='BMN') in user.groups.all() or Group.objects.get(name='asesor') in user.groups.all(), login_url='alihmedia_vital_authorization_rejected')
 def index(request):
@@ -180,8 +181,19 @@ def pdfdownload(request, uuid_id):
     
     path = os.path.join(settings.PDF_LOCATION, __package__.split('.')[1], folder, str(doc_number) + ".pdf")
     if exists(path):
+
+        doc = fitz.open(path)
+        for i in range(0, len(doc)):
+            page = doc[i]
+            tw = fitz.TextWriter(page.rect, opacity=0.3)
+            tw.append((50, 100), "COPY")
+            page.clean_contents()
+            page.write_text(rect=page.rect, writers=tw)
+        doc.save("tmp.pdf")            
+
         filename = f"{__package__.split('.')[1]}_{folder}_{doc_number}.pdf"
-        with open(path, 'rb') as pdf:
+        # with open(path, 'rb') as pdf:
+        with open("tmp.pdf", 'rb') as pdf:
             response = HttpResponse(pdf.read(), content_type='application/pdf')
             response['Content-Disposition'] = f'inline;filename={filename}'
             return response
