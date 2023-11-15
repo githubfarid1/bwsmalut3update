@@ -1,10 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect, get_list_or_404
 from django.http import HttpResponse, Http404
-from .models import Department, Subfolder, File
+from .models import Department
 import sys
 from django.template.defaultfilters import slugify
-from .forms import FileForm, DepartmentForm, SubfolderForm
-from taggit.models import Tag
+from .forms import DepartmentForm
 import os, shutil
 from django.conf import settings
 from os.path import exists
@@ -39,48 +38,36 @@ def check_permission(request, depslug):
     else:
         return status2
 
-def getmenu_year(department_id):
-    years = Subfolder.objects.filter(department_id=department_id).order_by("year").values("year").distinct()
-    yearlist = [int(x['year']) for x in years if x['year'] != '']
-    today = date.today()
-    if not today.year in yearlist:
-        yearlist.append(today.year)
-    if not today.year+1 in yearlist:    
-        yearlist.append(today.year+1)
-    yearlist.sort()
-    return yearlist        
-
 @csrf_exempt
 def department(request, slug):
     if not request.user.is_authenticated:
         return redirect('login')
     
     if not check_permission(request, slug):
-        return render(request=request, template_name='fm_pjpa/page_404.html', context={'message':'Otorisasi Ditolak'})
+        return render(request=request, template_name='file_manager/page_404.html', context={'message':'Otorisasi Ditolak'})
         
     dep = Department.objects.filter(slug=slug)
     if not dep:
-        return render(request=request, template_name='fm_pjpa/page_404.html', context={'message':'Halaman tidak ada'})
+        return render(request=request, template_name='file_manager/page_404.html', context={'message':'Halaman tidak ada'})
     
-    # folder = request.GET.get("folder")
     path = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], slug)
     contents =os.listdir(path)    
-    # return HttpResponse(contents)
     dep = Department.objects.filter(slug=slug).first()
     context = {
-        # 'data':subfolders,
         "years": contents,
         'depname':dep.name,
         'slug': slug,
+        'satkername': 'PJPA',
+        'depurl': 'fm_pjpa_department',
+        'deplisturl': 'fm_pjpa_department_list',
+        'depyearurl': 'fm_pjpa_department_year',
     }
-    return render(request=request, template_name='fm_pjpa/department.html', context=context)
+    return render(request=request, template_name='file_manager/department.html', context=context)
 
 @csrf_exempt
 def department_list(request):
     if not request.user.is_authenticated:
         return redirect('login')
-    # if not check_permission(request, ''):
-    #     return render(request=request, template_name='fm_pjpa/page_404.html', context={'message':'Otorisasi Ditolak'})
     departments = Department.objects.all()
     data = []
     for dep in departments:
@@ -92,56 +79,20 @@ def department_list(request):
     
     context = {
         'data':data,
+        'satkername': 'PJPA',
+        'depurl': 'fm_pjpa_department',
     }
 
-    return render(request=request, template_name='fm_pjpa/department_list.html', context=context)
+    return render(request=request, template_name='file_manager/department_list.html', context=context)
         
 @csrf_exempt
 def department_year(request, slug, year):
     if not request.user.is_authenticated:
         return redirect('login')
     if not check_permission(request, slug):
-        return render(request=request, template_name='fm_pjpa/page_404.html', context={'message':'Otorisasi Ditolak'})
+        return render(request=request, template_name='file_manager/page_404.html', context={'message':'Otorisasi Ditolak'})
     dep = Department.objects.get(slug=slug)
     depfolder = dep.folder
-    # subfolders = dep.subfolder_set.filter(year=year)
-    # if request.method == 'POST':
-    #     if request.POST.get('id'):
-    #         subfolder = Subfolder.objects.get(id=request.POST['id'])
-    #         if File.objects.filter(subfolder_id=subfolder.id).count() != 0:
-    #             messages.info(request, "Tidak bisa dihapus karena ada file terhubung")
-    #             return redirect(request.build_absolute_uri())
-    #         else:
-    #             path = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], dep.folder, subfolder.year, subfolder.folder)
-    #             # return HttpResponse(path)
-    #             subfolder.delete()
-    #             os.rmdir(path)
-    #             messages.info(request, "Hapus Folder Berhasil")
-    #             return redirect(request.build_absolute_uri())
-
-    #     form = SubfolderForm(request.POST)
-    #     if form.is_valid():
-    #         newfloder = form.save(commit=False)
-    #         foldertmp = slugify(newfloder.name)
-    #         yeartmp = str(year)
-    #         folder = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], depfolder, yeartmp)
-    #         if not exists(folder):
-    #             os.mkdir(folder)
-    #         folder = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], depfolder, yeartmp, foldertmp)
-    #         if exists(folder):
-    #             messages.info(request, "Folder sudah ada")
-    #             return redirect(request.build_absolute_uri())
-    #         else:
-    #             os.mkdir(folder)
-
-    #         newfloder.folder = slugify(newfloder.name)
-    #         newfloder.year = year
-    #         newfloder.department_id = dep.id
-    #         newfloder.create_date = timezone.now()
-    #         newfloder.save()
-
-    # form = SubfolderForm()
-    # folder = request.GET.get("folder")
     data = []
     path = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], depfolder, str(year))
     contents = os.listdir(path)    
@@ -150,20 +101,34 @@ def department_year(request, slug, year):
             data.append(file)
     context = {
         'data': data,
-        # "menu": getmenu_year(dep.id),
         'depname':dep.name,
         'slug': slug,
         'year': year,
-        # 'form': form,
+        'satkername': 'PJPA',
+        'depurl': 'fm_pjpa_department',
+        'deplisturl': 'fm_pjpa_department_list',
+
     }
-    return render(request=request, template_name='fm_pjpa/department_year.html', context=context)
+    return render(request=request, template_name='file_manager/department_year.html', context=context)
+
+def checkfolder(path):
+    contents =os.listdir(path)
+    if contents.count == 0:
+        return False
+    
+    for file in contents:
+        if os.path.isdir(os.path.join(path, file)):
+            condirs = os.listdir(os.path.join(path, file))
+            if condirs.count != 0:
+                return True
+    return False
 
 @csrf_exempt
 def add_department(request):
     if not request.user.is_authenticated:
         return redirect('login')
     if not check_permission(request, ''):
-        return render(request=request, template_name='fm_pjpa/page_404.html', context={'message':'Otorisasi Ditolak'})
+        return render(request=request, template_name='file_manager/page_404.html', context={'message':'Otorisasi Ditolak'})
     departments = Department.objects.all()
     data = []
     for dep in departments:
@@ -175,7 +140,7 @@ def add_department(request):
     if request.method == 'POST':
         if request.POST.get('slug'):
             dep = Department.objects.get(slug=request.POST['slug'])
-            if Subfolder.objects.filter(department_id=dep.id).count() != 0:
+            if checkfolder(os.path.join(settings.FM_LOCATION, __package__.split('.')[1], dep.folder)):
                 messages.info(request, "Tidak bisa dihapus karena ada folder terhubung")
                 return redirect(request.build_absolute_uri())
             else:
@@ -212,14 +177,12 @@ def add_department(request):
     form = DepartmentForm()
     context = {
     'data':data,
-    # 'depname':subfolder.department.name,
-    # 'subfoldername': subfolder.name,
-    # 'year': subfolder.year,
-    # 'common_tags':common_tags,
+    'satkername': 'PJPA',
+    'depurl': 'fm_pjpa_department',
     'form':form,        
     }
 
-    return render(request=request, template_name='fm_pjpa/add_department.html', context=context)
+    return render(request=request, template_name='file_manager/add_department.html', context=context)
 
 def get_fileinfo(filepath):
     file_size = os.path.getsize(filepath)
@@ -280,141 +243,8 @@ def get_fileinfo(filepath):
     return filemime, filesizestr, filetype, mime_type, mtime
 
 @csrf_exempt
-def subfolder(request, id):
-    # messages.info(request, "File Sudah ada")
-    if not request.user.is_authenticated:
-        return redirect('login')
-    subfolder = Subfolder.objects.get(id=id)
-    depslug = subfolder.department.slug
-    if not check_permission(request, depslug):
-        return render(request=request, template_name='fm_pjpa/page_404.html', context={'message':'Otorisasi Ditolak'})
-    files = subfolder.file_set.all()
-    data = []
-    for file in files:
-        filepath = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], file.subfolder.department.folder, str(file.subfolder.year), str(file.subfolder.folder), str(file.filename))
-        filemime = 'unknown.png'
-        filesize = 0
-        filetype = 'Unknown'
-        found = False
-        mime_type = ''
-        if exists(filepath):
-            filemime, filesize, filetype, mime_type = get_fileinfo(filepath)
-            # return HttpResponse(mime_type)
-            found = True
-            icon_location = os.path.join('assets/filetypes', filemime)
-        else:
-            icon_location = os.path.join('assets/filetypes', 'inprocess.png')
-        data.append({'filename': file.filename,
-                     'tags': file.tags,
-                     'uuid_id': file.uuid_id,
-                     'description': file.description,
-                     'icon_location': icon_location,
-                     'filesize': filesize,
-                     'filetype': filetype,
-                     'found': found,
-                     'upload_date': file.upload_date,
-                     })    
-        
-    common_tags = File.tags.most_common()[:10]
-    if request.method == 'POST':
-        if request.FILES and request.FILES['fileupload']:
-            form = FileForm(request.POST)
-            upload = request.FILES['fileupload']
-            folderstrlist = [__package__.split('.')[1], subfolder.department.folder, str(subfolder.year), str(subfolder.folder)]
-            folderstrlistwfile = folderstrlist.copy()
-            folderstrlistwfile.append(str(upload))
-            filetmpname = "$$".join(folderstrlistwfile)
-            filetmppath = os.path.join(settings.MEDIA_ROOT, "tmpfiles", filetmpname)
-            filepath = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], subfolder.department.folder, str(subfolder.year), str(subfolder.folder), str(upload))
-            if exists(filepath) or exists(filetmppath):
-                messages.info(request, "File Sudah ada")
-                return redirect(request.build_absolute_uri())
-            # print(form.errors)
-            if form.is_valid():
-                # breakpoint()
-                newsubfolder = form.save(commit=False)
-                newsubfolder.filename = upload
-                slugs = "-".join([__package__.split('.')[1], subfolder.department.folder, str(subfolder.year), str(subfolder.folder), str(upload)])
-                newsubfolder.slug = slugify(slugs)
-                newsubfolder.subfolder_id = id
-                newsubfolder.upload_date = timezone.now()
-                newsubfolder.save()
-                # Without this next line the tags won't be saved.
-                form.save_m2m()
-                fss = FileSystemStorage()
-                fss.save(filetmppath, upload)
-                # form = FileForm()
-                return redirect(request.build_absolute_uri())
-        else:
-            doc = File.objects.get(uuid_id=request.POST['uuid_id'])
-            doc.delete()
-            subfolder = str(doc.subfolder.folder)
-            year = str(doc.subfolder.year)
-            depfolder = str(doc.subfolder.department.folder)
-            filename = doc.filename
-            path = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], depfolder, year, subfolder, filename)
-            folderstrlistwfile = [__package__.split('.')[1], depfolder, year, subfolder, filename]
-            filetmpname = "$$".join(folderstrlistwfile)
-            filetmppath = os.path.join(settings.MEDIA_ROOT, "tmpfiles", filetmpname)
-            # print(filetmppath)
-            if exists(filetmppath):
-                os.remove(filetmppath)
-            if exists(path):
-                os.remove(path)
-            
-            return redirect(request.build_absolute_uri())
-
-    else:
-        form = FileForm()
-    
-    context = {
-    'data':data,
-    'depname':subfolder.department.name,
-    'subfoldername': subfolder.name,
-    'year': subfolder.year,
-    'common_tags':common_tags,
-    'form':form,
-    'depslug': depslug      
-    }
-
-    return render(request=request, template_name='fm_pjpa/subfolder.html', context=context)
-
-@csrf_exempt
-def filedownload(request, uuid_id):
-    if not request.user.is_authenticated:
-        return redirect('login')
-    
-    doc = File.objects.get(uuid_id=uuid_id)
-    subfolder = str(doc.subfolder.folder)
-    year = str(doc.subfolder.year)
-    depfolder = str(doc.subfolder.department.folder)
-    filename = doc.filename
-    path = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], depfolder, year, subfolder, filename)
-    # return HttpResponse(path)
-    if exists(path):
-       
-        mime_type, encoding = mimetypes.guess_type(path)
-        # return HttpResponse(mime_type)
-        with open(path, 'rb') as pdf:
-            response = HttpResponse(pdf.read(), content_type=f'{mime_type}')
-            response['Content-Disposition'] = f'inline;filename={filename}'
-            return response
-    raise Http404
-
-@csrf_exempt
-def tagged(request, slug):
-    tag = get_object_or_404(Tag, slug=slug)
-    # Filter posts by tag name  
-    files = File.objects.filter(tags=tag)
-    context = {
-        'tag':tag,
-        'data':files,
-    }
-    return render(request, 'fm_pjpa/subfolder.html', context)
-
-@csrf_exempt
 def page_404(request):
-    return render(request, 'fm_pjpa/page_404.html', {})
+    return render(request, 'file_manager/page_404.html', {})
 
 def build_breadcrumbs(url):
     folderlist = str(url).split("/")
@@ -474,9 +304,14 @@ def showfolder(request, slug, year):
         'depslug': slug,
         'breadcrumbs': build_breadcrumbs(folder),
         'folder': folder,
-        # 'folderlist': folderlist
+        'satkername': 'PJPA',
+        'depurl': 'fm_pjpa_department',
+        'deplisturl': 'fm_pjpa_department_list',
+        'showfolderurl': 'fm_pjpa_showfolder',
+        'downloadurl': 'fm_pjpa_download',
+        'depyearurl': 'fm_pjpa_department_year',
     }
-    return render(request=request, template_name='fm_pjpa/showfolder.html', context=context)
+    return render(request=request, template_name='file_manager/showfolder.html', context=context)
 
 @csrf_exempt
 def download(request, slug, year):
@@ -485,10 +320,8 @@ def download(request, slug, year):
     folder = request.GET.get("folder")
     filename = request.GET.get("filename")
     path = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], slug, year, folder, filename)
-    # return HttpResponse(path)
     if exists(path):
         mime_type, encoding = mimetypes.guess_type(path)
-        # return HttpResponse(mime_type)
         with open(path, 'rb') as pdf:
             response = HttpResponse(pdf.read(), content_type=f'{mime_type}')
             response['Content-Disposition'] = f'inline;filename={filename}'
