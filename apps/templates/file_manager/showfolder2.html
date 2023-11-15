@@ -19,7 +19,7 @@
 
 {% block content %}
 <div class="container-fluid">
-   <p class="text-left text-primary"><a class="btn btn-warning mb-2" href="{% url deplisturl %}">SATKER {{ satkername }}</a> &#62;&#62; <a class="btn btn-warning mb-2" href={% url depurl depslug %}> {{ depname }}</a> &#62;&#62; {{ year }}
+   <p class="text-left text-primary"><a class="btn btn-warning mb-2" href="{% url deplisturl %}">SATKER {{ satkername }}</a> &#62;&#62; <a class="btn btn-warning mb-2" href={% url depurl depslug %}> {{ depname }}</a> &#62;&#62; <a class="btn btn-warning mb-2" href={% url showfolderurl slug year %}?folder=>{{ year }}</a>
    {% for bread in breadcrumbs %}
     {% if bread.link != '' %}
     &#62;&#62; <a class="btn btn-warning mb-2" href="{% url showfolderurl slug year %}?folder={{bread.link}}"> {{ bread.label }}</a>
