@@ -1,9 +1,12 @@
 import fitz
 # from fitz import TextWriter
-doc = fitz.open("2.pdf")
+doc = fitz.open("54.pdf")
 page = doc[0]
 tw = fitz.TextWriter(page.rect, opacity=0.3)
-tw.append((50, 100), "COPY BWS")
-page.clean_contents(sanitize=False)
+tw.append((50, 100), "COPY")
+page.clean_contents()
 page.write_text(rect=page.rect, writers=tw)
-doc.save("/home/arsip/nas-media/fms/fm_pjpa/ppk1/2023/tester/new.pdf")
+
+
+# page.add_stamp_annot(page.rect, fitz.STAMP_Draft)
+doc.save("new.pdf")
