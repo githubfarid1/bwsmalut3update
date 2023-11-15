@@ -1,0 +1,33 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container-fluid">
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarText"
+      aria-controls="navbarText"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarText">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        {% if menu %} {% for m in menu %}
+        <li class="nav-item">
+          <a
+            class="nav-link {% if m.link == link %}active{% endif %}"
+            href="{% url m.link %}"
+            >{{ m.name|title }}</a
+          >
+        </li>
+        {% endfor %} {% endif %}
+        <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'alihmedia_inactive_statistics' %}" style="color: red;">Statistik</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

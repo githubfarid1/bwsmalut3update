@@ -1,0 +1,117 @@
+{% extends "layouts/base.html" %} {% load static %}
+{% block title %} | Data Inaktif {% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}" />
+{% include 'alihmedia_inactive/menu.html'%}
+<div class="container">
+  {% comment %} {% include 'messages.html'%} {% endcomment %}
+  <h3>Monitoring Alih Media Data Inaktif</h3>
+  <div class="summary">
+    <form action="{% url link %}" class="row g-3" style="float: right">
+      <div class="col-auto">
+        <input
+          class="form-control"
+          name="search"
+          id=""
+          placeholder="Keyword..."
+        />
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-primary mb-3">Cari..</button>
+      </div>
+    </form>
+    <div class="col-auto">
+      <p>
+        Kategori: {{ link|title }} <br />Total Data: {{ totdata }} <br />Sudah
+        Proses: {{ totscan }}<br />Belum Proses: {{ totnotscan }} <br/> Tahun: {{ years }}
+      </p>
+      <p>
+        <label for="file">Progress:</label>
+        <progress id="file" value="{{ percent }}" max="100"></progress
+        >&nbsp;&nbsp;<small>{{ percent }}%</small>
+      </p>
+    </div>
+  </div>
+  {% comment %}
+  <h4>
+    {% with data|length as total_results %} Found {{ total_results }} result{{
+    total_results|pluralize }} {% endwith %}
+  </h4>
+  {% endcomment %}
+
+  <table class="table">
+    <thead>
+      <tr style="background-color: beige">
+        {% comment %} <th scope="col">#</th> {% endcomment %}
+        <th scope="col">BOX</th>
+        <th scope="col">NO BERKAS</th>
+        <th scope="col">NO URUT</th>
+        <th scope="col">KODE</th>
+        <th scope="col">INDEX</th>
+        <th scope="col">URAIAN MASALAH</th>
+        <th scope="col">TAHUN</th>
+        <th scope="col">JML</th>
+        <th scope="col">KET</th>
+        {% comment %}
+        <th scope="col">ACTION</th>
+        {% endcomment %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for d in data %}
+      <tr>
+        {% comment %} <td>{{ d.row_number }}</td> {% endcomment %}
+        {% if d.box_number != "" %}
+        <td rowspan="{{ d.boxspan }}">{{ d.box_number }}</td>
+        {% endif %} {% if d.bundle_number != "" %}
+        <td rowspan="{{ d.bundlespan }}">{{ d.bundle_number }}</td>
+        {% endif %}
+        <td>{{ d.doc_number }}</td>
+        {% if d.bundle_number != "" %}
+        <td rowspan="{{ d.bundlespan }}">{{ d.bundle_code }}</td>
+        {% endif %}
+
+        {% if d.bundle_number != "" %}
+        <td rowspan="{{ d.bundlespan }}">{{ d.bundle_title }}</td>
+        {% endif %} {% comment %}
+        <td class="{% if d.pdffound %}file-exist{% endif %}">
+          {{ d.doc_description }}
+        </td>
+        {% endcomment %} {% if d.pdffound %}
+        <td>
+          <div class="card border-info">
+            <div class="card-header text-info"><small>{{ d.filesize }} kb / {{ d.pagecount }} pages</small>
+              <div style="float: right;"><a href="#" target="_new" class="btn btn-success btn-sm">
+                <i class="bi-download"></i>
+              </a>
+              <a href="{% static d.coverfilepath %}" target="_new" class="btn btn-info btn-sm">
+                <i class="bi-credit-card-2-front"></i>
+              </a>            
+            </div>
+            </div>
+            <div class="card-body">
+                  <cite title="Source Title">
+                    <small>{{ d.doc_description }}</small>
+                  </cite>
+            
+            </div>
+          </div>
+        </td>
+        {% else %}
+        <td class="file-not-exist">{{ d.doc_description }}</td>
+
+        {% endif %} {% if d.bundle_number != "" %}
+        <td rowspan="{{ d.bundlespan }}">{{ d.bundle_year }}</td>
+        {% endif %}
+        <td>{{ d.doc_count }}</td>
+        {% if d.bundle_number != "" %}
+        <td rowspan="{{ d.bundlespan }}">{{ d.bundle_orinot }}</td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

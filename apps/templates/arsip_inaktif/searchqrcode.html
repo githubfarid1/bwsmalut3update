@@ -1,0 +1,68 @@
+{% extends 'layouts/base.html' %}
+{% block title %} | Scan QRCode Data Inaktif {% endblock %}
+{% load crispy_forms_tags %}
+{% load static %} {% block content %}
+{% comment %} <link rel="stylesheet" href="{% static 'css/style.css' %}" /> {% endcomment %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+
+    <div class="col-lg-4 col-md-8 col-sm-12">  
+  <h3>Scan Isi Box Arsip Inaktif</h3>
+  <form action="{% url 'arsip_inaktif_searchqrcode' %}" method="post">
+    {% csrf_token %}
+    {{form|crispy}}
+    <button type="submit" class="btn btn-primary">Cari..</button>
+  </form>
+</div>
+</div>
+{% if data %}
+<h3 class="text-center">{{ depname }} :: BOX Nomor {{ box_number }}</h3>
+
+<div class="row">
+    {% for d in data %}
+    <div class="col-12 col-lg-3 my-3">
+        {% if d.pdffound %}
+        <div class="card">
+            <div class="row no-gutters">
+                <div class="col-sm-6 my-3">
+                    <div class="ps-3">
+                    <a href="{% static d.coverfilepath %}" target="_new"><img class="card-img border" src="{% static d.coverfilepath %}" alt=""></a>
+                </div>
+                </div>
+                <div class="col-sm-6 mt-3 text-center">
+                        <p><small>No. Berkas: {{d.bundle_number}}<br>No. Urut: {{d.doc_number}}<br>Tahun: {{d.bundle_year}}<br>Ukuran: {{d.filesize}} kb<br>Jml Hlmn: {{d.pagecount}}<br>
+                        </small> </p>
+                </div>
+                <div class="col-sm-12">
+                    <div class="px-3">
+                        <h5 class="card-title">{{d.doc_description}}</h5>
+                        <p class="card-text font-italic"><small>{{d.bundle_title}}</small></p>
+                    </div>
+                </div>
+                <div class="col-sm-12 mt-2 px-4">
+                    <a href="{% url 'arsip_inaktif_pdfdownload' d.doc_uuid_id %}" target="_new" class="btn btn-info btn-block mb-2 w-100">Download</a>
+                </div>
+
+            </div>
+        </div>
+        {% else %}
+        <div class="card bg-secondary">
+            <div class="row no-gutters">
+                <div class="col-sm-12">
+                    <div class="card-body">
+                        <h5 class="card-title">{{d.doc_description}}</h5>
+                        <p class="card-text"><small>{{d.bundle_title}}
+                            <br>No. Berkas: {{d.bundle_number}}<br>No. Urut: {{d.doc_number}}<br>Tahun: {{d.bundle_year}}
+                        </small> </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+</div>
+
+{% endblock %}

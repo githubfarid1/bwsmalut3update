@@ -1,0 +1,54 @@
+# byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# tests and coverage
+*.pytest_cache
+.coverage
+
+# database & logs
+*.db
+*.sqlite3
+*.log
+
+# venv
+env
+venv
+
+# other
+.DS_Store
+
+# javascript
+package-lock.json
+
+staticfiles/*
+!staticfiles/.gitkeep 
+.vscode/symbols.json
+
+apps/static/assets/node_modules
+apps/static/assets/yarn.lock
+apps/static/assets/.temp
+
+/bwsmalut3-venv
+/apps/media/tmpfiles/*
+/apps/static/cover/*
+/gitme.sh
+/.env
+/core/settings.py
+/media/tmpfiles/*
+
+#UTILITIES
+/utilities/alihmedia_inactive/settings.py
+/utilities/alihmedia_inactive/rungencover.sh
+/utilities/alihmedia_inactive/runmovepdf.sh
+/utilities/alihmedia_inactive/runbackup.sh
+
+/utilities/alihmedia_vital/settings.py
+/utilities/alihmedia_vital/rungencover.sh
+/utilities/alihmedia_vital/runmovepdf.sh
+/utilities/alihmedia_vital/runbackup.sh
+/utilities/file_explorer/runmovefile.sh
+
+/utilities/arsip_inaktif/rungencover.sh
+/utilities/arsip_inaktif/runmovepdf.sh
+/utilities/arsip_inaktif/settings.py

@@ -1,0 +1,20 @@
+# True for development, False for production
+DEBUG=True
+
+# Deployment SERVER address
+# SERVER=.appseed.us
+#SERVER=localhost
+SERVER=arsip.bwsmalut.my.id
+
+# Used for CDN (in production)
+# No Slash at the end
+ASSETS_ROOT=/static/assets
+
+
+# For MySql Persistence
+DB_ENGINE=mysql
+DB_NAME=arsipserverdb2
+DB_HOST=localhost
+DB_PORT=3306
+DB_USERNAME=root
+DB_PASS=workshop21

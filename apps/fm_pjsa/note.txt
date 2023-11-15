@@ -1,0 +1,11 @@
+masuk ke mysql terminal
+delete from django_migrations where app = 'fm_pjsa';
+SET foreign_key_checks = 0;
+drop table fm_pjsa_department;
+drop table fm_pjsa_subfolder;
+drop table fm_pjsa_file;
+SET foreign_key_checks = 1;
+
+python manage.py migrate
+
+tambahkan folder fm_pjsa di nas-media/fms

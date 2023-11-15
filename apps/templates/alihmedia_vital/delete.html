@@ -1,0 +1,42 @@
+{% extends "layouts/base.html" %} {% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="container mt-5">
+  <div class="row  justify-content-center">
+    <div class="col-lg-4 col-md-6 col-sm-12 border">  
+      <h2 class="text-center">Hapus Data</h2>
+        <div class="card bg-light">
+          <div class="row no-gutters">
+            <div class="col-sm-5 mt-3">
+                <div class="card-body">
+                {% if isexist %}
+                    <a href="{% static coverfilepath %}" target="_new"><img class="card-img border" src="{% static coverfilepath %}" alt=""></a>
+                {% endif %}
+            </div>
+            </div>
+            <div class="col-sm-7 mt-3 text-center">
+              <p><small><strong>No. Berkas: {{data.doc_number}}</strong><br>Tahun: {{data.period}}<br>Ukuran: {{data.filesize}} kb<br>Jml Hlmn: {{data.page_count}}<br>
+              </small> </p>
+            </div>
+            <div class="col-sm-12">
+              <div class="card-body">
+                  <h5 class="card-title">{{data.countstr}}</h5>
+                  <p class="card-text font-italic"><small><strong>Unit Kerja: {{data.work_unit}}</strong><br>{{data.name}}</small></p>
+              </div>
+          </div>
+
+        </div>
+        </div>
+  
+      <form action="" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="uuid_id" value="{{ uuid_id }}">
+        <button type="submit" class="btn btn-primary mt-2" onclick="return confirm('Hapus Data No Berkas {{ data.doc_number }}?')">Hapus</button>
+      </form>
+    </div>
+    </div>  
+  </div>
+</div>
+
+{% endblock %}

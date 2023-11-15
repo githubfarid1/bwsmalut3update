@@ -1,0 +1,129 @@
+{% extends "layouts/base.html" %} {% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %} | Data Inaktif {% endblock %}
+{% block stylesheets %}
+    <link href="{% static 'assets/vendors/coreui/icons/css/free.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <style>
+      div.hoverbackground:hover{
+        opacity: 0.7;
+        background-color: #FF9800!important;
+      }
+      {% comment %} body {
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+        color: #5a5a5a;
+      } {% endcomment %}
+    
+    </style>
+    <link rel="stylesheet" href=
+    "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" />
+    
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="container-fluid">
+<h3 class="text-center">Data Inaktif {{ year }}</h3>
+
+{% include 'arsip_inaktif/menu2.html'%}
+
+{% if data %}
+<div class="row">
+    <div class="col-sm-4">
+        <form action="" method="post">
+            {% csrf_token %}
+            <input name="year" type="hidden" value="{{ year }}">
+            <button type="submit" class="btn btn-success mt-4">Export ke Excel</button>
+        </form>
+    </div>
+    <div class="col-sm-4">
+    </div>
+    <div class="col-sm-4">
+            <form action="" method="get">
+                <div class="row">
+                <div class="col-sm-10">
+                    {{form|crispy}}
+                </div>
+                <div class="col-sm-2 mt-3">
+                    <button type="submit" class="btn btn-primary mt-2">Cari</button>
+                </div>
+            </div>
+            </form>
+        
+    </div>
+</div>    
+<div class="row">
+    {% for d in data %}
+    <div class="col-12 col-lg-3 mt-3">
+        {% if d.pdffound %}
+        <div class="card">
+            <div class="row no-gutters">
+                <div class="col-sm-6 mt-3">
+                    <div class="ps-3">
+                    <a href="{% static d.coverfilepath %}" target="_new"><img class="card-img border" src="{% static d.coverfilepath %}" alt=""></a>
+                </div>
+                </div>
+                <div class="col-sm-6 mt-3 text-center">
+                        <p><small>No. Berkas: {{d.bundle_number}}<br>No. Urut: {{d.doc_number}}<br>Tahun: {{d.bundle_year}}<br>Ukuran: {{d.filesize}} kb<br>Jml Hlmn: {{d.pagecount}}<br>
+                        </small> </p>
+                </div>
+                <div class="col-sm-12">
+                    <div class="px-3 py-2">
+                        <h5 class="card-title">{{d.doc_description}}</h5>
+                        <p class="card-text font-italic"><small>{{d.bundle_title}}</small></p>
+                    </div>
+                </div>
+                <div class="col-sm-12 mt-2 px-4">
+                    <a href="{% url 'arsip_inaktif_pdfdownload' d.doc_uuid_id %}" target="_new" class="btn btn-info btn-block mb-2 w-100">Download</a>
+                </div>
+
+            </div>
+        </div>
+        {% else %}
+
+        {% if d.pdftmpfound %}
+        <div class="card bg-light">
+       {% else %}
+       <div class="card bg-white">
+       {% endif %}  
+            <div class="row no-gutters">
+                <div class="col-sm-5 mt-3">
+                    <div class="card-body">
+                    {% if d.pdffound %}
+                        <a href="{% static d.coverfilepath %}" target="_new"><img class="card-img border" src="{% static d.coverfilepath %}" alt=""></a>
+                    {% endif %}
+                </div>
+                </div>
+                <div class="col-sm-7 mt-3 text-center">
+                        <p><strong><small>Kode: {{d.bundle_code}}<br>No. Box: {{d.box_number}}<br>No. Berkas: {{d.bundle_number}}<br>No. Urut: {{d.doc_number}}</strong><br>Tahun: {{d.bundle_year}}<br>Ukuran: {{d.filesize}} kb<br>Jml Hlmn: {{d.pagecount}}<br>
+                        </small> </p>
+                </div>
+                <div class="col-sm-12">
+                    <div class="card-body">
+                        <a href="{% url 'arsip_inaktif_pdfupload' d.doc_uuid_id %}"><h5 class="card-title">{{d.doc_description}}</h5></a>
+                        <p class="card-text font-italic"><small>{{d.bundle_title}}</small></p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+</div>
+
+{% endblock %}
+{% block javascripts %}
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+
+{% endblock %}

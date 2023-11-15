@@ -1,0 +1,93 @@
+
+{% load static %}
+<div class="sidebar sidebar-dark sidebar-fixed" id="sidebar">
+  <div class="sidebar-brand d-none d-md-flex">
+    <a class="sidebar-brand-full" href=""><img src="{% static 'logo/bws.jpg' %}" alt="BWS Maluku Utara" width="50px" height="45px"></a>
+    <img class="sidebar-brand-narrow" src="{% static 'logo/bws.jpg' %}" alt="BWS Maluku Utara" width="50" height="46">
+  </div>
+  <ul class="sidebar-nav" data-coreui="navigation" data-simplebar="">
+      <li class="nav-title">Arsip Dinamis</li>
+        <li class="nav-group"><a class="nav-link nav-group-toggle" href="#">
+            <svg class="nav-icon">
+              <use xlink:href="{% static 'assets/vendors/coreui/icons/svg/free.svg' %}#cil-puzzle"></use>
+            </svg> Arsip Inaktif</a>
+          <ul class="nav-group-items">
+            <li class="nav-item"><a class="nav-link" href="{% url 'arsip_inaktif_statistics' %}"><span class="nav-icon"></span> Berkas Per Klasifikasi</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'arsip_inaktif_statistics_year' %}"><span class="nav-icon"></span> Berkas Per Tahun</a></li>
+
+            {% comment %} <li class="nav-item"><a class="nav-link" href="{% url 'alihmedia_inactive_deletepdf' %}"><span class="nav-icon"></span> Hapus Berkas PDF</a></li> {% endcomment %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'arsip_inaktif_searchdoc' %}"><span class="nav-icon"></span> Cari Dokumen</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'arsip_inaktif_searchqrcode' %}"><span class="nav-icon"></span> Scan Dokumen QR Code</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'arsip_inaktif_export' %}"><span class="nav-icon"></span> Export per Klasifikasi</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'arsip_inaktif_statistic_scan' %}"><span class="nav-icon"></span> Statistik Scan Per Bulan</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'arsip_inaktif_digitalisasi' %}"><span class="nav-icon"></span> Daftar Alih Digital</a></li>
+          </ul>
+        </li>
+        <li class="nav-group"><a class="nav-link nav-group-toggle" href="#">
+          <svg class="nav-icon">
+            <use xlink:href="{% static 'assets/vendors/coreui/icons/svg/free.svg' %}#cil-cursor"></use>
+          </svg> Arsip Aktif</a>
+          <ul class="nav-group-items">
+            {% comment %} <li class="nav-item"><a class="nav-link" href="{% url 'alihmedia_vital_index' %}"><span class="nav-icon"></span> Daftar Berkas</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'alihmedia_vital_searchdoc' %}"><span class="nav-icon"></span> Cari Dokumen</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'alihmedia_vital_export' %}"><span class="nav-icon"></span> Export ke Excel</a></li> {% endcomment %}
+          </ul>
+        </li>
+
+        <li class="nav-group"><a class="nav-link nav-group-toggle" href="#">
+          <svg class="nav-icon">
+            <use xlink:href="{% static 'assets/vendors/coreui/icons/svg/free.svg' %}#cil-cursor"></use>
+          </svg> Arsip Vital</a>
+          <ul class="nav-group-items">
+            <li class="nav-item"><a class="nav-link" href="{% url 'alihmedia_vital_index' %}"><span class="nav-icon"></span> Daftar Berkas</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'alihmedia_vital_searchdoc' %}"><span class="nav-icon"></span> Cari Dokumen</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'alihmedia_vital_export' %}"><span class="nav-icon"></span> Export ke Excel</a></li>
+          </ul>
+        </li>
+        <li class="nav-title">Arsip Manager</li>
+        <li class="nav-group"><a class="nav-link nav-group-toggle" href="#">
+          <svg class="nav-icon">
+            <use xlink:href="{% static 'assets/vendors/coreui/icons/svg/free.svg' %}#cil-cursor"></use>
+          </svg> SATKER PJPA</a>
+          <ul class="nav-group-items">
+            <li class="nav-item"><a class="nav-link" href="{% url 'fm_pjpa_add_department' %}"><span class="nav-icon"></span> Tambah PPK</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'fm_pjpa_department_list' %}"><span class="nav-icon"></span> Daftar PPK</a></li>
+
+          </ul>
+        </li>
+        <li class="nav-group"><a class="nav-link nav-group-toggle" href="#">
+          <svg class="nav-icon">
+            <use xlink:href="{% static 'assets/vendors/coreui/icons/svg/free.svg' %}#cil-cursor"></use>
+          </svg> SATKER PJSA</a>
+          <ul class="nav-group-items">
+            <li class="nav-item"><a class="nav-link" href="{% url 'fm_pjsa_add_department' %}"><span class="nav-icon"></span> Tambah PPK</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'fm_pjsa_department_list' %}"><span class="nav-icon"></span> Daftar PPK</a></li>
+
+          </ul>
+        </li>
+        <li class="nav-group"><a class="nav-link nav-group-toggle" href="#">
+          <svg class="nav-icon">
+            <use xlink:href="{% static 'assets/vendors/coreui/icons/svg/free.svg' %}#cil-cursor"></use>
+          </svg> SATKER OPSDA</a>
+          <ul class="nav-group-items">
+            <li class="nav-item"><a class="nav-link" href="{% url 'fm_opsda_add_department' %}"><span class="nav-icon"></span> Tambah PPK</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'fm_opsda_department_list' %}"><span class="nav-icon"></span> Daftar PPK</a></li>
+
+          </ul>
+        </li>
+
+        <li class="nav-group"><a class="nav-link nav-group-toggle" href="#">
+          <svg class="nav-icon">
+            <use xlink:href="{% static 'assets/vendors/coreui/icons/svg/free.svg' %}#cil-cursor"></use>
+          </svg> SATKER BALAI</a>
+          <ul class="nav-group-items">
+            <li class="nav-item"><a class="nav-link" href="{% url 'fm_balai_add_department' %}"><span class="nav-icon"></span> Tambah PPK</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'fm_balai_department_list' %}"><span class="nav-icon"></span> Daftar PPK</a></li>
+
+          </ul>
+        </li>
+
+      </ul>
+  <button class="sidebar-toggler" type="button" data-coreui-toggle="unfoldable" title="Title"></button>
+</div>
+<!--tes-->

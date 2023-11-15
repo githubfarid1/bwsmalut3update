@@ -1,0 +1,29 @@
+{% extends "layouts/base.html" %} {% load static %}
+{% block title %} | Data Vital {% endblock %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="container-fluid px-4">
+  <h3 class="text-center">Update Data Vital</h3>
+  <form action="" method="POST">
+    <div class="row border">  
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="col-md-6 p-2">{{field|as_crispy_field}}</div>
+        {%endfor%}
+        {% comment %} {{form|crispy}} {% endcomment %}
+        <input type="hidden" name="next" value="{{ request.GET.next }}">
+        <div class="col-md-12">
+            <ul class="list-inline text-right">
+                <li class="list-inline-item">
+                    <button type="submit" class="btn btn-primary mt-2">Submit</button>
+                </li>
+            </ul>
+        </div>        
+    </div>  
+  </form>
+     
+  </div>
+
+{% endblock %}

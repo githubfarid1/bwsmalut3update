@@ -1,0 +1,56 @@
+{% extends "layouts/base.html" %} {% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %} | DAFTAR PPK {% endblock %}
+{% block stylesheets %}
+    <link href="{% static 'assets/vendors/coreui/icons/css/free.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <style>
+      div.hoverbackground:hover{
+        opacity: 0.7;
+        background-color: #FF9800!important;
+      }
+    
+      {% comment %} body {
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+        color: #5a5a5a;
+      } {% endcomment %}
+    
+    </style>
+    <link rel="stylesheet" href=
+    "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" />
+    
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="container-fluid">
+  <h4 class="text-left">SATKER BALAI</h4>
+  {% if data %}
+
+  <div class="row">
+    <p></p>
+    <h4>Daftar PPK</h4>
+    {% for d in data %}
+    <div class="col-12 col-lg-3 mt-3">
+      <div class="card border-primary mb-3">
+        <div class="row no-gutters px-3 py-2">
+          <div class="col-sm-6 mt-3 text-center">
+            <a href="{% url 'fm_balai_department' d.slug %}"><img class="card-img border" src="{% static 'assets/filetypes/satker.png' %}" alt=""></a>
+          </div>
+
+          <div class="col-sm-6 mt-3 text-center">
+            <p><small>Waktu Buat: {{ d.create_date }}</small></p>
+          </div>
+          <div class="col-sm-12 mt-3 text-center">
+              <h5>{{ d.name }}</h5>
+            </div>
+
+
+        </div>
+    </div>
+  </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock content %}

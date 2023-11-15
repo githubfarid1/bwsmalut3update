@@ -1,0 +1,30 @@
+{% extends 'base.html' %}{% load static %} {% block content %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}" />
+<div class="row">
+{% for d in data %}
+<div class="col-12 col-lg-3 mt-3">
+    
+<div class="card border-info">
+    <div class="card-header text-info"><small>{{ d.filesize }} kb / {{ d.page_count }} pages</small>
+      <div style="float: right;"><a href="" class="btn btn-success btn-sm">
+        <i class="bi-download"></i>
+      </a>
+      <a href="{% static d.coverfilepath %}" target="_new" class="btn btn-info btn-sm">
+        <i class="bi-credit-card-2-front"></i>
+      </a>            
+    </div>
+    </div>
+    <div class="card-body">
+          <cite title="Source Title">
+            <small>{{ d.description }}</small>
+          </cite><br>
+          <cite title="Source Title">
+            <small>{{ d.bundle.title }}</small>
+          </cite>
+    
+    </div>
+  </div>
+</div>
+  {% endfor %}
+</div>
+{% endblock %}
