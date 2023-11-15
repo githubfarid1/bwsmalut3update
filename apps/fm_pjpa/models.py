@@ -35,19 +35,3 @@ class Subfolder(models.Model):
     def __str__(self) -> str:
         return self.name
 
-class File(models.Model):
-    id = models.AutoField(primary_key=True)
-    uuid_id = models.UUIDField(default=uuid.uuid4, editable=False)
-    filename = models.CharField(max_length=255)
-    slug = models.SlugField(unique=True, max_length=100)
-    tags = TaggableManager(related_name="pjpa_taggit")
-    description = models.TextField(null=True, blank=True)
-    upload_date = models.DateTimeField(null=True, blank=True)
-    subfolder = models.ForeignKey(
-        Subfolder,
-        db_column='subfolder_id',
-        on_delete=models.CASCADE, 
-        # related_name='pjpa_files'
-    )        
-    def __str__(self):
-        return self.filename
