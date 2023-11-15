@@ -119,7 +119,7 @@ def checkfolder(path):
     for file in contents:
         if os.path.isdir(os.path.join(path, file)):
             condirs = os.listdir(os.path.join(path, file))
-            if len(contents) != 0:
+            if len(condirs) != 0:
                 return True
     return False
 
