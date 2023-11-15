@@ -20,7 +20,7 @@
 {% block content %}
 <div class="container-fluid">
    <p class="text-left text-primary"><a class="btn btn-warning mb-2" href="{% url deplisturl %}">SATKER {{ satkername }}</a> &#62;&#62; <a class="btn btn-warning mb-2" href={% url depurl depslug %}> {{ depname }}</a> &#62;&#62; 
-    {% if len(breadcrumbs) == 1 %}
+    {% if breadcrumbs|length == 1 %}
     {{ year }}    
     {% else %}
     <a class="btn btn-warning mb-2" href={% url showfolderurl slug year %}?folder=>{{ year }}</a>
