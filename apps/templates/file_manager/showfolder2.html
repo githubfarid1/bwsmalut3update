@@ -1,0 +1,77 @@
+{% extends "layouts/base.html" %} {% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %} | Daftar Folder {% endblock %}
+{% block stylesheets %}
+    <link href="{% static 'assets/vendors/coreui/icons/css/free.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <style>
+      div.hoverbackground:hover{
+        opacity: 0.7;
+        background-color: #FF9800!important;
+      }
+    
+    </style>
+    <link rel="stylesheet" href=
+    "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" />
+    
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="container-fluid">
+   <p class="text-left text-primary"><a class="btn btn-warning mb-2" href="{% url deplisturl %}">SATKER {{ satkername }}</a> &#62;&#62; <a class="btn btn-warning mb-2" href={% url depurl depslug %}> {{ depname }}</a> &#62;&#62; <a class="btn btn-warning mb-2" href={% url showfolderurl slug year %}?folder=>{{ year }}</a>
+   {% for bread in breadcrumbs %}
+    {% if bread.link != '' %}
+    &#62;&#62; <a class="btn btn-warning mb-2" href="{% url showfolderurl slug year %}?folder={{bread.link}}"> {{ bread.label }}</a>
+    {% else %}
+    &#62;&#62; {{ bread.label }}    
+    {% endif %}
+   {% endfor %}
+   </p>
+  <div class="container">
+  </div>
+
+  {% if data %}
+    
+  <div class="row">
+    <p></p>
+       {% for d in data %}
+       {% if d.type == 'folder' %}
+        <div class="col-3 col-lg-3 mt-3">
+            <div class="card border-primary mb-3">
+                <div class="row no-gutters px-3 py-2">
+                    <div class="col-sm-6 mt-3 text-center">
+                        <a href="{% url showfolderurl slug year %}?folder={{d.link}}"><img class="card-img border" src="{% static 'assets/filetypes/folder.png' %}" alt=""></a>
+                    </div>
+                    <div class="col-sm-6 mt-3 text-center">
+                        <small>{{ d.mtime }}</small>
+                    </div>
+                    <div class="col-sm-12 mt-3 text-center">
+                        <p><small>{{ d.name }}</small></p>
+                    </div>
+                </div>
+        </div>
+        </div>
+        {% else %}
+        <div class="col-3 col-lg-3 mt-3">
+            <div class="card border-primary mb-3">
+                <div class="row no-gutters px-3 py-2">
+                    <div class="col-sm-6 mt-3 text-center">
+                        <a href="{% url downloadurl slug year %}?folder={{ folder }}&filename={{ d.name }}" download="{% url downloadurl slug year %}?folder={{ folder }}&filename={{ d.name }}" target="_new"><img class="card-img border" src="{% static d.icon_location %}" alt=""></a>
+                    </div>
+                    <div class="col-sm-6 mt-3 text-center">
+                        <small><em>{{d.filesize}} <br/>{{ d.mtime }}</em></small>
+                    </div>
+                    <div class="col-sm-12 mt-3 text-center">
+                        <p><small>{{ d.name}}</small></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% endif %}
+      {% endfor %}
+  </div>
+  {% endif %}
+ 
+{% endblock content %}

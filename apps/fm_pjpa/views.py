@@ -313,7 +313,7 @@ def showfolder(request, slug, year):
         'downloadurl': 'fm_pjpa_download',
         'depyearurl': 'fm_pjpa_department_year',
     }
-    return render(request=request, template_name='file_manager/showfolder.html', context=context)
+    return render(request=request, template_name='file_manager/showfolder2.html', context=context)
 
 @csrf_exempt
 def download(request, slug, year):
