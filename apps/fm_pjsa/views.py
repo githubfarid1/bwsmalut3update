@@ -107,6 +107,8 @@ def department_year(request, slug, year):
         'satkername': 'PJSA',
         'depurl': 'fm_pjsa_department',
         'deplisturl': 'fm_pjsa_department_list',
+        'showfolderurl': 'fm_pjsa_showfolder',
+
 
     }
     return render(request=request, template_name='file_manager/department_year.html', context=context)

@@ -107,6 +107,7 @@ def department_year(request, slug, year):
         'satkername': 'OPSDA',
         'depurl': 'fm_opsda_department',
         'deplisturl': 'fm_opsda_department_list',
+        'showfolderurl': 'fm_opsda_showfolder',
 
     }
     return render(request=request, template_name='file_manager/department_year.html', context=context)

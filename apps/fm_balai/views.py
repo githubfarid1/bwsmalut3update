@@ -107,6 +107,7 @@ def department_year(request, slug, year):
         'satkername': 'BALAI',
         'depurl': 'fm_balai_department',
         'deplisturl': 'fm_balai_department_list',
+        'showfolderurl': 'fm_balai_showfolder',
 
     }
     return render(request=request, template_name='file_manager/department_year.html', context=context)
