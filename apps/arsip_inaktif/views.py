@@ -363,8 +363,8 @@ def pdfdownload(request, uuid_id):
         doc.save("tmp.pdf")            
             
         filename = f"{__package__.split('.')[1]}_{folder}_{box_number}_{doc_number}.pdf"
-        with open("tmp.pdf", 'rb') as pdf:
         # with open(path, 'rb') as pdf:
+        with open("tmp.pdf", 'rb') as pdf:
             response = HttpResponse(pdf.read(), content_type='application/pdf')
             response['Content-Disposition'] = f'inline;filename={filename}'
             return response
