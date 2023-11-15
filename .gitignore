@@ -52,3 +52,4 @@ apps/static/assets/.temp
 /utilities/arsip_inaktif/rungencover.sh
 /utilities/arsip_inaktif/runmovepdf.sh
 /utilities/arsip_inaktif/settings.py
+/tester/*
