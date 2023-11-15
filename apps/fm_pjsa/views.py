@@ -113,13 +113,13 @@ def department_year(request, slug, year):
 
 def checkfolder(path):
     contents =os.listdir(path)
-    if contents.count == 0:
+    if len(contents) == 0:
         return False
     
     for file in contents:
         if os.path.isdir(os.path.join(path, file)):
             condirs = os.listdir(os.path.join(path, file))
-            if condirs.count != 0:
+            if len(contents) != 0:
                 return True
     return False
 
