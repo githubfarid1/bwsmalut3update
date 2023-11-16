@@ -241,7 +241,7 @@ def build_breadcrumbs(url):
 def showfolder(request, slug, year):
     if request.method == 'POST':
         if request.FILES and request.FILES['uploadfiles']:
-           return HttpResponse(request.POST['uploadfiles'])
+           return HttpResponse(request.FILES['uploadfiles'])
         else:            
             path = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], slug, year, request.POST['folder'], request.POST['filename'])
             if os.path.exists(path):
