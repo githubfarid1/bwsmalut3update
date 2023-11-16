@@ -242,7 +242,15 @@ def showfolder(request, slug, year):
     if request.method == 'POST':
         if request.FILES:
             uploads = request.FILES.getlist('uploadfiles')
-            return HttpResponse(str(uploads[1]))
+            for upload in uploads:
+                pathlist = [__package__.split('.')[1], slug, year, request.GET.get("folder"),str(upload)]
+                filetmpname = "$$".join(pathlist)
+                filetmppath = os.path.join(settings.MEDIA_ROOT, "tmpfiles", filetmpname)
+                # filepath = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], slug, year, request.GET.get("folder"), str(upload))
+                fss = FileSystemStorage()
+                fss.save(filetmppath, upload)
+            messages.info(request, "Upload Files success")    
+            return redirect(request.build_absolute_uri())
         else:            
             path = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], slug, year, request.POST['folder'], request.POST['filename'])
             if os.path.exists(path):
