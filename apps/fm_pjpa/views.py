@@ -240,7 +240,11 @@ def build_breadcrumbs(url):
 
 def showfolder(request, slug, year):
     if request.method == 'POST':
-        return HttpResponse(request.POST['filename'])
+        path = os.path.join(request.POST['folder'], request.POST['filename'])
+        if os.path.exists(path):
+            os.remove(path)
+        return redirect(request.build_absolute_uri())
+    
     folder = request.GET.get("folder")
     folderlist = str(folder).split("/")
     curfolder = folderlist[0]
