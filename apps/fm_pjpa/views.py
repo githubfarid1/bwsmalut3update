@@ -248,7 +248,9 @@ def showfolder(request, slug, year):
             else:
                 messages.info(request, "Hapus file gagal")    
             return redirect(request.build_absolute_uri())
-    
+        if request.POST['uploadfiles']:
+           return HttpResponse(request.POST['uploadfiles'])
+                    
     folder = request.GET.get("folder")
     folderlist = str(folder).split("/")
     curfolder = folderlist[0]
