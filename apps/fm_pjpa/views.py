@@ -243,7 +243,7 @@ def showfolder(request, slug, year):
         if request.FILES:
             uploads = request.FILES.getlist('uploadfiles')
             for upload in uploads:
-                pathlist = [__package__.split('.')[1], slug, year, request.GET.get("folder").replace("/", '$$') ,str(upload)]
+                pathlist = [__package__.split('.')[1], slug, year, str(request.GET.get("folder")).replace("/", '$$') ,str(upload)]
                 filetmpname = "$$".join(pathlist)
                 filetmppath = os.path.join(settings.MEDIA_ROOT, "tmpfiles", filetmpname)
                 # filepath = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], slug, year, request.GET.get("folder"), str(upload))
