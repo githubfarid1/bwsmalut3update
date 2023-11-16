@@ -67,8 +67,11 @@
                                 <i class="bi bi-cloud-download"></i>
                               </button></a>
                         </div>
-                        <div class="col-sm-4">   
-                                <button type="button" class="btn btn-danger" onclick="return confirm('Hapus file File?')"><i class="bi bi-trash"></i></button>
+                        <div class="col-sm-4">
+                            <a href="{% url downloadurl slug year %}?folder={{ folder }}&filename={{ d.name }}" download="{% url downloadurl slug year %}?folder={{ folder }}&filename={{ d.name }}" target="_new">
+                            <button type="button" class="btn btn-success">
+                                <i class="bi bi-cloud-download"></i>
+                              </button></a>
                         </div>
         
                     </div>
