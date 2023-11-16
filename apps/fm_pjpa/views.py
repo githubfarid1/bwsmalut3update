@@ -242,7 +242,7 @@ def showfolder(request, slug, year):
     if request.method == 'POST':
         if request.FILES and request.FILES['uploadfiles']:
             upload = request.FILES['uploadfiles']
-            return HttpResponse(str(upload))
+            return HttpResponse(upload)
         else:            
             path = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], slug, year, request.POST['folder'], request.POST['filename'])
             if os.path.exists(path):
