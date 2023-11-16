@@ -240,13 +240,14 @@ def build_breadcrumbs(url):
 
 def showfolder(request, slug, year):
     if request.method == 'POST':
-        path = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], slug, year, request.POST['folder'], request.POST['filename'])
-        if os.path.exists(path):
-            os.remove(path)
-            messages.info(request, "Hapus file Berhasil")
-        else:
-            messages.info(request, "Hapus file gagal")    
-        return redirect(request.build_absolute_uri())
+        if request.POST['filename']:
+            path = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], slug, year, request.POST['folder'], request.POST['filename'])
+            if os.path.exists(path):
+                os.remove(path)
+                messages.info(request, "Hapus file Berhasil")
+            else:
+                messages.info(request, "Hapus file gagal")    
+            return redirect(request.build_absolute_uri())
     
     folder = request.GET.get("folder")
     folderlist = str(folder).split("/")
