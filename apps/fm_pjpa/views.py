@@ -239,6 +239,8 @@ def build_breadcrumbs(url):
     return result
 
 def showfolder(request, slug, year):
+    if request.method == 'DELETE':
+        return HttpResponse(request.DELETE['filename'])
     folder = request.GET.get("folder")
     folderlist = str(folder).split("/")
     curfolder = folderlist[0]
