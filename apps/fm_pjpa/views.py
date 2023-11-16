@@ -86,32 +86,6 @@ def department_list(request):
 
     return render(request=request, template_name='file_manager/department_list.html', context=context)
         
-@csrf_exempt
-def department_year(request, slug, year):
-    if not request.user.is_authenticated:
-        return redirect('login')
-    if not check_permission(request, slug):
-        return render(request=request, template_name='file_manager/page_404.html', context={'message':'Otorisasi Ditolak'})
-    dep = Department.objects.get(slug=slug)
-    depfolder = dep.folder
-    data = []
-    path = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], depfolder, str(year))
-    contents = os.listdir(path)    
-    for file in contents:
-        if os.path.isdir(os.path.join(path, file)):
-            data.append(file)
-    context = {
-        'data': data,
-        'depname':dep.name,
-        'slug': slug,
-        'year': year,
-        'satkername': 'PJPA',
-        'depurl': 'fm_pjpa_department',
-        'deplisturl': 'fm_pjpa_department_list',
-        'showfolderurl': 'fm_pjpa_showfolder',
-
-    }
-    return render(request=request, template_name='file_manager/department_year.html', context=context)
 
 def checkfolder(path):
     contents =os.listdir(path)
