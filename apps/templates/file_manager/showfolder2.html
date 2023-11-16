@@ -68,11 +68,7 @@
                               </button></a>
                         </div>
                         <div class="col-sm-4">   
-                            <form action="" method="post">
-                                {% csrf_token %}
-                                <input type="hidden" name="uuid_id" value="{{ d.uuid_id }}">
                                 <button type="submit" class="btn btn-danger" onclick="return confirm('Hapus file File?')"><i class="bi bi-trash"></i></button>
-                            </form>
                         </div>
         
                     </div>
