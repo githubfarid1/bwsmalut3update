@@ -62,19 +62,19 @@
                 <div class="row no-gutters px-3 py-2">
                     <div class="col-sm-12">
                         <div class="row">
-                        <div class="col-sm-4">
-                            <a href="{% url downloadurl slug year %}?folder={{ folder }}&filename={{ d.name }}" download="{% url downloadurl slug year %}?folder={{ folder }}&filename={{ d.name }}" target="_new">
-                            <button type="button" class="btn btn-success">
-                                <i class="bi bi-cloud-download"></i>
-                              </button></a>
-                        </div>
-                        <div class="col-sm-4">   
-                            <form action="" method="post">
-                                {% csrf_token %}
-                                <input type="hidden" name="uuid_id" value="{{ d.uuid_id }}">
-                                <button type="submit" class="btn btn-danger" onclick="return confirm('Hapus file File?')"><i class="bi bi-trash"></i></button>
-                            </form>
-                        </div>
+                            <div class="col-sm-4">
+                                <a href="{% url downloadurl slug year %}?folder={{ folder }}&filename={{ d.name }}" download="{% url downloadurl slug year %}?folder={{ folder }}&filename={{ d.name }}" target="_new">
+                                <button type="button" class="btn btn-success">
+                                    <i class="bi bi-cloud-download"></i>
+                                </button></a>
+                            </div>
+                            <div class="col-sm-4">   
+                                <form action="" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="uuid_id" value="{{ d.uuid_id }}">
+                                    <button type="submit" class="btn btn-danger" onclick="return confirm('Hapus file File?')"><i class="bi bi-trash"></i></button>
+                                </form>
+                            </div>
                         </div>
                     </div>
 
