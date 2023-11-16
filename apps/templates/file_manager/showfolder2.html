@@ -32,10 +32,8 @@
     {% endif %}
    {% endfor %}
     </p>
-    <div class="row">
-        <div class="col-lg-6">
-        </div>
-        <div class="col-lg-6">
+    <div class="d-flex flex-row-reverse bd-highlight">
+        <div class="p-2 bd-highlight">
             <form action="" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                 <input type="file" id="uploadfiles" name="uploadfiles" multiple>
