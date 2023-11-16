@@ -18,7 +18,7 @@
 
 {% block content %}
 <div class="container-fluid">
-   <p class="text-left text-primary"><a class="btn btn-warning mb-2" href="{% url deplisturl %}">SATKER {{ satkername }}</a> &#62;&#62; <a class="btn btn-warning mb-2" href={% url depurl depslug %}> {{ depname }}</a> &#62;&#62;
+    <p class="text-left text-primary"><a class="btn btn-warning mb-2" href="{% url deplisturl %}">SATKER {{ satkername }}</a> &#62;&#62; <a class="btn btn-warning mb-2" href={% url depurl depslug %}> {{ depname }}</a> &#62;&#62;
     {% if breadcrumbs.0.label == '' %}
     {{ year }}    
     {% else %}
@@ -31,14 +31,13 @@
     &#62;&#62; {{ bread.label }}    
     {% endif %}
    {% endfor %}
-   </p>
+    </p>
     <form action="" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <input type="file" id="uploadfiles" name="uploadfiles" multiple>
         <button type="submit" class="btn btn-primary">Upload</button>
     </form>
 
-</div>
 
   {% if data %}
     
