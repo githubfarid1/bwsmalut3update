@@ -80,7 +80,7 @@
                     </div>
 
                     <div class="col-sm-6 mt-3 text-center">
-                        <a href="{% url downloadurl slug year %}?folder={{ folder }}&filename={{ d.name }}" download="{% url downloadurl slug year %}?folder={{ folder }}&filename={{ d.name }}" target="_new"><img class="card-img border" src="{% static d.icon_location %}" alt=""></a>
+                        <img class="card-img border" src="{% static d.icon_location %}" alt="">
                     </div>
                     <div class="col-sm-6 mt-3 text-center">
                         <small><em>{{d.filesize}} <br/>{{ d.mtime }}</em></small>
