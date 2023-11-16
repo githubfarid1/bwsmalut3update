@@ -69,10 +69,10 @@
                                 </button></a>
                             </div>
                             <div class="col-sm-3">   
-                                <form action="" method="POST">
+                                <form action="" method="DELETE">
                                     {% csrf_token %}
-                                    <input type="hidden" name="filename" value="{{ filename }}">
-                                    <input type="hidden" name="folder" value="{{ folder }}">
+                                    <input type="hidden" name="filename" value="{{ d.filename }}">
+                                    <input type="hidden" name="folder" value="{{ d.folder }}">
                                     <button type="submit" class="btn btn-danger" onclick="return confirm('Hapus file File?')"><i class="bi bi-trash"></i></button>
                                 </form>
                             </div>
