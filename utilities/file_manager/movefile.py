@@ -30,8 +30,8 @@ for file in list(tmpfms.iterdir()):
     if not found:
         continue
 
-    filepath = str(file).replace("$$", "/")
-    filepath = filepath.replace(TMPFM_LOCATION + "/", "")
+    filepath = str(file).replace("$$", os.path.sep)
+    filepath = filepath.replace(TMPFM_LOCATION + os.path.sep, "")
     if exists(os.path.join(FM_LOCATION, filepath)):
         os.remove(os.path.join(FM_LOCATION, filepath))
     print("File", filename, "Dipindah Ke: " + os.path.join(FM_LOCATION, filepath))
