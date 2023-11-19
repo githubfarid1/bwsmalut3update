@@ -3,7 +3,7 @@ from django.http import HttpResponse, Http404
 from .models import Department
 import sys
 from django.template.defaultfilters import slugify
-from .forms import DepartmentForm
+from .forms import DepartmentForm, AddFolderForm
 import os, shutil
 from django.conf import settings
 from os.path import exists
@@ -17,6 +17,7 @@ from datetime import date, datetime
 import mimetypes
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
+import json
 
 # tes commit
 @csrf_exempt
@@ -61,7 +62,7 @@ def department(request, slug):
         'depurl': 'fm_pjpa_department',
         'deplisturl': 'fm_pjpa_department_list',
         'depyearurl': 'fm_pjpa_department_year',
-        'showfolderurl': 'fm_pjpa_showfolder',
+        'showfolderurl': 'fm_pjpa_show_folder',
     }
     return render(request=request, template_name='file_manager/department2.html', context=context)
 
@@ -223,22 +224,23 @@ def page_404(request):
     return render(request, 'file_manager/page_404.html', {})
 
 def build_breadcrumbs(url):
-    folderlist = str(url).split("/")
+    folderlist = str(url).split(os.path.sep )
     result = []
-    maxcount = len(folderlist)
     for idx, folder in enumerate(folderlist):
         tmpl = []
         for i in range(0, idx+1):
             tmpl.append(folderlist[i])
         mdict = {
             'label': folder,
-            'link': '/'.join(tmpl),
+            'link': os.path.sep.join(tmpl),
         }
         result.append(mdict)
     result[-1]['link'] = ''
     return result
 
 def showfolder(request, slug, year):
+    if not request.user.is_authenticated:
+        return redirect('login')
     if request.method == 'POST':
         if request.FILES:
             uploads = request.FILES.getlist('uploadfiles')
@@ -326,3 +328,133 @@ def download(request, slug, year):
             response['Content-Disposition'] = f'inline;filename={filename}'
             return response
     raise Http404
+
+def folder_list(request):
+    slug = request.GET.get("slug")
+    year = request.GET.get("year")
+    folder = request.GET.get("folder")
+    
+    folderlist = str(folder).split("/")
+    folderlist.pop(0)
+    path = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], slug, year, folder)
+    contents =os.listdir(path)
+    data = []
+    for file in contents:
+        if os.path.isfile(os.path.join(path, file)):
+            filemime, filesize, filetype, mime_type, mtime = get_fileinfo(os.path.join(path, file))
+            icon_location = os.path.join('assets/filetypes', filemime)
+            data.append({
+                'name': file,
+                'type': 'file',
+                'icon_location': icon_location,
+                'filesize': filesize,
+                'filetype': filetype,
+                'mimetype': mime_type,
+                'folder': folder,
+                'mtime': datetime.fromtimestamp(mtime),
+                
+            })
+        else:
+            mtime = os.path.getmtime(os.path.join(path, file))
+            data.append({
+                'name': file,
+                'type': 'folder',
+                'link': os.path.join(folder, file),
+                'mtime': datetime.fromtimestamp(mtime),
+                
+            })
+    
+    dep = Department.objects.get(slug=slug)        
+    context = {
+        'data': data,
+        'folder': folder,
+        'showfolderurl': 'fm_pjpa_show_folder',
+        'downloadurl': 'fm_pjpa_download',
+        'slug': slug,
+        'year': year
+}
+    # return HttpResponse(context)
+    return render(request=request, template_name='file_manager/folder_list.html', context=context)
+
+
+def show_folder(request, slug, year):
+    folder = request.GET.get("folder")
+    dep = Department.objects.get(slug=slug)
+    context = {
+        'slug': slug,
+        'year': year,
+        'depname':dep.name,
+        'depslug': slug,
+        'breadcrumbs': build_breadcrumbs(folder),
+        'folder': folder,
+        'satkername': 'PJPA',
+        'depurl': 'fm_pjpa_department',
+        'deplisturl': 'fm_pjpa_department_list',
+        'folderlisturl': 'fm_pjpa_folder_list',
+        'downloadurl': 'fm_pjpa_download',
+        'depyearurl': 'fm_pjpa_department_year',
+        'showfolderurl': 'fm_pjpa_show_folder',
+    }
+    return render(request=request, template_name='file_manager/show_folder.html', context=context)
+
+def add_folder(request):
+    if request.method == "POST":
+        foldername = request.POST.get('foldername')
+        slug = request.POST.get("slug")
+        year = str(request.POST.get("year"))
+        folder = request.POST.get("folder")
+        newfolder = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], slug, year, folder, foldername)
+        if not exists(newfolder):
+            os.mkdir(newfolder)
+            message = f"penambahan folder {foldername} Sukses."
+        else:
+            message = f"penambahan folder {foldername} Gagal."
+                    
+        return HttpResponse(
+            status=204,
+            headers={
+                'HX-Trigger': json.dumps({
+                    "movieListChanged": None,
+                    "showMessage": message
+                })
+            })
+    else:
+        slug = request.GET.get("slug")
+        year = str(request.GET.get("year"))
+        folder = request.GET.get("folder")
+        form = AddFolderForm(initial={'year': year, 'slug': slug, 'folder': folder})
+    return render(request, 'file_manager/add_folder.html', {
+        'form': form,
+    })
+
+
+def upload_file(request):
+    if request.method == "POST":
+        if request.FILES:
+            slug = request.POST.get("slug")
+            year = str(request.POST.get("year"))
+            folder = request.POST.get("folder")
+            uploads = request.FILES.getlist('uploadfiles')
+            for upload in uploads:
+                pathlist = [__package__.split('.')[1], slug, year, str(folder).replace(os.path.sep, '$$') ,str(upload)]
+                filetmpname = "$$".join(pathlist)
+                filetmppath = os.path.join(settings.MEDIA_ROOT, "tmpfiles", filetmpname)
+                fss = FileSystemStorage()
+                fss.save(filetmppath, upload)
+            return HttpResponse(
+                status=204,
+                headers={
+                    'HX-Trigger': json.dumps({
+                        "movieListChanged": None,
+                        "showMessage": 'Upload File Sukses, tunggu beberapa saat kemudian refresh halaman'
+                    })
+                })
+    else:
+        slug = request.GET.get("slug")
+        year = str(request.GET.get("year"))
+        folder = request.GET.get("folder")
+    return render(request, 'file_manager/upload_file.html', {
+        'slug': slug,
+        'year': year,
+        'folder': folder
+    })
