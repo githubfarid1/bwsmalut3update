@@ -367,16 +367,16 @@ def add_folder(request):
 
 @csrf_exempt
 def upload_file(request):
-    return HttpResponse(
-        status=204,
-        headers={
-            'HX-Trigger': json.dumps({
-                "movieListChanged": None,
-                "showMessage": 'Upload File Sukses, tunggu beberapa saat kemudian refresh halaman'
-                
-            })
-        })
     if request.method == "POST":
+        return HttpResponse(
+            status=204,
+            headers={
+                'HX-Trigger': json.dumps({
+                    "movieListChanged": None,
+                    "showMessage": 'Upload File Sukses, tunggu beberapa saat kemudian refresh halaman'
+                    
+                })
+            })
         if request.FILES:
             slug = request.POST.get("slug")
             year = str(request.POST.get("year"))
