@@ -34,12 +34,12 @@
     </p>
     <div class="d-flex flex-row-reverse bd-highlight">
         <div class="p-2 bd-highlight">
-            <button hx-get="{% url 'fm_pjpa_add_folder' %}?slug={{ slug }}&year={{ year }}&folder={{ folder }}" hx-target="#dialog" class="btn btn-sm btn-primary">
+            <button hx-get="{% url addfolderurl %}?slug={{ slug }}&year={{ year }}&folder={{ folder }}" hx-target="#dialog" class="btn btn-sm btn-primary">
                 Folder Baru
             </button>
         </div>
         <div class="p-2 bd-highlight">
-            <button hx-get="{% url 'fm_pjpa_upload_file' %}?slug={{ slug }}&year={{ year }}&folder={{ folder }}" hx-target="#dialog" class="btn btn-sm btn-primary">
+            <button hx-get="{% url uploadfileurl %}?slug={{ slug }}&year={{ year }}&folder={{ folder }}" hx-target="#dialog" class="btn btn-sm btn-primary">
                 Upload File
             </button>
         </div>

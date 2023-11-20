@@ -257,7 +257,10 @@ def download(request, slug, year):
             return response
     raise Http404
 
+@csrf_exempt
 def folder_list(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
     slug = request.GET.get("slug")
     year = request.GET.get("year")
     folder = request.GET.get("folder")
@@ -299,13 +302,19 @@ def folder_list(request):
         'showfolderurl': 'fm_pjpa_show_folder',
         'downloadurl': 'fm_pjpa_download',
         'slug': slug,
-        'year': year
+        'year': year,
+        'zipfolderurl':'fm_pjpa_download_folder',
+        'renameurl': 'fm_pjpa_rename_file',
+        'removeurl': 'fm_pjpa_remove_file',
+        
 }
     # return HttpResponse(context)
     return render(request=request, template_name='file_manager/folder_list.html', context=context)
 
-
+@csrf_exempt
 def show_folder(request, slug, year):
+    if not request.user.is_authenticated:
+        return redirect('login')
     folder = request.GET.get("folder")
     dep = Department.objects.get(slug=slug)
     context = {
@@ -322,9 +331,12 @@ def show_folder(request, slug, year):
         'downloadurl': 'fm_pjpa_download',
         'depyearurl': 'fm_pjpa_department_year',
         'showfolderurl': 'fm_pjpa_show_folder',
+        'addfolderurl': 'fm_pjpa_add_folder',
+        'uploadfileurl': 'fm_pjpa_upload_file'
     }
     return render(request=request, template_name='file_manager/show_folder.html', context=context)
 
+@csrf_exempt
 def add_folder(request):
     if request.method == "POST":
         foldername = request.POST.get('foldername')
@@ -355,7 +367,7 @@ def add_folder(request):
         'form': form,
     })
 
-
+@csrf_exempt
 def upload_file(request):
     if request.method == "POST":
         if request.FILES:
@@ -387,6 +399,7 @@ def upload_file(request):
         'folder': folder
     })
 
+@csrf_exempt
 def remove_file(request):
     if request.method == "POST":
         filename = request.POST.get('filename')
@@ -431,6 +444,7 @@ def remove_file(request):
 def zipfolder(path):
     return shutil.make_archive((path, "zip", path))
         
+@csrf_exempt
 def download_folder(request):
     if request.method == "POST":
         filename = request.POST.get('filename')
@@ -462,6 +476,7 @@ def download_folder(request):
         'filename': filename,
     })
 
+@csrf_exempt
 def rename_file(request):
     if request.method == "POST":
         newname = request.POST.get('newname')

@@ -8,17 +8,17 @@
                     <div class="col-lg-12">
                         <div class="row">
                             <div class="col-lg-2">   
-                                <button hx-get="{% url 'fm_pjpa_download_folder' %}?slug={{ slug }}&year={{ year }}&folder={{ folder }}&filename={{ d.name }}" hx-target="#dialog" class="btn btn-warning">
+                                <button hx-get="{% url zipfolderurl %}?slug={{ slug }}&year={{ year }}&folder={{ folder }}&filename={{ d.name }}" hx-target="#dialog" class="btn btn-warning">
                                     <i class="bi bi-file-earmark-zip"></i>
                                 </button>
                             </div>
                             <div class="col-lg-2">   
-                                <button hx-get="{% url 'fm_pjpa_rename_file' %}?slug={{ slug }}&year={{ year }}&folder={{ folder }}&filename={{ d.name }}" hx-target="#dialog" class="btn btn-primary">
-                                    <i class="bi bi-blockquote-right"></i>
+                                <button hx-get="{% url renameurl %}?slug={{ slug }}&year={{ year }}&folder={{ folder }}&filename={{ d.name }}" hx-target="#dialog" class="btn btn-primary">
+                                    <i class="bi bi-bootstrap-reboot"></i>
                                 </button>
                             </div>
                             <div class="col-lg-2">   
-                                <button hx-get="{% url 'fm_pjpa_remove_file' %}?type=folder&slug={{ slug }}&year={{ year }}&folder={{ folder }}&filename={{ d.name }}" hx-target="#dialog" class="btn btn-danger">
+                                <button hx-get="{% url removeurl %}?type=folder&slug={{ slug }}&year={{ year }}&folder={{ folder }}&filename={{ d.name }}" hx-target="#dialog" class="btn btn-danger">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </div>
@@ -52,13 +52,13 @@
     
                             </div>
                             <div class="col-lg-2">   
-                                <button hx-get="{% url 'fm_pjpa_rename_file' %}?slug={{ slug }}&year={{ year }}&folder={{ folder }}&filename={{ d.name }}" hx-target="#dialog" class="btn btn-primary">
-                                    <i class="bi bi-blockquote-right"></i>
+                                <button hx-get="{% url renameurl %}?slug={{ slug }}&year={{ year }}&folder={{ folder }}&filename={{ d.name }}" hx-target="#dialog" class="btn btn-primary">
+                                    <i class="bi bi-bootstrap-reboot"></i>
                                 </button>
                             </div>
 
                             <div class="col-lg-2">   
-                                <button hx-get="{% url 'fm_pjpa_remove_file' %}?type=file&slug={{ slug }}&year={{ year }}&folder={{ folder }}&filename={{ d.name }}" hx-target="#dialog" class="btn btn-danger">
+                                <button hx-get="{% url removeurl %}?type=file&slug={{ slug }}&year={{ year }}&folder={{ folder }}&filename={{ d.name }}" hx-target="#dialog" class="btn btn-danger">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </div>
