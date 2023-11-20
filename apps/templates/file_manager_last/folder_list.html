@@ -1,0 +1,84 @@
+{% load static %}
+{% if data %}
+       {% for d in data %}
+       {% if d.type == 'folder' %}
+        <div class="col-lg-3 mt-3">
+            <div class="card border-primary mb-3">
+                <div class="row no-gutters px-3 py-2">
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-lg-2">   
+                                <button hx-get="{% url zipfolderurl %}?slug={{ slug }}&year={{ year }}&folder={{ folder }}&filename={{ d.name }}" hx-target="#dialog" class="btn btn-warning">
+                                    <i class="bi bi-file-earmark-zip"></i>
+                                </button>
+                            </div>
+                            <div class="col-lg-2">   
+                                <button hx-get="{% url renameurl %}?slug={{ slug }}&year={{ year }}&folder={{ folder }}&filename={{ d.name }}" hx-target="#dialog" class="btn btn-primary">
+                                    <i class="bi bi-bootstrap-reboot"></i>
+                                </button>
+                            </div>
+                            <div class="col-lg-2">   
+                                <button hx-get="{% url removeurl %}?type=folder&slug={{ slug }}&year={{ year }}&folder={{ folder }}&filename={{ d.name }}" hx-target="#dialog" class="btn btn-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-sm-6 mt-3 text-center">
+                        <a href="{% url showfolderurl slug year %}?folder={{d.link}}"><img class="card-img border" src="{% static 'assets/filetypes/folder.png' %}" alt=""></a>
+                    </div>
+                    <div class="col-sm-6 mt-3 text-center">
+                        <small>{{ d.mtime }}</small>
+                    </div>
+                    <div class="col-sm-12 mt-3 text-center">
+                        <p><small>{{ d.name }}</small></p>
+                    </div>
+                </div>
+        </div>
+        </div>
+        {% else %}
+        <div class="col-lg-3 mt-3">
+            <div class="card border-primary mb-3">
+                <div class="row no-gutters px-3 py-2">
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-lg-2">
+                                <a href="{% url downloadurl slug year %}?folder={{ folder }}&filename={{ d.name }}" target="_new">
+                                    <button type="button" class="btn btn-success">
+                                        <i class="bi bi-cloud-download"></i>
+                                    </button></a>
+    
+                            </div>
+                            <div class="col-lg-2">   
+                                <button hx-get="{% url renameurl %}?slug={{ slug }}&year={{ year }}&folder={{ folder }}&filename={{ d.name }}" hx-target="#dialog" class="btn btn-primary">
+                                    <i class="bi bi-bootstrap-reboot"></i>
+                                </button>
+                            </div>
+
+                            <div class="col-lg-2">   
+                                <button hx-get="{% url removeurl %}?type=file&slug={{ slug }}&year={{ year }}&folder={{ folder }}&filename={{ d.name }}" hx-target="#dialog" class="btn btn-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 mt-3 text-center">
+                        <img class="card-img border" src="{% static d.icon_location %}" alt="">
+                    </div>
+                    <div class="col-sm-6 mt-3 text-center">
+                        <small><em>{{d.filesize}} <br/>{{ d.mtime }}</em></small>
+                    </div>
+                    <div class="col-sm-12 mt-3 mb-2 text-center">
+                        <small>{{ d.name}}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% endif %}
+      {% endfor %}
+  {% endif %}
+ 

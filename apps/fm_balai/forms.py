@@ -1,25 +1,5 @@
 from django import forms
-from .models import File, Department, Subfolder
-
-class FileForm(forms.ModelForm):
-    # fileupload = forms.FileField(required=False, widget=forms.FileInput(attrs={'accept':'application/vnd.ms-excel, image/*, application/pdf, application/msword, application/vnd.ms-powerpoint, video/x-matroska, application/vnd.openxmlformats-officedocument.wordprocessingml.document, video/mp4'}))
-    fileupload = forms.FileField(required=False, widget=forms.FileInput())
-    class Meta:
-        model = File
-        fields = [
-            # 'filename',
-            'description',
-            # 'tags',
-        ]
-        labels = {
-                "description": "Deskripsi File",
-        }
-
-        widgets = {
-            # 'tags': forms.TextInput(attrs={'data-role': 'tagsinput'}),
-            'description': forms.Textarea(attrs={'rows': '3'}),
-            # 'filename': forms.FileInput(attrs={'accept':'application/vnd.ms-excel, image/*, application/pdf, application/msword, application/vnd.ms-powerpoint'})
-        }
+from .models import Department
 
 class DepartmentForm(forms.ModelForm):
     class Meta:
@@ -31,15 +11,19 @@ class DepartmentForm(forms.ModelForm):
         
         labels = {
                 "name": "Nama PPK",
-                "shortname": "Nama singkat"
+                "shortname": "Nama Singkat"
         }
 
-class SubfolderForm(forms.ModelForm):
-    class Meta:
-        model = Subfolder
-        fields = [
-            'name',
-        ]
-        labels = {
-                "name": "Nama Folder",
-        }
+class AddFolderForm(forms.Form): 
+    foldername = forms.CharField(label="Nama Folder", max_length = 255, help_text = "Masukkan Nama Folder")
+    slug = forms.CharField(widget = forms.HiddenInput(), max_length = 255)
+    year = forms.CharField(widget = forms.HiddenInput(), max_length = 4)
+    folder = forms.CharField(widget = forms.HiddenInput(), max_length = 255)
+
+
+class RenameFileForm(forms.Form): 
+    newname = forms.CharField(label="Nama File/Folder", max_length = 255, help_text = "Masukkan Nama File/Folder")
+    slug = forms.CharField(widget = forms.HiddenInput(), max_length = 255)
+    year = forms.CharField(widget = forms.HiddenInput(), max_length = 4)
+    folder = forms.CharField(widget = forms.HiddenInput(), max_length = 255)
+    filename = forms.CharField(widget = forms.HiddenInput(), max_length = 255)

@@ -1,0 +1,27 @@
+{% load widget_tweaks %}
+{% with WIDGET_ERROR_CLASS='is-invalid' %}
+<form hx-post="{{ request.path }}" hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' class="modal-content">
+  <div class="modal-header">
+    <h5 class="modal-title">Ubah Nama File/Folder</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  </div>
+  <div class="modal-body">
+    <div class="mb-3">
+      <label for="{{ form.newname.id_for_label }}" class="form-label">Nama File/Folder</label>
+      {% render_field form.newname class="form-control" placeholder="" %}
+      <div class="invalid-feedback">{{ form.newname.errors|first }}</div>
+    </div>
+    {% render_field form.year class="form-control" placeholder="" %}
+    {% render_field form.slug class="form-control" placeholder="" %}
+    {% render_field form.folder class="form-control" placeholder="" %}
+    {% render_field form.filename class="form-control" placeholder="" %}
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+      Cancel
+    </button>
+    <button type="submit" class="btn btn-primary">Save</button>
+  </div>
+</form>
+{% endwith %}

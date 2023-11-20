@@ -1,0 +1,14 @@
+masuk ke mysql terminal
+use arsipserverdb2
+delete from django_migrations where app = 'fm_balai';
+SET foreign_key_checks = 0;
+drop table fm_balai_department;
+drop table fm_balai_subfolder;
+drop table fm_balai_file;
+SET foreign_key_checks = 1;
+
+hapus semua data di migratios folder kecuali init
+python manage.py makemigrations
+python manage.py migrate
+
+tambahkan folder fm_balai di nas-media/fms

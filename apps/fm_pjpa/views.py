@@ -64,7 +64,7 @@ def department(request, slug):
         'depyearurl': 'fm_pjpa_department_year',
         'showfolderurl': 'fm_pjpa_show_folder',
     }
-    return render(request=request, template_name='file_manager/department2.html', context=context)
+    return render(request=request, template_name='file_manager/department.html', context=context)
 
 @csrf_exempt
 def department_list(request):

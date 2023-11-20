@@ -3,7 +3,7 @@ from django.http import HttpResponse, Http404
 from .models import Department
 import sys
 from django.template.defaultfilters import slugify
-from .forms import DepartmentForm
+from .forms import DepartmentForm, AddFolderForm, RenameFileForm
 import os, shutil
 from django.conf import settings
 from os.path import exists
@@ -17,8 +17,9 @@ from datetime import date, datetime
 import mimetypes
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
+import json
+from asgiref.sync import sync_to_async
 
-# tes commit
 @csrf_exempt
 def check_permission(request, depslug):
     if request.user.is_superuser:
@@ -61,6 +62,7 @@ def department(request, slug):
         'depurl': 'fm_opsda_department',
         'deplisturl': 'fm_opsda_department_list',
         'depyearurl': 'fm_opsda_department_year',
+        'showfolderurl': 'fm_opsda_show_folder',
     }
     return render(request=request, template_name='file_manager/department.html', context=context)
 
@@ -85,32 +87,6 @@ def department_list(request):
 
     return render(request=request, template_name='file_manager/department_list.html', context=context)
         
-@csrf_exempt
-def department_year(request, slug, year):
-    if not request.user.is_authenticated:
-        return redirect('login')
-    if not check_permission(request, slug):
-        return render(request=request, template_name='file_manager/page_404.html', context={'message':'Otorisasi Ditolak'})
-    dep = Department.objects.get(slug=slug)
-    depfolder = dep.folder
-    data = []
-    path = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], depfolder, str(year))
-    contents = os.listdir(path)    
-    for file in contents:
-        if os.path.isdir(os.path.join(path, file)):
-            data.append(file)
-    context = {
-        'data': data,
-        'depname':dep.name,
-        'slug': slug,
-        'year': year,
-        'satkername': 'OPSDA',
-        'depurl': 'fm_opsda_department',
-        'deplisturl': 'fm_opsda_department_list',
-        'showfolderurl': 'fm_opsda_showfolder',
-
-    }
-    return render(request=request, template_name='file_manager/department_year.html', context=context)
 
 def checkfolder(path):
     contents =os.listdir(path)
@@ -248,25 +224,46 @@ def page_404(request):
     return render(request, 'file_manager/page_404.html', {})
 
 def build_breadcrumbs(url):
-    folderlist = str(url).split("/")
+    folderlist = str(url).split(os.path.sep )
     result = []
-    maxcount = len(folderlist)
     for idx, folder in enumerate(folderlist):
         tmpl = []
         for i in range(0, idx+1):
             tmpl.append(folderlist[i])
         mdict = {
             'label': folder,
-            'link': '/'.join(tmpl),
+            'link': os.path.sep.join(tmpl),
         }
         result.append(mdict)
     result[-1]['link'] = ''
     return result
 
-def showfolder(request, slug, year):
+@csrf_exempt
+def download(request, slug, year):
+    if not request.user.is_authenticated:
+        return redirect('login')
     folder = request.GET.get("folder")
+    filename = request.GET.get("filename")
+    path = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], slug, year, folder, filename)
+    # return HttpResponse(path)
+    if exists(path):
+        mime_type, encoding = mimetypes.guess_type(path)
+        # return HttpResponse(mime_type)
+        with open(path, 'rb') as pdf:
+            response = HttpResponse(pdf.read(), content_type=f'{mime_type}')
+            response['Content-Disposition'] = f'inline;filename={filename}'
+            return response
+    raise Http404
+
+@csrf_exempt
+def folder_list(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    slug = request.GET.get("slug")
+    year = request.GET.get("year")
+    folder = request.GET.get("folder")
+    
     folderlist = str(folder).split("/")
-    curfolder = folderlist[0]
     folderlist.pop(0)
     path = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], slug, year, folder)
     contents =os.listdir(path)
@@ -299,6 +296,26 @@ def showfolder(request, slug, year):
     dep = Department.objects.get(slug=slug)        
     context = {
         'data': data,
+        'folder': folder,
+        'showfolderurl': 'fm_opsda_show_folder',
+        'downloadurl': 'fm_opsda_download',
+        'slug': slug,
+        'year': year,
+        'zipfolderurl':'fm_opsda_download_folder',
+        'renameurl': 'fm_opsda_rename_file',
+        'removeurl': 'fm_opsda_remove_file',
+        
+}
+    # return HttpResponse(context)
+    return render(request=request, template_name='file_manager/folder_list.html', context=context)
+
+@csrf_exempt
+def show_folder(request, slug, year):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    folder = request.GET.get("folder")
+    dep = Department.objects.get(slug=slug)
+    context = {
         'slug': slug,
         'year': year,
         'depname':dep.name,
@@ -308,25 +325,185 @@ def showfolder(request, slug, year):
         'satkername': 'OPSDA',
         'depurl': 'fm_opsda_department',
         'deplisturl': 'fm_opsda_department_list',
-        'showfolderurl': 'fm_opsda_showfolder',
+        'folderlisturl': 'fm_opsda_folder_list',
         'downloadurl': 'fm_opsda_download',
         'depyearurl': 'fm_opsda_department_year',
+        'showfolderurl': 'fm_opsda_show_folder',
+        'addfolderurl': 'fm_opsda_add_folder',
+        'uploadfileurl': 'fm_opsda_upload_file'
     }
-    return render(request=request, template_name='file_manager/showfolder.html', context=context)
+    return render(request=request, template_name='file_manager/show_folder.html', context=context)
 
 @csrf_exempt
-def download(request, slug, year):
-    if not request.user.is_authenticated:
-        return redirect('login')
-    folder = request.GET.get("folder")
-    filename = request.GET.get("filename")
-    path = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], slug, year, folder, filename)
-    # return HttpResponse(path)
-    if exists(path):
-        mime_type, encoding = mimetypes.guess_type(path)
-        # return HttpResponse(mime_type)
-        with open(path, 'rb') as pdf:
-            response = HttpResponse(pdf.read(), content_type=f'{mime_type}')
-            response['Content-Disposition'] = f'inline;filename={filename}'
-            return response
-    raise Http404
+def add_folder(request):
+    if request.method == "POST":
+        foldername = request.POST.get('foldername')
+        slug = request.POST.get("slug")
+        year = str(request.POST.get("year"))
+        folder = request.POST.get("folder")
+        newfolder = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], slug, year, folder, foldername)
+        if not exists(newfolder):
+            os.mkdir(newfolder)
+            message = f"penambahan folder {foldername} Sukses."
+        else:
+            message = f"penambahan folder {foldername} Gagal."
+                    
+        return HttpResponse(
+            status=204,
+            headers={
+                'HX-Trigger': json.dumps({
+                    "movieListChanged": None,
+                    "showMessage": message
+                })
+            })
+    else:
+        slug = request.GET.get("slug")
+        year = str(request.GET.get("year"))
+        folder = request.GET.get("folder")
+        form = AddFolderForm(initial={'year': year, 'slug': slug, 'folder': folder})
+    return render(request, 'file_manager/add_folder.html', {
+        'form': form,
+    })
+
+@csrf_exempt
+def upload_file(request):
+    if request.method == "POST":
+        if request.FILES:
+            slug = request.POST.get("slug")
+            year = str(request.POST.get("year"))
+            folder = request.POST.get("folder")
+            uploads = request.FILES.getlist('uploadfiles')
+            for upload in uploads:
+                pathlist = [__package__.split('.')[1], slug, year, str(folder).replace(os.path.sep, '$$') ,str(upload)]
+                filetmpname = "$$".join(pathlist)
+                filetmppath = os.path.join(settings.MEDIA_ROOT, "tmpfiles", filetmpname)
+                fss = FileSystemStorage()
+                fss.save(filetmppath, upload)
+            return HttpResponse(
+                status=204,
+                headers={
+                    'HX-Trigger': json.dumps({
+                        "movieListChanged": None,
+                        "showMessage": 'Upload File Sukses, tunggu beberapa saat kemudian refresh halaman'
+                    })
+                })
+    else:
+        slug = request.GET.get("slug")
+        year = str(request.GET.get("year"))
+        folder = request.GET.get("folder")
+    return render(request, 'file_manager/upload_file.html', {
+        'slug': slug,
+        'year': year,
+        'folder': folder
+    })
+
+@csrf_exempt
+def remove_file(request):
+    if request.method == "POST":
+        filename = request.POST.get('filename')
+        slug = request.POST.get("slug")
+        year = str(request.POST.get("year"))
+        folder = request.POST.get("folder")
+        type = request.POST.get("type")
+
+        path = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], slug, year, folder, filename)
+        if exists(path):
+            if type=='file':
+                os.remove(path)
+            else:
+                shutil.rmtree(path)
+            message = f"Hapus { type } {filename} Sukses."
+        else:
+            message = f"Hapus { type } {filename} Gagal."
+                    
+        return HttpResponse(
+            status=204,
+            headers={
+                'HX-Trigger': json.dumps({
+                    "movieListChanged": None,
+                    "showMessage": message
+                })
+            })
+    else:
+        slug = request.GET.get("slug")
+        year = str(request.GET.get("year"))
+        folder = request.GET.get("folder")
+        filename = request.GET.get("filename")
+        type = request.GET.get("type")
+        
+    return render(request, 'file_manager/remove_file.html', {
+        'slug': slug,
+        'year': year,
+        'folder': folder,
+        'filename': filename,
+        'type': type
+    })
+
+def zipfolder(path):
+    return shutil.make_archive((path, "zip", path))
+        
+@csrf_exempt
+def download_folder(request):
+    if request.method == "POST":
+        filename = request.POST.get('filename')
+        slug = request.POST.get("slug")
+        year = str(request.POST.get("year"))
+        folder = request.POST.get("folder")
+
+        path = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], slug, year, folder, filename)
+        # await sync_to_async(zipfolder, thread_sensitive=True)
+        shutil.make_archive(path, "zip", path)    
+        return HttpResponse(
+            status=204,
+            headers={
+                'HX-Trigger': json.dumps({
+                    "movieListChanged": None,
+                    "showMessage": "Zip File berhasil, tunggu beberapa saat apabila file zip belum ada"
+                })
+            })
+    else:
+        slug = request.GET.get("slug")
+        year = str(request.GET.get("year"))
+        folder = request.GET.get("folder")
+        filename = request.GET.get("filename")
+        
+    return render(request, 'file_manager/download_folder.html', {
+        'slug': slug,
+        'year': year,
+        'folder': folder,
+        'filename': filename,
+    })
+
+@csrf_exempt
+def rename_file(request):
+    if request.method == "POST":
+        newname = request.POST.get('newname')
+        slug = request.POST.get("slug")
+        year = str(request.POST.get("year"))
+        folder = request.POST.get("folder")
+        filename = request.POST.get("filename")
+        existingfile = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], slug, year, folder, filename)
+        newfile = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], slug, year, folder, newname)
+        if exists(existingfile):
+            os.rename(existingfile, newfile)
+            message = f"perubahan nama {filename} Sukses."
+        else:
+            message = f"perubahan nama {filename} Gagal."
+                    
+        return HttpResponse(
+            status=204,
+            headers={
+                'HX-Trigger': json.dumps({
+                    "movieListChanged": None,
+                    "showMessage": message
+                })
+            })
+    else:
+        slug = request.GET.get("slug")
+        year = str(request.GET.get("year"))
+        folder = request.GET.get("folder")
+        filename = request.GET.get("filename")
+        form = RenameFileForm(initial={'newname':filename, 'year': year, 'slug': slug, 'folder': folder, 'filename': filename})
+    return render(request, 'file_manager/rename_file.html', {
+        'form': form,
+    })
