@@ -367,6 +367,7 @@ def add_folder(request):
 
 @csrf_exempt
 def upload_file(request):
+    #tes
     if request.method == "POST":
         return HttpResponse(
             status=204,
