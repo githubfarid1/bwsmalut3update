@@ -377,8 +377,8 @@ def upload_file(request):
                 pathlist = [__package__.split('.')[1], slug, year, str(folder).replace(os.path.sep, '$$') ,str(upload)]
                 filetmpname = "$$".join(pathlist)
                 filetmppath = os.path.join(settings.MEDIA_ROOT, "tmpfiles", filetmpname)
-                fss = FileSystemStorage()
-                fss.save(filetmppath, upload)
+                # fss = FileSystemStorage()
+                # fss.save(filetmppath, upload)
             return HttpResponse(
                 status=204,
                 headers={
