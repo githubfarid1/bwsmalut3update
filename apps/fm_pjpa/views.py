@@ -87,7 +87,6 @@ def department_list(request):
 
     return render(request=request, template_name='file_manager/department_list.html', context=context)
         
-
 def checkfolder(path):
     contents =os.listdir(path)
     if len(contents) == 0:
@@ -211,7 +210,8 @@ def get_fileinfo(filepath):
             filemime, filetype = 'doc.png', 'Word'
         elif 'compressed' in mime_type:
             filemime, filetype = 'zip.png', 'Zip'
-
+        elif 'zip' in mime_type:
+            filemime, filetype = 'zip.png', 'Zip'
         else:
             filemime, filetype = 'unknown.png', 'Unknown'
     else:
