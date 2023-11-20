@@ -3,7 +3,7 @@ from django.http import HttpResponse, Http404
 from .models import Department
 import sys
 from django.template.defaultfilters import slugify
-from .forms import DepartmentForm, AddFolderForm
+from .forms import DepartmentForm, AddFolderForm, RenameFileForm
 import os, shutil
 from django.conf import settings
 from os.path import exists
@@ -18,6 +18,8 @@ import mimetypes
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 import json
+import aioshutil
+from asgiref.sync import sync_to_async
 
 # tes commit
 @csrf_exempt
@@ -238,80 +240,6 @@ def build_breadcrumbs(url):
     result[-1]['link'] = ''
     return result
 
-def showfolder(request, slug, year):
-    if not request.user.is_authenticated:
-        return redirect('login')
-    if request.method == 'POST':
-        if request.FILES:
-            uploads = request.FILES.getlist('uploadfiles')
-            for upload in uploads:
-                pathlist = [__package__.split('.')[1], slug, year, str(request.GET.get("folder")).replace("/", '$$') ,str(upload)]
-                filetmpname = "$$".join(pathlist)
-                filetmppath = os.path.join(settings.MEDIA_ROOT, "tmpfiles", filetmpname)
-                # filepath = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], slug, year, request.GET.get("folder"), str(upload))
-                fss = FileSystemStorage()
-                fss.save(filetmppath, upload)
-            messages.info(request, "Upload Files success")    
-            return redirect(request.build_absolute_uri())
-        else:            
-            path = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], slug, year, request.POST['folder'], request.POST['filename'])
-            if os.path.exists(path):
-                os.remove(path)
-                messages.info(request, "Hapus file Berhasil")
-            else:
-                messages.info(request, "Hapus file gagal")    
-            return redirect(request.build_absolute_uri())
-
-    folder = request.GET.get("folder")
-    folderlist = str(folder).split("/")
-    curfolder = folderlist[0]
-    folderlist.pop(0)
-    path = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], slug, year, folder)
-    contents =os.listdir(path)
-    data = []
-    for file in contents:
-        if os.path.isfile(os.path.join(path, file)):
-            filemime, filesize, filetype, mime_type, mtime = get_fileinfo(os.path.join(path, file))
-            icon_location = os.path.join('assets/filetypes', filemime)
-            data.append({
-                'name': file,
-                'type': 'file',
-                'icon_location': icon_location,
-                'filesize': filesize,
-                'filetype': filetype,
-                'mimetype': mime_type,
-                'folder': folder,
-                'mtime': datetime.fromtimestamp(mtime),
-                
-            })
-        else:
-            mtime = os.path.getmtime(os.path.join(path, file))
-            data.append({
-                'name': file,
-                'type': 'folder',
-                'link': os.path.join(folder, file),
-                'mtime': datetime.fromtimestamp(mtime),
-                
-            })
-    
-    dep = Department.objects.get(slug=slug)        
-    context = {
-        'data': data,
-        'slug': slug,
-        'year': year,
-        'depname':dep.name,
-        'depslug': slug,
-        'breadcrumbs': build_breadcrumbs(folder),
-        'folder': folder,
-        'satkername': 'PJPA',
-        'depurl': 'fm_pjpa_department',
-        'deplisturl': 'fm_pjpa_department_list',
-        'showfolderurl': 'fm_pjpa_showfolder',
-        'downloadurl': 'fm_pjpa_download',
-        'depyearurl': 'fm_pjpa_department_year',
-    }
-    return render(request=request, template_name='file_manager/showfolder2.html', context=context)
-
 @csrf_exempt
 def download(request, slug, year):
     if not request.user.is_authenticated:
@@ -457,4 +385,112 @@ def upload_file(request):
         'slug': slug,
         'year': year,
         'folder': folder
+    })
+
+def remove_file(request):
+    if request.method == "POST":
+        filename = request.POST.get('filename')
+        slug = request.POST.get("slug")
+        year = str(request.POST.get("year"))
+        folder = request.POST.get("folder")
+        type = request.POST.get("type")
+
+        path = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], slug, year, folder, filename)
+        if exists(path):
+            if type=='file':
+                os.remove(path)
+            else:
+                shutil.rmtree(path)
+            message = f"Hapus { type } {filename} Sukses."
+        else:
+            message = f"Hapus { type } {filename} Gagal."
+                    
+        return HttpResponse(
+            status=204,
+            headers={
+                'HX-Trigger': json.dumps({
+                    "movieListChanged": None,
+                    "showMessage": message
+                })
+            })
+    else:
+        slug = request.GET.get("slug")
+        year = str(request.GET.get("year"))
+        folder = request.GET.get("folder")
+        filename = request.GET.get("filename")
+        type = request.GET.get("type")
+        
+    return render(request, 'file_manager/remove_file.html', {
+        'slug': slug,
+        'year': year,
+        'folder': folder,
+        'filename': filename,
+        'type': type
+    })
+
+def zipfolder(path):
+    return shutil.make_archive((path, "zip", path))
+        
+def download_folder(request):
+    if request.method == "POST":
+        filename = request.POST.get('filename')
+        slug = request.POST.get("slug")
+        year = str(request.POST.get("year"))
+        folder = request.POST.get("folder")
+
+        path = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], slug, year, folder, filename)
+        # await sync_to_async(zipfolder, thread_sensitive=True)
+        shutil.make_archive(path, "zip", path)    
+        return HttpResponse(
+            status=204,
+            headers={
+                'HX-Trigger': json.dumps({
+                    "movieListChanged": None,
+                    "showMessage": "Zip File berhasil, tunggu beberapa saat apabila file zip belum ada"
+                })
+            })
+    else:
+        slug = request.GET.get("slug")
+        year = str(request.GET.get("year"))
+        folder = request.GET.get("folder")
+        filename = request.GET.get("filename")
+        
+    return render(request, 'file_manager/download_folder.html', {
+        'slug': slug,
+        'year': year,
+        'folder': folder,
+        'filename': filename,
+    })
+
+def rename_file(request):
+    if request.method == "POST":
+        newname = request.POST.get('newname')
+        slug = request.POST.get("slug")
+        year = str(request.POST.get("year"))
+        folder = request.POST.get("folder")
+        filename = request.POST.get("filename")
+        existingfile = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], slug, year, folder, filename)
+        newfile = os.path.join(settings.FM_LOCATION, __package__.split('.')[1], slug, year, folder, newname)
+        if exists(existingfile):
+            os.rename(existingfile, newfile)
+            message = f"perubahan nama {filename} Sukses."
+        else:
+            message = f"perubahan nama {filename} Gagal."
+                    
+        return HttpResponse(
+            status=204,
+            headers={
+                'HX-Trigger': json.dumps({
+                    "movieListChanged": None,
+                    "showMessage": message
+                })
+            })
+    else:
+        slug = request.GET.get("slug")
+        year = str(request.GET.get("year"))
+        folder = request.GET.get("folder")
+        filename = request.GET.get("filename")
+        form = RenameFileForm(initial={'newname':filename, 'year': year, 'slug': slug, 'folder': folder, 'filename': filename})
+    return render(request, 'file_manager/rename_file.html', {
+        'form': form,
     })

@@ -33,13 +33,6 @@
    {% endfor %}
     </p>
     <div class="d-flex flex-row-reverse bd-highlight">
-        {% comment %} <div class="p-2 bd-highlight">
-            <form action="" method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
-                <input type="file" id="uploadfiles" name="uploadfiles" multiple>
-                <button type="submit" class="btn btn-primary">Upload</button>
-            </form>
-        </div> {% endcomment %}
         <div class="p-2 bd-highlight">
             <button hx-get="{% url 'fm_pjpa_add_folder' %}?slug={{ slug }}&year={{ year }}&folder={{ folder }}" hx-target="#dialog" class="btn btn-sm btn-primary">
                 Folder Baru
