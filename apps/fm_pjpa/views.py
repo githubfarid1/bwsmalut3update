@@ -368,33 +368,23 @@ def add_folder(request):
 @csrf_exempt
 def upload_file(request):
     if request.method == "POST":
-        return HttpResponse(
-            status=204,
-            headers={
-                'HX-Trigger': json.dumps({
-                    "movieListChanged": None,
-                    "showMessage": 'Upload File Sukses, tunggu beberapa saat kemudian refresh halaman'
-                    
-                })
-            })
         if request.FILES:
             slug = request.POST.get("slug")
             year = str(request.POST.get("year"))
             folder = request.POST.get("folder")
             uploads = request.FILES.getlist('uploadfiles')
-            # for upload in uploads:
-            # pathlist = [__package__.split('.')[1], slug, year, str(folder).replace(os.path.sep, '$$') ,str(uploads[0])]
-            # filetmpname = "$$".join(pathlist)
-            # filetmppath = os.path.join(settings.MEDIA_ROOT, "tmpfiles", filetmpname)
-                # fss = FileSystemStorage()
-                # fss.save(filetmppath, upload)
+            for upload in uploads:
+                pathlist = [__package__.split('.')[1], slug, year, str(folder).replace(os.path.sep, '$$') ,str(upload)]
+                filetmpname = "$$".join(pathlist)
+                filetmppath = os.path.join(settings.MEDIA_ROOT, "tmpfiles", filetmpname)
+                fss = FileSystemStorage()
+                fss.save(filetmppath, upload)
             return HttpResponse(
                 status=204,
                 headers={
                     'HX-Trigger': json.dumps({
                         "movieListChanged": None,
                         "showMessage": 'Upload File Sukses, tunggu beberapa saat kemudian refresh halaman'
-                        
                     })
                 })
     else:
