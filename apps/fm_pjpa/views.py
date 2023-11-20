@@ -18,10 +18,8 @@ import mimetypes
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 import json
-import aioshutil
 from asgiref.sync import sync_to_async
 
-# tes commit
 @csrf_exempt
 def check_permission(request, depslug):
     if request.user.is_superuser:
