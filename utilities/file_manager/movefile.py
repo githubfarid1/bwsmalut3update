@@ -22,7 +22,7 @@ for file in list(tmpfms.iterdir()):
     # print(tmp)
     filename = pathlib.Path(file).name
     
-    # found = False
+    found = False
     for app in APPS_NAME:
         if filename[:len(app)] != app:
             found = True
