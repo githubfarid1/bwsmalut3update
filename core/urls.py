@@ -22,5 +22,5 @@ urlpatterns = [
     path('fm_pjsa/', include('apps.fm_pjsa.urls')),
     path('fm_opsda/', include('apps.fm_opsda.urls')),
     path('fm_balai/', include('apps.fm_balai.urls')),
-
+    path('arsip_tata/', include('apps.arsip_tata.urls')),
 ]
