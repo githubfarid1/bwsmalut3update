@@ -1,0 +1,47 @@
+{% load widget_tweaks %}
+{% with WIDGET_ERROR_CLASS='is-invalid' %}
+<form hx-post="{{ request.path }}" hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' class="modal-content">
+  <div class="modal-header">
+    <h5 class="modal-title">{{ module }} Item</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  </div>
+  <div class="modal-body">
+    <div class="mb-3">
+        <label for="{{ form.item_number.id_for_label }}" class="form-label">Nomor Item</label>
+        {% render_field form.item_number class="form-control" placeholder="" %}
+        <div class="invalid-feedback">{{ form.item_number.errors|first }}</div>
+    </div>
+    <div class="mb-3">  
+        <label for="{{ form.title.id_for_label }}" class="form-label">Kegiatan</label>
+        {% render_field form.title class="form-control" placeholder="" %}
+        <div class="invalid-feedback">{{ form.title.errors|first }}</div>
+    </div>  
+    <div class="mb-3">  
+        <label for="{{ form.copy.id_for_label }}" class="form-label">Jumlah Copy</label>
+        {% render_field form.copy class="form-control" placeholder="" %}
+        <div class="invalid-feedback">{{ form.copy.errors|first }}</div>
+    </div>
+    <div class="mb-3">  
+        <label for="{{ form.original.id_for_label }}" class="form-label">Jumlah Asli</label>
+        {% render_field form.original class="form-control" placeholder="" %}
+        <div class="invalid-feedback">{{ form.original.errors|first }}</div>
+    </div>
+    <div class="mb-3">  
+        <label for="{{ form.accesstype.id_for_label }}" class="form-label">Jenis Akses</label>
+        {% render_field form.accesstype class="form-control" placeholder="" %}
+        <div class="invalid-feedback">{{ form.accesstype.errors|first }}</div>
+    </div>
+    
+  </div>
+  <div class="modal-footer">
+    {% if item %}
+    <button type="button" class="btn btn-danger" hx-post="{% url 'arsip_tata_remove_item' pk=item.id %}" onclick="return confirm('Hapus Item?')">Remove</button>
+    <span class="flex-grow-1"></span>
+    {% endif %}
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+      Cancel
+    </button>
+    <button type="submit" class="btn btn-primary">Save</button>
+  </div>
+</form>
+{% endwith %}

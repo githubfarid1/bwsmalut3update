@@ -1,0 +1,19 @@
+{% load static %}
+  {% if items %}
+    {% for d in items %}
+    <div class="col-12 col-lg-2 mt-3">
+      <div class="card border-primary mb-3">
+        <button class="btn btn-primary btn-sm" hx-get="{% url 'arsip_tata_edit_item' pk=d.pk %}" hx-target="#dialog">Edit</button>
+        <div class="row no-gutters px-3 py-2">
+          <div class="col-lg-12 mt-3 text-center">
+            <a href=""><img class="card-img border" src="{% static 'assets/icons/item.png' %}" alt=""></a>
+          </div>
+          <div class="col-sm-12 mt-3 text-center">
+              <h5>No. Item {{ d.item_number }}</h5>
+              <p>{{ d.title }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+{% endif %}

@@ -15,6 +15,9 @@ class Box(models.Model):
     box_number = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(1)]
     )
+    yeardate = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(2023), MaxValueValidator(2050)]
+    )
 
     year = models.ForeignKey(
         Year,
@@ -23,11 +26,9 @@ class Box(models.Model):
         default=None
     )        
     class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['box_number', 'year_id'], name="unique_box_number_year"
-            )
-        ]
+        unique_together = ('box_number', 'yeardate')    
+    
+    
     def __str__(self) -> str:
         return f"{self.box_number}_{self.year.yeardate}"
 
@@ -39,9 +40,12 @@ class Bundle(models.Model):
     )
     code = models.CharField(max_length=10)
     creator = models.CharField(max_length=255)
-    decription = models.TextField(null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
     year_bundle = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(1900),MaxValueValidator(2050)]
+    )
+    yeardate = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(2023), MaxValueValidator(2050)]
     )
    
     box = models.ForeignKey(
@@ -52,11 +56,7 @@ class Bundle(models.Model):
     )        
 
     class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['bundle_number', 'box_id'], name="unique_bundle_number_box"
-            )
-        ]
+        unique_together = ('bundle_number', 'yeardate')    
 
     def __str__(self) -> str:
         return f"{self.bundle_number}_{self.box.box_number}"
@@ -75,15 +75,18 @@ class Item(models.Model):
     )
     title = models.CharField(max_length=255)
     copy = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1)]
+        validators=[MinValueValidator(0)], default=0
     )
     original = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1)]
+        validators=[MinValueValidator(0)], default=0
     )
     total = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(1)]
     )
     accesstype = models.CharField(max_length=2, choices=ACCESS_CHOICES, default='T')
+    yeardate = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(2023), MaxValueValidator(2050)]
+    )
     
     bundle = models.ForeignKey(
         Bundle,
@@ -92,11 +95,7 @@ class Item(models.Model):
         default=None
     )        
     class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['item_number', 'bundle_id'], name="unique_item_number_bundle"
-            )
-        ]
+        unique_together = ('item_number', 'yeardate')    
 
     def __str__(self) -> str:
         return f"{self.item_number}_{self.bundle.bundle_number}"

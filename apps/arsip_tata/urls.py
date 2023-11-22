@@ -15,4 +15,16 @@ urlpatterns = [
     path('boxes/<int:pk>/edit', view=views.edit_box, name=prefix + "edit_box"),
     path('boxes/<int:pk>/remove', view=views.remove_box, name=prefix + 'remove_box'),
 
+    path(route='bundles/<int:year_date>/<int:box_number>', view=views.show_bundles, name=prefix + "show_bundles"),
+    path(route='bundle_list/<int:box_id>', view=views.bundle_list, name=prefix + "bundle_list"),
+    path(route='add_bundle/<int:box_id>', view=views.add_bundle, name=prefix + "add_bundle"),
+    path('bundles/<int:pk>/edit', view=views.edit_bundle, name=prefix + "edit_bundle"),
+    path('bundles/<int:pk>/remove', view=views.remove_bundle, name=prefix + 'remove_bundle'),
+
+    path(route='items/<int:year_date>/<int:bundle_number>', view=views.show_items, name=prefix + "show_items"),
+    path(route='item_list/<int:bundle_id>', view=views.item_list, name=prefix + "item_list"),
+    path(route='add_item/<int:bundle_id>', view=views.add_item, name=prefix + "add_item"),
+    path('items/<int:pk>/edit', view=views.edit_item, name=prefix + "edit_item"),
+    path('items/<int:pk>/remove', view=views.remove_item, name=prefix + 'remove_item'),
+
 ]
