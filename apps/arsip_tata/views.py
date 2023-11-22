@@ -20,6 +20,8 @@ def year_list(request):
     })
     
 def show_year(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
     context = {
     }
     return render(request=request, template_name='arsip_tata/show_year.html', context=context)
@@ -85,6 +87,8 @@ def remove_year(request, pk):
 
 
 def show_boxes(request, year):
+    if not request.user.is_authenticated:
+        return redirect('login')
     year = Year.objects.get(yeardate=year)
     context = {
         'year_id': year.id,
@@ -162,6 +166,8 @@ def remove_box(request, pk):
         })
 
 def show_bundles(request, year_date, box_number):
+    if not request.user.is_authenticated:
+        return redirect('login')
     year = Year.objects.get(yeardate=year_date)
     box = Box.objects.filter(year_id=year.id, box_number=box_number).first()
     
@@ -241,9 +247,9 @@ def remove_bundle(request, pk):
             })
         })
 
-
 def show_items(request, year_date, bundle_number):
-    # year = Year.objects.get(yeardate=year_date)
+    if not request.user.is_authenticated:
+        return redirect('login')
     bundle = Bundle.objects.filter(yeardate=year_date, bundle_number=bundle_number).first()
     context = {
         'bundle': bundle,
