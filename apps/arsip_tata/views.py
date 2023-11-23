@@ -463,10 +463,6 @@ def create_xls(datalist, sheet, year):
     sheet.cell(row=7, column=12).alignment = centervh
 
     i = 10
-    # result = datalist
-    # curbox = result[0]["box_number"]
-    # curbundle = result[0]["bundle_number"]
-    # isfirst = True
     for res in datalist:
         sheet['{}{}'.format('K', i)].border = thin_border4
         sheet['{}{}'.format('A', i)].border = thin_border4
@@ -488,9 +484,6 @@ def create_xls(datalist, sheet, year):
         sheet['{}{}'.format('I', i)].border = thin_border1
         sheet['{}{}'.format('J', i)].border = thin_border1
         sheet['{}{}'.format('L', i)].border = thin_border1
-
-
-# (bundlenumber, item.item_number, code, creator, description, year_bundle, item.total, item.original, item.copy, boxnumber, item.get_accesstype_display())    
             
         sheet['{}{}'.format('A', i)].value = res[0]
         sheet['{}{}'.format('B', i)].value = res[1]
@@ -538,7 +531,7 @@ def generate_data(year):
         cbox = True
         for bundle in box.bundle_set.all():
             cbundle = True
-            for item in bundle.item_set.all():
+            for item in bundle.item_set.all().order_by('item_number'):
                 if cbox:
                     boxnumber = box.box_number
                     cbox = False
