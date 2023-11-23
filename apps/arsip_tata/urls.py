@@ -26,5 +26,6 @@ urlpatterns = [
     path(route='add_item/<int:bundle_id>', view=views.add_item, name=prefix + "add_item"),
     path('items/<int:pk>/edit', view=views.edit_item, name=prefix + "edit_item"),
     path('items/<int:pk>/remove', view=views.remove_item, name=prefix + 'remove_item'),
+    path('report/<int:year>', view=views.report, name=prefix + 'report'),
 
 ]
