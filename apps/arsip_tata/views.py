@@ -340,7 +340,7 @@ def create_xls(datalist, sheet, year):
     sheet.column_dimensions['D'].width = 20
     sheet.column_dimensions['E'].width = 60
     sheet.column_dimensions['F'].width = 7
-    sheet.column_dimensions['G'].width = 3
+    sheet.column_dimensions['G'].width = 2
     sheet.column_dimensions['H'].width = 6 
     sheet.column_dimensions['I'].width = 7 
     sheet.column_dimensions['J'].width = 7
@@ -376,6 +376,9 @@ def create_xls(datalist, sheet, year):
     thin_border4 = Border(right=Side(style='thin'),left=Side(style='thin'))
     thin_border5 = Border(top=Side(style='thin'), bottom=Side(style='thin'))
     thin_border6 = Border(top=Side(style='thin'))
+    thin_border7 = Border(bottom=Side(style='thin'))
+    thin_border8 = Border(left=Side(style='thin'))
+    thin_border9 = Border(right=Side(style='thin'))
 
 
     font_style1 = Font(name='Arial Narrow', size=11, bold=True)
@@ -472,16 +475,16 @@ def create_xls(datalist, sheet, year):
         sheet['{}{}'.format('D', i)].border = thin_border4
         sheet['{}{}'.format('E', i)].border = thin_border4
         sheet['{}{}'.format('F', i)].border = thin_border4
-        sheet['{}{}'.format('G', i)].border = thin_border4
-        sheet['{}{}'.format('H', i)].border = thin_border4
+        sheet['{}{}'.format('G', i)].border = thin_border7
+        sheet['{}{}'.format('H', i)].border = thin_border7
         sheet['{}{}'.format('I', i)].border = thin_border4
         sheet['{}{}'.format('J', i)].border = thin_border4
         sheet['{}{}'.format('L', i)].border = thin_border4
 
         sheet['{}{}'.format('B', i)].border = thin_border1
         sheet['{}{}'.format('E', i)].border = thin_border1
-        sheet['{}{}'.format('G', i)].border = thin_border1
-        sheet['{}{}'.format('H', i)].border = thin_border1
+        # sheet['{}{}'.format('G', i)].border = thin_border7
+        # sheet['{}{}'.format('H', i)].border = thin_border1
         sheet['{}{}'.format('I', i)].border = thin_border1
         sheet['{}{}'.format('J', i)].border = thin_border1
         sheet['{}{}'.format('L', i)].border = thin_border1
@@ -507,7 +510,7 @@ def create_xls(datalist, sheet, year):
         sheet['{}{}'.format('D', i)].alignment = centervh
         sheet['{}{}'.format('E', i)].alignment = centerv
         sheet['{}{}'.format('F', i)].alignment = centervh
-        sheet['{}{}'.format('G', i)].alignment = centervh
+        # sheet['{}{}'.format('G', i)].alignment = centervh
         sheet['{}{}'.format('H', i)].alignment = centervh
         sheet['{}{}'.format('I', i)].alignment = centervh
         sheet['{}{}'.format('J', i)].alignment = centervh
