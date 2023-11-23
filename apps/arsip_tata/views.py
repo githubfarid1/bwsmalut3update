@@ -26,7 +26,6 @@ def show_year(request):
     }
     return render(request=request, template_name='arsip_tata/show_year.html', context=context)
     
-
 def add_year(request):
     if request.method == "POST":
         form = YearForm(request.POST)
@@ -262,7 +261,7 @@ def item_list(request, bundle_id):
     if not request.user.is_authenticated:
         return redirect('login')
     
-    items = Item.objects.filter(bundle_id=bundle_id)
+    items = Item.objects.filter(bundle_id=bundle_id).order_by('item_number')
     return render(request, 'arsip_tata/item_list.html', {
         'items': items,
     })
