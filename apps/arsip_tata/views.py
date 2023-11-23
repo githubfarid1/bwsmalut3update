@@ -352,7 +352,7 @@ def create_xls(datalist, sheet, year):
     sheet.merge_cells('A3:L3')
     aligncenter = Alignment(horizontal='center')
     headerfont = Font(name='Arial Narrow', size=14, bold=True)
-    sheet['A1'] = "DAFTAR ARSIP INAKTIF {}".format(year)
+    sheet['A1'] = "DAFTAR ARSIP INAKTIF"
     sheet['A1'].alignment = aligncenter
     sheet['A1'].font = headerfont
     sheet['A2'] = "UNIT PENGOLAH: BALAI WILAYAH SUNGAI MALUKU UTARA"
@@ -527,9 +527,6 @@ def create_xls(datalist, sheet, year):
     sheet['{}{}'.format('D', i)].border = thin_border6
     sheet['{}{}'.format('F', i)].border = thin_border6
     sheet['{}{}'.format('K', i)].border = thin_border6
-
-
-
 
 def generate_data(year):
     result = []

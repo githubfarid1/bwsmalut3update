@@ -12,6 +12,10 @@
               <h5>{{ d.yeardate }}</h5>
           </div>
         </div>
+        <div class="col-lg-12 mt-3">
+          <a href="{% url 'arsip_tata_report' d.yeardate %}"><button class="w-100 btn btn-sm btn-primary">Report</button></a>
+        </div>
+
       </div>
     </div>
     {% endfor %}
