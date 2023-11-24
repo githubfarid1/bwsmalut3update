@@ -32,6 +32,12 @@ class Box(models.Model):
     def __str__(self) -> str:
         return f"{self.box_number}_{self.year.yeardate}"
 
+class Bundlecode(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255)
+
+    def __str__(self) -> str:
+        return self.name
 
 class Bundle(models.Model):
     id = models.AutoField(primary_key=True)
@@ -54,7 +60,14 @@ class Bundle(models.Model):
         on_delete=models.CASCADE, 
         default=None
     )        
-
+   
+    bundlecode = models.ForeignKey(
+        Bundlecode,
+        db_column='bundlecode_id',
+        on_delete=models.CASCADE, 
+        default=None
+    )        
+    
     class Meta:
         unique_together = ('bundle_number', 'yeardate')    
 
@@ -99,3 +112,4 @@ class Item(models.Model):
 
     def __str__(self) -> str:
         return f"{self.item_number}_{self.bundle.bundle_number}"
+
