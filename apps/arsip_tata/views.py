@@ -125,7 +125,8 @@ def add_box(request, year_id):
                     })
                 })
     else:
-        form = BoxForm()
+        year = Year.objects.get(id=year_id)
+        form = BoxForm(initial={'yeardate': year.yeardate})
     return render(request, 'arsip_tata/box_form.html', {
         'form': form,
     })
@@ -195,8 +196,9 @@ def add_bundle(request, box_id):
         if form.is_valid():
             bundle = form.save(commit=False)
             bundle.box_id = box_id
-            box = Box.objects.get(id=box_id)
-            bundle.yeardate = box.yeardate
+            # bundle.code = bundle.bundlecode.name.split(" - ")[0]
+            # box = Box.objects.get(id=box_id)
+            # bundle.yeardate = box.yeardate
             bundle.save()
             return HttpResponse(
                 status=204,
@@ -207,7 +209,8 @@ def add_bundle(request, box_id):
                     })
                 })
     else:
-        form = BundleForm()
+        box = Box.objects.get(id=box_id)
+        form = BundleForm(initial={'yeardate': box.yeardate})
     return render(request, 'arsip_tata/bundle_form.html', {
         'form': form,
     })
@@ -276,7 +279,7 @@ def add_item(request, bundle_id):
             item.bundle_id = bundle_id
             item.total = item.copy + item.original
             bundle = Bundle.objects.get(id=bundle_id)
-            item.yeardate = bundle.yeardate
+            # item.yeardate = bundle.yeardate
             item.save()
             return HttpResponse(
                 status=204,
@@ -287,7 +290,8 @@ def add_item(request, bundle_id):
                     })
                 })
     else:
-        form = ItemForm()
+        bundle = Bundle.objects.get(id=bundle_id)
+        form = ItemForm(initial={'yeardate': bundle.yeardate})
     return render(request, 'arsip_tata/item_form.html', {
         'form': form,
     })

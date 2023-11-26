@@ -61,15 +61,16 @@ class Bundle(models.Model):
         default=None
     )        
    
-    bundlecode = models.ForeignKey(
-        Bundlecode,
-        db_column='bundlecode_id',
-        on_delete=models.CASCADE, 
-        default=None
-    )        
+    # bundlecode = models.ForeignKey(
+    #     Bundlecode,
+    #     db_column='bundlecode_id',
+    #     on_delete=models.CASCADE, 
+    #     default=None
+    # )        
     
     class Meta:
         unique_together = ('bundle_number', 'yeardate')    
+
 
     def __str__(self) -> str:
         return f"{self.bundle_number}_{self.box.box_number}"
