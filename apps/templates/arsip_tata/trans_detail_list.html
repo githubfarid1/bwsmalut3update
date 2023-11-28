@@ -1,0 +1,17 @@
+{% load static %}
+  {% if transdetail %}
+    {% for d in transdetail %}
+    <div class="col-12 col-lg-3 mt-3">
+      <div class="card border-primary mb-3">
+        <button class="btn btn-warning btn-sm" hx-get="{% url 'arsip_tata_remove_transdetail' d.id %}" hx-target="#dialog">Hapus</button>
+        <div class="row no-gutters px-3 py-2">
+          <div class="col-sm-12 mt-3 text-center">
+              <p>{{ d.item.title }}<br/>{{ d.item.bundle.description }}</p>
+              <h5>{{ d.item.codegen }}</h5>
+              {% comment %} <h5>{{ d.customer.name }}</h5> {% endcomment %}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+{% endif %}

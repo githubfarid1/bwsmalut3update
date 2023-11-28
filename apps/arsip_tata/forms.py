@@ -1,7 +1,8 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import Year, Box, Bundle, Item, Bundlecode
+from .models import Year, Box, Bundle, Item, Bundlecode, Customer, Trans
 from django.core.exceptions import NON_FIELD_ERRORS
+import re
 
 class YearForm(forms.ModelForm):
     class Meta:
@@ -60,3 +61,26 @@ class ItemForm(forms.ModelForm):
                         'unique_together': "Nomor Urut Sudah Ada",
                     }
                 }
+        
+class CustomerForm(forms.ModelForm):
+    class Meta:
+        model = Customer
+        fields = ['name', 'phone_number', 'description']
+
+    def clean_phone_number(self):
+        cleaned_data = self.cleaned_data['phone_number']
+        reg = re.compile('^\+?1?\d{9,15}$')
+        if not reg.match(cleaned_data):
+            raise ValidationError(f"Format Telpon Salah, gunakan format +9999999, maximal 15 digit")
+        
+        return cleaned_data
+        
+class TransForm(forms.ModelForm):
+    date_trans = forms.DateField(widget=forms.TextInput(attrs={'class': 'form-control', 'type':'date'}))
+    class Meta:
+        model = Trans
+        fields = ['date_trans', 'customer']
+
+
+class AddTransDetailForm(forms.Form): 
+    code = forms.CharField(label="Kode Item Berkas", max_length = 255, help_text = "xxx") 

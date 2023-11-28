@@ -2,15 +2,23 @@ from django.shortcuts import render
 import os
 from django.shortcuts import render, get_object_or_404, redirect, get_list_or_404
 from django.http import HttpResponse, Http404
-from .models import Year, Box, Bundle, Item
+from .models import Year, Box, Bundle, Item, Customer, Trans, TransDetail
 from django.views.decorators.csrf import csrf_exempt
 import json
-from .forms import YearForm, BoxForm, BundleForm, ItemForm
+from .forms import YearForm, BoxForm, BundleForm, ItemForm, CustomerForm, TransForm, AddTransDetailForm
 from django.views.decorators.http import require_POST
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.styles.borders import Border, Side
 
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from reportlab.lib.styles import getSampleStyleSheet
+import io
+from reportlab.platypus import SimpleDocTemplate, Paragraph, PageTemplate, BaseDocTemplate, Frame, Spacer
+from reportlab.lib.units import inch
+from reportlab.platypus.tables import Table,TableStyle,colors
+from datetime import datetime, timedelta
 # Create your views here.
 @csrf_exempt
 def year_list(request):
@@ -279,7 +287,7 @@ def add_item(request, bundle_id):
             item.bundle_id = bundle_id
             item.total = item.copy + item.original
             bundle = Bundle.objects.get(id=bundle_id)
-            # item.yeardate = bundle.yeardate
+            item.codegen = "-".join([str(item.yeardate), str(bundle.box.box_number), str(bundle.bundle_number), str(item.item_number)])
             item.save()
             return HttpResponse(
                 status=204,
@@ -301,15 +309,17 @@ def edit_item(request, pk):
     if request.method == "POST":
         form = ItemForm(request.POST, instance=item)
         if form.is_valid():
-            item = form.save(commit=False)
-            item.total = item.copy + item.original
-            item.save()
+            itemsave = form.save(commit=False)
+            itemsave.total = itemsave.copy + itemsave.original
+            # bundle = Bundle.objects.get(id=item.bundle_id)
+            itemsave.codegen = "-".join([str(itemsave.yeardate), str(item.bundle.box.box_number), str(item.bundle.bundle_number), str(itemsave.item_number)])
+            itemsave.save()
             return HttpResponse(
                 status=204,
                 headers={
                     'HX-Trigger': json.dumps({
                         "itemListChanged": None,
-                        "showMessage": f"{item.item_number} updated."
+                        "showMessage": f"{itemsave.item_number} updated."
                     })
                 }
             )
@@ -570,4 +580,276 @@ def report(request, year):
     response['Content-Disposition'] = 'attachment; filename={}'.format(filename)    
     wb.save(response)
     return response
-                    
+
+def show_customers(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    context = {
+    }
+    return render(request=request, template_name='arsip_tata/show_customer.html', context=context)
+
+def customer_list(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    return render(request, 'arsip_tata/customer_list.html', {
+        'customers': Customer.objects.all(),
+    })
+
+def add_customer(request):
+    if request.method == "POST":
+        form = CustomerForm(request.POST)
+        if form.is_valid():
+            customer = form.save()
+            return HttpResponse(
+                status=204,
+                headers={
+                    'HX-Trigger': json.dumps({
+                        "customerListChanged": None,
+                        "showMessage": f"{customer.name} added."
+                    })
+                })
+    else:
+        form = CustomerForm()
+    return render(request, 'arsip_tata/customer_form.html', {
+        'form': form,
+        'module': 'Tambah Data'
+    })
+
+def edit_customer(request, pk):
+    customer = get_object_or_404(Customer, pk=pk)
+    if request.method == "POST":
+        form = CustomerForm(request.POST, instance=customer)
+        if form.is_valid():
+            form.save()
+            return HttpResponse(
+                status=204,
+                headers={
+                    'HX-Trigger': json.dumps({
+                        "customerListChanged": None,
+                        "showMessage": f"{customer.name} updated."
+                    })
+                }
+            )
+    else:
+        form = CustomerForm(instance=customer)
+    return render(request, 'arsip_tata/customer_form.html', {
+        'form': form,
+        'customer': customer,
+        'module': 'Edit Data'
+    })
+
+@ require_POST
+def remove_customer(request, pk):
+    customer = get_object_or_404(Customer, pk=pk)
+    customer.delete()
+    return HttpResponse(
+        status=204,
+        headers={
+            'HX-Trigger': json.dumps({
+                "customerListChanged": None,
+                "showMessage": f"{customer.name} deleted."
+            })
+        })
+
+
+def show_trans(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    context = {
+    }
+    return render(request=request, template_name='arsip_tata/show_trans.html', context=context)
+
+def trans_list(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    return render(request, 'arsip_tata/trans_list.html', {
+        'trans': Trans.objects.all().order_by("-id"),
+    })
+
+def add_trans(request):
+    if request.method == "POST":
+        form = TransForm(request.POST)
+        if form.is_valid():
+            trans = form.save()
+            return HttpResponse(
+                status=204,
+                headers={
+                    'HX-Trigger': json.dumps({
+                        "transListChanged": None,
+                        "showMessage": f"{trans.id} added."
+                    })
+                })
+    else:
+        form = TransForm()
+    return render(request, 'arsip_tata/trans_form.html', {
+        'form': form,
+        'module': 'Tambah Data'
+    })
+
+def edit_trans(request, pk):
+    trans = get_object_or_404(Trans, pk=pk)
+    if request.method == "POST":
+        form = TransForm(request.POST, instance=trans)
+        if form.is_valid():
+            form.save()
+            return HttpResponse(
+                status=204,
+                headers={
+                    'HX-Trigger': json.dumps({
+                        "transListChanged": None,
+                        "showMessage": f"{trans.id} updated."
+                    })
+                }
+            )
+    else:
+        form = TransForm(instance=trans)
+    return render(request, 'arsip_tata/trans_form.html', {
+        'form': form,
+        'trans': trans,
+        'module': 'Edit Data'
+    })
+
+@ require_POST
+def remove_trans(request, pk):
+    trans = get_object_or_404(Trans, pk=pk)
+    trans.delete()
+    return HttpResponse(
+        status=204,
+        headers={
+            'HX-Trigger': json.dumps({
+                "transListChanged": None,
+                "showMessage": f"{trans.id} deleted."
+            })
+        })
+
+
+
+def show_trans_detail(request, trans_id):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    trans = Trans.objects.get(id=trans_id)
+    context = {
+        'trans': trans,
+    }
+    return render(request=request, template_name='arsip_tata/show_trans_detail.html', context=context)
+
+@csrf_exempt
+def trans_detail_list(request, trans_id):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    transdetail = TransDetail.objects.filter(trans_id=trans_id)
+    return render(request, 'arsip_tata/trans_detail_list.html', {
+        'transdetail': transdetail,
+    })
+
+@csrf_exempt
+def add_trans_detail(request, trans_id):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    if request.method == "POST":
+        code = request.POST.get('code')
+        # form = AddTransDetailForm(request.POST)
+        try:
+            # year, box, bundle, item = code.split("-")
+            message = f"Kode item berkas {code} sukses"
+            item = Item.objects.get(codegen=code)
+            if item:
+                if item.total == 1:
+                    message = f"Kode item berkas {code} hanya ada 1, tidak boleh pinjam lebih dari 1 hari"
+                
+                td = TransDetail.objects.filter(item_id=item.id, date_return__isnull=True)
+                if td.count() != 0:
+                    message = f"Kode item berkas {code} sedang dipinjam"
+                else:
+                    td = TransDetail(item_id=item.id, trans_id=trans_id)
+                    td.save()
+                    message = f"Kode item berkas {code} tersimpan"
+        except:
+            message = f"Kode item berkas {code} tidak ada"
+        return HttpResponse(
+            status=204,
+            headers={
+                'HX-Trigger': json.dumps({
+                    "transDetailListChanged": None,
+                    "showMessage": message
+                })
+            })
+    else:
+        form = AddTransDetailForm()
+    return render(request, 'arsip_tata/add_trans_detail_form.html', {
+        'form': form,
+        'module': 'Tambah Data'
+    })
+
+# @ require_POST
+def remove_transdetail(request, pk):
+    trans = get_object_or_404(TransDetail, pk=pk)
+    trans.delete()
+    return HttpResponse(
+        status=204,
+        headers={
+            'HX-Trigger': json.dumps({
+                "transDetailListChanged": None,
+                "showMessage": f"{trans.id} deleted."
+            })
+        })
+
+def trans_form(request, pk):
+    trans = Trans.objects.get(pk=pk)
+    detail = trans.transdetail_set.all()
+    pdf = io.BytesIO()
+    doc = SimpleDocTemplate(pdf, pagesize=A4)
+    date1 = trans.date_trans
+    date1show = date1.strftime('%d %B %Y')
+    date2 = date1 + timedelta(days=7)
+    date2show = date2.strftime('%d %B %Y')
+    styles = getSampleStyleSheet()
+    title = "Form Peminjaman Dokumen"
+
+    frame = Frame(doc.leftMargin, doc.bottomMargin, doc.width, doc.height)
+    template = PageTemplate(frames=[frame], id='mytemplate')
+
+    doc.addPageTemplates([template])
+    elements = []
+    elements.append(Paragraph(title, styles['Title']))
+    elements.append(Spacer(1, 12))
+    elements.append(Paragraph(f'Nama Peminjam: <strong>{trans.customer.name}</strong>', styles['Normal']))
+    elements.append(Spacer(1, 6))
+    elements.append(Paragraph(f'No WhatsApp: <strong>{trans.customer.phone_number}</strong>', styles['Normal']))
+    elements.append(Spacer(1, 6))
+    elements.append(Paragraph(f'Tanggal Pinjam: <strong>{date1show}</strong>', styles['Normal']))
+    elements.append(Spacer(1, 6))
+    elements.append(Paragraph(f'Tanggal Kembali: <strong>{date2show}</strong>', styles['Normal']))
+    mydata = []
+    mydata.append(("No", "Kode", "Judul Dokumen"))
+    c_width = [0.4*inch, 1*inch, 5*inch]
+    
+    style2 = getSampleStyleSheet()
+    style2 = style2["BodyText"]
+    style2.wordWrap = 'CJK'
+    
+    for idx, data in enumerate(detail):
+        myset = (Paragraph(str(idx+1), style2) , Paragraph(data.item.codegen, style2), Paragraph(data.item.title + "<br/>" + data.item.bundle.description.replace("\n", "<br/>") , style2))
+        mydata.append(myset)
+    
+    mytable = Table(mydata, colWidths=c_width, hAlign='LEFT')
+    mytable.setStyle(TableStyle([('BACKGROUND',(0,0),(-1,0),colors.lightgreen),
+                       ('INNERGRID', (0,0), (-1,-1), 0.25, colors.red),
+                       ('FONTSIZE',(0,0),(-1,0),12),
+                       ('FONTSIZE',(0,1),(-1,-1),8),
+                       ('FONTNAME', (0,0), (-1,0), 'Courier-Bold'),
+                       ('ALIGN', (0,0), (-1,0), 'CENTER'),
+                       ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+                       ('VALIGN',(0,0),(-1,-1),'TOP'),
+                       ]))
+    elements.append(Spacer(1, 10))
+    elements.append(mytable)
+
+    doc.build(elements)
+    pdf.seek(0)
+    response = HttpResponse(pdf.read(), content_type='application/pdf')
+    response['Content-Disposition'] = f'inline;filename=tes1.pdf'
+    return response

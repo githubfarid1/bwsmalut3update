@@ -101,7 +101,7 @@ class Item(models.Model):
     yeardate = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(2023), MaxValueValidator(2050)]
     )
-    
+    codegen = models.CharField(max_length=20, blank=True, unique=True)
     bundle = models.ForeignKey(
         Bundle,
         db_column='bundle_id',
@@ -114,3 +114,47 @@ class Item(models.Model):
     def __str__(self) -> str:
         return f"{self.item_number}_{self.bundle.bundle_number}"
 
+
+class Customer(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255)
+    phone_number = models.CharField(max_length=20, unique=True)
+    description = models.TextField(null=True, blank=True)
+    def __str__(self) -> str:
+        return self.name
+
+class Trans(models.Model):
+    id = models.AutoField(primary_key=True)
+    date_trans = models.DateField()
+    customer = models.ForeignKey(
+        Customer,
+        db_column='customer_id',
+        on_delete=models.CASCADE, 
+        default=None
+    )        
+
+
+    def __str__(self) -> str:
+        return f"{self.customer.name}_{self.date_trans}"
+
+
+class TransDetail(models.Model):
+    id = models.AutoField(primary_key=True)
+    date_return = models.DateField(null=True)
+    
+    item = models.ForeignKey(
+        Item,
+        db_column='item_id',
+        on_delete=models.CASCADE, 
+        default=None
+    )
+    
+    trans = models.ForeignKey(
+        Trans,
+        db_column='trans_id',
+        on_delete=models.CASCADE, 
+        default=None
+    )        
+
+    def __str__(self) -> str:
+        return f"{self.item.title}_{self.date_return}"
