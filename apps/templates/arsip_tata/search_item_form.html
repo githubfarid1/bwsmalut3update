@@ -20,15 +20,16 @@
     </div>  
   </div>
   {%if data %}
-  <section>
+  <section class="mx-4 mt-2">
     <!--Table-->
-    <table class="table align-middle mb-0 bg-white table-bordered mt-3">
+    <table class="table align-middle mb-0 bg-white table-bordered">
         <!--Table head-->
         <thead class="table-warning">
             <tr>
                 <th>Kode Dokumen</th>
                 <th>Judul</th>
                 <th>Uraian Pekerjaan</th>
+                <th>Status</th>
             </tr>
         </thead>
         <!--Table head-->
@@ -37,9 +38,13 @@
         <tbody>
             {% for d in data %}
             <tr>
-                <th scope="row"><button class="btncopy btn btn-success btn-sm" data-clipboard-text="{{ d.codegen }}"><strong>{{ d.codegen }}</strong></th>
-                <td class="fw-bold">{{ d.title }}</td>
-                <td>{{ d.bundle.description|linebreaks }}</td>
+                <th scope="row"><button class="btncopy btn btn-success btn-sm" data-clipboard-text="{{ d.0 }}"><strong>{{ d.0 }}</strong></th>
+                <td class="fw-bold">{{ d.1 }}</td>
+                <td>{{ d.2|linebreaks }}</td>
+                
+                  <td>{% if d.3 == 'Ada' %} {{ d.3 }} {% else %} <a href="{% url 'arsip_tata_show_trans_detail' d.4 %}"><button class="btn btn-sm btn-warning"><strong>{{ d.3 }}</strong></button></a> {% endif %}</td>
+                
+                
             </tr>
             {% endfor %}
         </tbody>
