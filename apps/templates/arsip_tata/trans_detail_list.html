@@ -3,11 +3,16 @@
     {% for d in transdetail %}
     <div class="col-12 col-lg-3 mt-3">
       <div class="card border-primary mb-3">
-        <button class="btn btn-warning btn-sm" hx-get="{% url 'arsip_tata_remove_transdetail' d.id %}" hx-target="#dialog">Hapus</button>
+        <form class="form-inline" action="{% url 'arsip_tata_remove_transdetail' d.id %}" method="post">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-warning w-100 btn-sm" onclick="return confirm('Hapus file Item Berkas?')">Hapus</button>
+        </form>
+  
+        {% comment %} <button class="btn btn-warning btn-sm" hx-get="{% url 'arsip_tata_remove_transdetail' d.id %}" hx-target="#dialog">Hapus</button> {% endcomment %}
         <div class="row no-gutters px-3 py-2">
           <div class="col-sm-12 mt-3 text-center">
-              <p>{{ d.item.title }}<br/>{{ d.item.bundle.description }}</p>
-              <h5>{{ d.item.codegen }}</h5>
+              <p><strong>{{ d.item.title }}</strong><br/>{{ d.item.bundle.description }}</p>
+              <h5>Kode: <strong>{{ d.item.codegen }}</strong></h5>
               {% comment %} <h5>{{ d.customer.name }}</h5> {% endcomment %}
           </div>
         </div>

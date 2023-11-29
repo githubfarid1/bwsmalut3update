@@ -1,6 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import Year, Box, Bundle, Item, Bundlecode, Customer, Trans
+from .models import Year, Box, Bundle, Item, Bundlecode, Customer, Trans, TransDetail
 from django.core.exceptions import NON_FIELD_ERRORS
 import re
 
@@ -84,3 +84,10 @@ class TransForm(forms.ModelForm):
 
 class AddTransDetailForm(forms.Form): 
     code = forms.CharField(label="Kode Item Berkas", max_length = 255, help_text = "xxx") 
+
+
+class EditTransDetailForm(forms.ModelForm):
+    date_return = forms.DateField(widget=forms.TextInput(attrs={'class': 'form-control', 'type':'date'}))
+    class Meta:
+        model = TransDetail
+        fields = ['date_return']

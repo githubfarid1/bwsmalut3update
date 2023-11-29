@@ -140,7 +140,7 @@ class Trans(models.Model):
 
 class TransDetail(models.Model):
     id = models.AutoField(primary_key=True)
-    date_return = models.DateField(null=True)
+    date_return = models.DateField(null=True, blank=True)
     
     item = models.ForeignKey(
         Item,

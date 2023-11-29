@@ -1,7 +1,7 @@
 {% extends "layouts/base.html" %} {% load static %}
 {% load crispy_forms_tags %}
 
-{% block title %} | Form Detail Peminjaman {% endblock %}
+{% block title %} | Form Pengembalian {% endblock %}
 {% block stylesheets %}
     <link href="{% static 'assets/vendors/coreui/icons/css/free.min.css' %}" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/style.css' %}" />
@@ -18,25 +18,9 @@
 
 {% block content %}
 <div class="container-fluid">
-  <h3 class="text-center">Detail Form Peminjaman</h3>
+    <h3 class="text-center">Form Pengembalian</h3>
 
-    <h5>Nama Peminjam: {{ trans.customer.name }}</h5>
-    <h5>Tanggal Pinjam: {{ trans.date_trans|date:"d M Y" }}</h5>
-
-    <div class="d-flex flex-row-reverse bd-highlight">
-        <div class="p-2 bd-highlight">
-            <button hx-get="{% url 'arsip_tata_add_trans_detail' trans.id %}" hx-target="#dialog" class="btn btn-sm btn-primary">
-                Tambah Berkas Pinjam
-            </button>
-        </div>
-        <div class="p-2 bd-highlight">
-          <a href="{% url 'arsip_tata_trans_form' trans.id %}"><button class="btn btn-sm btn-success">
-              Cetak Form
-          </button></a>
-      </div>
-  
-    </div>
-    <div class="row" hx-trigger="load, transDetailListChanged from:body" hx-get="{% url 'arsip_tata_trans_detail_list' trans.id %}" hx-target="this">
+    <div class="row" hx-trigger="load, transretListChanged from:body" hx-get="{% url 'arsip_tata_transret_list' %}" hx-target="this">
         <span class="visually-hidden">Loading...</span>
     </div>
     <!-- Placeholder for the modal -->

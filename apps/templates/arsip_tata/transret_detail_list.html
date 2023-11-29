@@ -1,0 +1,24 @@
+{% load static %}
+  {% if transdetail %}
+    {% for d in transdetail %}
+    <div class="col-12 col-lg-3 mt-3">
+      <div class="card border-primary mb-3">
+        {% if d.date_return %}
+        <button class="btn btn-warning btn-sm" hx-get="{% url 'arsip_tata_edit_transdetail' d.id %}" hx-target="#dialog">Hapus Tanggal Kembali</button>
+        {% else %}
+        <button class="btn btn-primary btn-sm" hx-get="{% url 'arsip_tata_edit_transdetail' d.id %}" hx-target="#dialog">Input Tanggal Kembali</button>
+
+        {% endif %}
+        <div class="row no-gutters px-3 py-2">
+          <div class="col-sm-12 mt-3 text-center">
+              <p><strong>{{ d.item.title }}</strong><br/>{{ d.item.bundle.description }}</p>
+              {% if d.date_return %}
+                <h5 style="color: red;">Kembali: {{ d.date_return|date:"d M Y" }}</h5>
+              {% endif %}
+              {% comment %} <h5>{{ d.customer.name }}</h5> {% endcomment %}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+{% endif %}

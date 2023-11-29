@@ -12,6 +12,7 @@
               <use xlink:href="{% static 'assets/vendors/coreui/icons/svg/free.svg' %}#cil-puzzle"></use>
             </svg> Arsip Inaktif</a>
           <ul class="nav-group-items">
+            <li class="nav-item"><a class="nav-link" href="{% url 'arsip_tata_show_year' %}"><span class="nav-icon"></span> Penataan Arsip</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'arsip_inaktif_statistics' %}"><span class="nav-icon"></span> Berkas Per Klasifikasi</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'arsip_inaktif_statistics_year' %}"><span class="nav-icon"></span> Berkas Per Tahun</a></li>
 
@@ -44,10 +45,19 @@
             <li class="nav-item"><a class="nav-link" href="{% url 'alihmedia_vital_export' %}"><span class="nav-icon"></span> Export ke Excel</a></li>
           </ul>
         </li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'arsip_tata_show_year' %}"><svg class="nav-icon">
+        <li class="nav-title">Peminjaman Arsip</li>
+
+        <li class="nav-item"><a class="nav-link" href="{% url 'arsip_tata_show_customers' %}"><svg class="nav-icon">
           <use xlink:href="{% static 'assets/vendors/coreui/icons/svg/free.svg' %}#cil-cursor"></use>
-        </svg> Penataan Arsip</a></li>
-        <li class="nav-title">Arsip Manager</li>
+        </svg> Data Peminjam</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'arsip_tata_show_trans' %}"><svg class="nav-icon">
+          <use xlink:href="{% static 'assets/vendors/coreui/icons/svg/free.svg' %}#cil-cursor"></use>
+        </svg> Form Peminjaman</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'arsip_tata_show_transret' %}"><svg class="nav-icon">
+          <use xlink:href="{% static 'assets/vendors/coreui/icons/svg/free.svg' %}#cil-cursor"></use>
+        </svg> Form Pengembalian</a></li>
+
+        <li class="nav-title">Manajemen File</li>
         <li class="nav-group"><a class="nav-link nav-group-toggle" href="#">
           <svg class="nav-icon">
             <use xlink:href="{% static 'assets/vendors/coreui/icons/svg/free.svg' %}#cil-cursor"></use>

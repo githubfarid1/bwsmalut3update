@@ -5,7 +5,7 @@ from django.http import HttpResponse, Http404
 from .models import Year, Box, Bundle, Item, Customer, Trans, TransDetail
 from django.views.decorators.csrf import csrf_exempt
 import json
-from .forms import YearForm, BoxForm, BundleForm, ItemForm, CustomerForm, TransForm, AddTransDetailForm
+from .forms import YearForm, BoxForm, BundleForm, ItemForm, CustomerForm, TransForm, AddTransDetailForm, EditTransDetailForm
 from django.views.decorators.http import require_POST
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Alignment, Font, PatternFill
@@ -19,6 +19,8 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, PageTemplate, BaseD
 from reportlab.lib.units import inch
 from reportlab.platypus.tables import Table,TableStyle,colors
 from datetime import datetime, timedelta
+from django.template.defaultfilters import slugify
+
 # Create your views here.
 @csrf_exempt
 def year_list(request):
@@ -724,8 +726,6 @@ def remove_trans(request, pk):
             })
         })
 
-
-
 def show_trans_detail(request, trans_id):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -786,16 +786,11 @@ def add_trans_detail(request, trans_id):
 
 # @ require_POST
 def remove_transdetail(request, pk):
-    trans = get_object_or_404(TransDetail, pk=pk)
-    trans.delete()
-    return HttpResponse(
-        status=204,
-        headers={
-            'HX-Trigger': json.dumps({
-                "transDetailListChanged": None,
-                "showMessage": f"{trans.id} deleted."
-            })
-        })
+    if request.method == "POST":
+        trans = get_object_or_404(TransDetail, pk=pk)
+        trans_id = trans.trans.id
+        trans.delete()
+        return redirect('arsip_tata_show_trans_detail', trans_id=trans_id)
 
 def trans_form(request, pk):
     trans = Trans.objects.get(pk=pk)
@@ -822,7 +817,7 @@ def trans_form(request, pk):
     elements.append(Spacer(1, 6))
     elements.append(Paragraph(f'Tanggal Pinjam: <strong>{date1show}</strong>', styles['Normal']))
     elements.append(Spacer(1, 6))
-    elements.append(Paragraph(f'Tanggal Kembali: <strong>{date2show}</strong>', styles['Normal']))
+    elements.append(Paragraph(f'Akan Kembali pada: <strong>{date2show}</strong>', styles['Normal']))
     mydata = []
     mydata.append(("No", "Kode", "Judul Dokumen"))
     c_width = [0.4*inch, 1*inch, 5*inch]
@@ -830,7 +825,7 @@ def trans_form(request, pk):
     style2 = getSampleStyleSheet()
     style2 = style2["BodyText"]
     style2.wordWrap = 'CJK'
-    
+    filename = f"form_pinjam_{slugify(trans.customer.name)}.pdf"
     for idx, data in enumerate(detail):
         myset = (Paragraph(str(idx+1), style2) , Paragraph(data.item.codegen, style2), Paragraph(data.item.title + "<br/>" + data.item.bundle.description.replace("\n", "<br/>") , style2))
         mydata.append(myset)
@@ -851,5 +846,135 @@ def trans_form(request, pk):
     doc.build(elements)
     pdf.seek(0)
     response = HttpResponse(pdf.read(), content_type='application/pdf')
-    response['Content-Disposition'] = f'inline;filename=tes1.pdf'
+    response['Content-Disposition'] = f'inline;filename={filename}'
+    return response
+
+def show_transret(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    context = {
+    }
+    return render(request=request, template_name='arsip_tata/show_transret.html', context=context)
+
+def transret_list(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    return render(request, 'arsip_tata/transret_list.html', {
+        'trans': Trans.objects.all().order_by("-id"),
+    })
+
+def show_transret_detail(request, trans_id):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    trans = Trans.objects.get(id=trans_id)
+    context = {
+        'trans': trans,
+    }
+    return render(request=request, template_name='arsip_tata/show_transret_detail.html', context=context)
+
+def edit_transdetail(request, pk):
+    trans = get_object_or_404(TransDetail, pk=pk)
+    if request.method == "POST":
+        form = EditTransDetailForm(request.POST, instance=trans)
+        if form.is_valid():
+            form.save()
+            return HttpResponse(
+                status=204,
+                headers={
+                    'HX-Trigger': json.dumps({
+                        "transretDetailListChanged": None,
+                        "showMessage": f"{trans.id} updated."
+                    })
+                }
+            )
+    else:
+        if trans.date_return == None:
+            form = EditTransDetailForm(instance=trans)
+        else:
+            trans.date_return = None
+            trans.save()
+            return HttpResponse(
+                status=204,
+                headers={
+                    'HX-Trigger': json.dumps({
+                        "transretDetailListChanged": None,
+                        "showMessage": f"{trans.id} updated."
+                    })
+                }
+            )
+
+    return render(request, 'arsip_tata/edit_trans_detail_form.html', {
+        'form': form,
+        'transdetail': trans,
+        'module': 'Edit Data'
+    })
+
+@csrf_exempt
+def transret_detail_list(request, trans_id):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    transdetail = TransDetail.objects.filter(trans_id=trans_id)
+    return render(request, 'arsip_tata/transret_detail_list.html', {
+        'transdetail': transdetail,
+    })
+
+
+def transret_form(request, pk):
+    trans = Trans.objects.get(pk=pk)
+    detail = trans.transdetail_set.all()
+    pdf = io.BytesIO()
+    doc = SimpleDocTemplate(pdf, pagesize=A4)
+    date1 = trans.date_trans
+    date1show = date1.strftime('%d %B %Y')
+    styles = getSampleStyleSheet()
+    title = "Form Pengembalian Dokumen"
+
+    frame = Frame(doc.leftMargin, doc.bottomMargin, doc.width, doc.height)
+    template = PageTemplate(frames=[frame], id='mytemplate')
+
+    doc.addPageTemplates([template])
+    elements = []
+    elements.append(Paragraph(title, styles['Title']))
+    elements.append(Spacer(1, 12))
+    elements.append(Paragraph(f'Nama Peminjam: <strong>{trans.customer.name}</strong>', styles['Normal']))
+    elements.append(Spacer(1, 6))
+    elements.append(Paragraph(f'No WhatsApp: <strong>{trans.customer.phone_number}</strong>', styles['Normal']))
+    elements.append(Spacer(1, 6))
+    elements.append(Paragraph(f'Tanggal Pinjam: <strong>{date1show}</strong>', styles['Normal']))
+    elements.append(Spacer(1, 6))
+    mydata = []
+    mydata.append(("No", "Kode", "Judul Dokumen", "Kembali"))
+    c_width = [0.4*inch, 1*inch, 4*inch, 1*inch]
+    
+    style2 = getSampleStyleSheet()
+    style2 = style2["BodyText"]
+    style2.wordWrap = 'CJK'
+    filename = f"form_kembali_{slugify(trans.customer.name)}.pdf"
+    for idx, data in enumerate(detail):
+        if data.date_return:
+            date_return = data.date_return.strftime('%d %b %Y')
+        else:
+            date_return = ""
+        myset = (Paragraph(str(idx+1), style2) , Paragraph(data.item.codegen, style2), Paragraph(data.item.title + "<br/>" + data.item.bundle.description.replace("\n", "<br/>") , style2), Paragraph(date_return, style2))
+        mydata.append(myset)
+
+    mytable = Table(mydata, colWidths=c_width, hAlign='LEFT')
+    mytable.setStyle(TableStyle([('BACKGROUND',(0,0),(-1,0),colors.lightblue),
+                       ('INNERGRID', (0,0), (-1,-1), 0.25, colors.red),
+                       ('FONTSIZE',(0,0),(-1,0),12),
+                       ('FONTSIZE',(0,1),(-1,-1),8),
+                       ('FONTNAME', (0,0), (-1,0), 'Courier-Bold'),
+                       ('ALIGN', (0,0), (-1,0), 'CENTER'),
+                       ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+                       ('VALIGN',(0,0),(-1,-1),'TOP'),
+                       ]))
+    elements.append(Spacer(1, 10))
+    elements.append(mytable)
+
+    doc.build(elements)
+    pdf.seek(0)
+    response = HttpResponse(pdf.read(), content_type='application/pdf')
+    response['Content-Disposition'] = f'inline;filename={filename}'
     return response

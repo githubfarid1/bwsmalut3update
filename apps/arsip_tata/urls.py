@@ -46,4 +46,11 @@ urlpatterns = [
     path(route='transdetail/<int:pk>/remove', view=views.remove_transdetail, name=prefix + 'remove_transdetail'),
     path(route='trans_form/<int:pk>', view=views.trans_form, name=prefix + 'trans_form'),
 
+    path(route='transret', view=views.show_transret, name=prefix + "show_transret"),
+    path(route='transret_list', view=views.transret_list, name=prefix + "transret_list"),
+    path(route='transretdetail/<int:trans_id>', view=views.show_transret_detail, name=prefix + "show_transret_detail"),
+    path(route='transretdetail_list/<int:trans_id>', view=views.transret_detail_list, name=prefix + "transret_detail_list"),
+    path(route='transdetail/<int:pk>/edit', view=views.edit_transdetail, name=prefix + 'edit_transdetail'),
+    path(route='transret_form/<int:pk>', view=views.transret_form, name=prefix + 'transret_form'),
+  
 ]
