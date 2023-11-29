@@ -101,7 +101,7 @@ class Item(models.Model):
     yeardate = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(2023), MaxValueValidator(2050)]
     )
-    codegen = models.CharField(max_length=20, blank=True, unique=True)
+    codegen = models.CharField(max_length=20, blank=True, unique=True, null=True)
     bundle = models.ForeignKey(
         Bundle,
         db_column='bundle_id',
