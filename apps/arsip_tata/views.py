@@ -5,7 +5,7 @@ from django.http import HttpResponse, Http404
 from .models import Year, Box, Bundle, Item, Customer, Trans, TransDetail
 from django.views.decorators.csrf import csrf_exempt
 import json
-from .forms import YearForm, BoxForm, BundleForm, ItemForm, CustomerForm, TransForm, AddTransDetailForm, EditTransDetailForm
+from .forms import YearForm, BoxForm, BundleForm, ItemForm, CustomerForm, TransForm, AddTransDetailForm, EditTransDetailForm, SearchItemForm
 from django.views.decorators.http import require_POST
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Alignment, Font, PatternFill
@@ -20,6 +20,8 @@ from reportlab.lib.units import inch
 from reportlab.platypus.tables import Table,TableStyle,colors
 from datetime import datetime, timedelta
 from django.template.defaultfilters import slugify
+from django.db.models import Q
+
 
 # Create your views here.
 @csrf_exempt
@@ -920,7 +922,6 @@ def transret_detail_list(request, trans_id):
         'transdetail': transdetail,
     })
 
-
 def transret_form(request, pk):
     trans = Trans.objects.get(pk=pk)
     detail = trans.transdetail_set.all()
@@ -978,3 +979,24 @@ def transret_form(request, pk):
     response = HttpResponse(pdf.read(), content_type='application/pdf')
     response['Content-Disposition'] = f'inline;filename={filename}'
     return response
+
+def search_item(request):
+    context = {}
+    if request.GET.get("title") or request.GET.get("description"):
+        title = request.GET.get("title")
+        description = request.GET.get("description")
+        if title != None and description == None:
+            items = Item.objects.filter(title__icontains=title)
+        elif title == None and description != None:
+            items = Item.objects.filter(bundle__description__icontains=description)
+        else:
+            items = Item.objects.filter(Q(bundle__description__icontains=description) & Q(title__icontains=title))       
+        # data = []
+        # for item in items:
+        #     myset = (item.codegen, item.title, item.bundle.description )
+        #     data.append(myset)
+        # return HttpResponse(data)
+        context['data'] = items
+    
+    context['form'] = SearchItemForm()
+    return render(request,'arsip_tata/search_item_form.html', context=context)

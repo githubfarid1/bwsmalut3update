@@ -83,7 +83,7 @@ class TransForm(forms.ModelForm):
 
 
 class AddTransDetailForm(forms.Form): 
-    code = forms.CharField(label="Kode Item Berkas", max_length = 255, help_text = "xxx") 
+    code = forms.CharField(label="Kode Item Berkas", max_length = 255, help_text = "") 
 
 
 class EditTransDetailForm(forms.ModelForm):
@@ -91,3 +91,7 @@ class EditTransDetailForm(forms.ModelForm):
     class Meta:
         model = TransDetail
         fields = ['date_return']
+
+class SearchItemForm(forms.Form): 
+    description = forms.CharField(label="Uraian Masalah", max_length = 255, help_text = "", required=False) 
+    title = forms.CharField(label="Judul", max_length = 255, help_text = "", required=False) 

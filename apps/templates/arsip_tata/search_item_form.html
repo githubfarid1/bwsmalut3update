@@ -1,0 +1,72 @@
+{% extends "layouts/base.html" %} {% load static %}
+{% block title %} | Cari Item Berkas {% endblock %}
+{% block stylesheets %}
+    <link rel="stylesheet" href=
+    "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" />
+{% endblock stylesheets %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="container-fluid">
+  <h3 class="text-center">Cari Item Berkas</h3>
+  <div class="row justify-content-center">
+    <div class="col-lg-4 col-md-6 col-sm-12 border">  
+      <form action="" method="get">
+        {{form|crispy}}
+        <button type="submit" class="btn btn-primary mt-2">Cari</button>
+      </form>
+    </div>
+    </div>  
+  </div>
+  {%if data %}
+  <section>
+    <!--Table-->
+    <table class="table align-middle mb-0 bg-white table-bordered mt-3">
+        <!--Table head-->
+        <thead class="table-warning">
+            <tr>
+                <th>Kode Dokumen</th>
+                <th>Judul</th>
+                <th>Uraian Pekerjaan</th>
+            </tr>
+        </thead>
+        <!--Table head-->
+
+        <!--Table body-->
+        <tbody>
+            {% for d in data %}
+            <tr>
+                <th scope="row"><button class="btncopy btn btn-success btn-sm" data-clipboard-text="{{ d.codegen }}"><strong>{{ d.codegen }}</strong></th>
+                <td class="fw-bold">{{ d.title }}</td>
+                <td>{{ d.bundle.description|linebreaks }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <!--Table body-->
+    </table>
+    <!--Table-->
+</section>
+  {% endif %}
+  
+</div>
+{% endblock content %}
+{% block javascripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js"></script>
+<script>
+var clipboard = new ClipboardJS('.btncopy');
+
+clipboard.on('success', function(e) {
+    console.info('Action:', e.action);
+    console.info('Text:', e.text);
+    console.info('Trigger:', e.trigger);
+
+    e.clearSelection();
+});
+
+clipboard.on('error', function(e) {
+    console.error('Action:', e.action);
+    console.error('Trigger:', e.trigger);
+});
+</script>
+{%endblock javascripts %}

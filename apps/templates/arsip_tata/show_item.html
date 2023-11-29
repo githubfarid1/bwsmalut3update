@@ -67,21 +67,4 @@
 <script src="https://unpkg.com/htmx.org@1.6.1/dist/htmx.min.js"></script>
 <script src="{% static "js/dialog.js" %}"></script>
 <script src="{% static "js/toast.js" %}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js"></script>
-<script>
-var clipboard = new ClipboardJS('.btncopy');
-
-clipboard.on('success', function(e) {
-    console.info('Action:', e.action);
-    console.info('Text:', e.text);
-    console.info('Trigger:', e.trigger);
-
-    e.clearSelection();
-});
-
-clipboard.on('error', function(e) {
-    console.error('Action:', e.action);
-    console.error('Trigger:', e.trigger);
-});
-</script>
 {%endblock javascripts %}

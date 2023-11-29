@@ -52,5 +52,7 @@ urlpatterns = [
     path(route='transretdetail_list/<int:trans_id>', view=views.transret_detail_list, name=prefix + "transret_detail_list"),
     path(route='transdetail/<int:pk>/edit', view=views.edit_transdetail, name=prefix + 'edit_transdetail'),
     path(route='transret_form/<int:pk>', view=views.transret_form, name=prefix + 'transret_form'),
-  
+   path(route='search_item', view=views.search_item, name=prefix + "search_item"),
+   
+
 ]
