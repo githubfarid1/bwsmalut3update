@@ -33,7 +33,12 @@
           <a href="{% url 'arsip_tata_trans_form' trans.id %}"><button class="btn btn-sm btn-success">
               Cetak Form
           </button></a>
-      </div>
+        </div>
+        <div class="p-2 bd-highlight">
+          <a href="https://wa.me/{{ trans.customer.phone_number }}" target="_new"><button class="btn btn-sm btn-success">
+              Chat WhatsApp
+          </button></a>
+        </div>
   
     </div>
     <div class="row" hx-trigger="load, transDetailListChanged from:body" hx-get="{% url 'arsip_tata_trans_detail_list' trans.id %}" hx-target="this">
