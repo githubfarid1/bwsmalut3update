@@ -8,8 +8,8 @@
             <a href="{% url 'arsip_tata_show_transret_detail' d.pk %}"><img class="card-img border" src="{% static 'assets/icons/trans.png' %}" alt=""></a>
           </div>
           <div class="col-sm-12 mt-2 text-center">
-            <h5>{{ d.codetrans }}</h5>
-            <h5>{{ d.customer.name }} <br/> {{d.date_trans}}</h5>
+            <h5>{{ d.codetrans }}<br/>
+            {{ d.customer.name }} <br/> {{d.date_trans}}</h5>
             <p>{{d.transdetail_set.count}} item</p>
         </div>
 
