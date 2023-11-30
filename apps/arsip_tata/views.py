@@ -991,16 +991,18 @@ def search_item(request):
             items = Item.objects.filter(bundle__description__icontains=description)
         else:
             items = Item.objects.filter(Q(bundle__description__icontains=description) & Q(title__icontains=title))       
-        data = []
-        for item in items:
-            status = 'Ada'
-            trans_id = None
-            if item.transdetail_set.filter(date_return__isnull=True).count() != 0:
-                status='Dipinjam'
-                trans_id = item.transdetail_set.filter(date_return__isnull=True).first().trans_id
-            myset = (item.codegen, item.title, item.bundle.description, status, trans_id)
-            data.append(myset)
-        context['data'] = data
-    
+    else:
+        items = Item.objects.all()
+    data = []
+    for item in items:
+        status = 'Ada'
+        trans_id = None
+        if item.transdetail_set.filter(date_return__isnull=True).count() != 0:
+            status='Dipinjam'
+            trans_id = item.transdetail_set.filter(date_return__isnull=True).first().trans_id
+        myset = (item.codegen, item.title, item.bundle.description, status, trans_id)
+        data.append(myset)
+    context['data'] = data
+
     context['form'] = SearchItemForm()
     return render(request,'arsip_tata/search_item_form.html', context=context)
