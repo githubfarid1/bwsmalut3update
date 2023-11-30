@@ -20,8 +20,9 @@
 <div class="container-fluid">
   <h3 class="text-center">Detail Form Peminjaman</h3>
 
-    <h5>Nama Peminjam: {{ trans.customer.name }}</h5>
-    <h5>Tanggal Pinjam: {{ trans.date_trans|date:"d M Y" }}</h5>
+  <h5>Kode Peminjaman: {{ trans.codetrans }}</h5>
+  <h5>Tanggal Pinjam: {{ trans.date_trans|date:"d M Y" }}</h5>
+  <h5>Nama Peminjam: {{ trans.customer.name }}</h5>
 
     <div class="d-flex flex-row-reverse bd-highlight">
         <div class="p-2 bd-highlight">

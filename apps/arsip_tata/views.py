@@ -656,7 +656,6 @@ def remove_customer(request, pk):
             })
         })
 
-
 def show_trans(request):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -676,7 +675,17 @@ def add_trans(request):
     if request.method == "POST":
         form = TransForm(request.POST)
         if form.is_valid():
-            trans = form.save()
+            trans = form.save(commit=False)
+            yearnow = datetime.today().year
+            stryearnow = str(yearnow)
+            ctran = Trans.objects.filter(codetrans__contains=stryearnow).order_by("-id").first()
+            if not ctran:
+                no = 1
+            else:
+                no = int(ctran.codetrans[4:]) + 1
+            print(stryearnow + "{:05d}".format(no))
+            trans.codetrans = stryearnow + "{:04d}".format(no)
+            trans.save()
             return HttpResponse(
                 status=204,
                 headers={
@@ -813,6 +822,8 @@ def trans_form(request, pk):
     elements = []
     elements.append(Paragraph(title, styles['Title']))
     elements.append(Spacer(1, 12))
+    elements.append(Paragraph(f'Kode Peminjaman: <strong>{trans.codetrans}</strong>', styles['Normal']))
+    elements.append(Spacer(1, 6))
     elements.append(Paragraph(f'Nama Peminjam: <strong>{trans.customer.name}</strong>', styles['Normal']))
     elements.append(Spacer(1, 6))
     elements.append(Paragraph(f'No WhatsApp: <strong>{trans.customer.phone_number}</strong>', styles['Normal']))
@@ -939,6 +950,8 @@ def transret_form(request, pk):
     elements = []
     elements.append(Paragraph(title, styles['Title']))
     elements.append(Spacer(1, 12))
+    elements.append(Paragraph(f'Kode Peminjaman: <strong>{trans.codetrans}</strong>', styles['Normal']))
+    elements.append(Spacer(1, 6))
     elements.append(Paragraph(f'Nama Peminjam: <strong>{trans.customer.name}</strong>', styles['Normal']))
     elements.append(Spacer(1, 6))
     elements.append(Paragraph(f'No WhatsApp: <strong>{trans.customer.phone_number}</strong>', styles['Normal']))

@@ -75,7 +75,6 @@ class Bundle(models.Model):
     def __str__(self) -> str:
         return f"{self.bundle_number}_{self.box.box_number}"
 
-
 class Item(models.Model):
     ACCESS_CHOICES = (
         ('B', 'Biasa'),
@@ -125,6 +124,7 @@ class Customer(models.Model):
 
 class Trans(models.Model):
     id = models.AutoField(primary_key=True)
+    codetrans = models.CharField(max_length=8, unique=True, null=True)
     date_trans = models.DateField()
     customer = models.ForeignKey(
         Customer,
