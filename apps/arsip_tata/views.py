@@ -838,7 +838,7 @@ def trans_form(request, pk):
     style2 = getSampleStyleSheet()
     style2 = style2["BodyText"]
     style2.wordWrap = 'CJK'
-    filename = f"form_pinjam_{slugify(trans.customer.name)}.pdf"
+    filename = f"form_pinjam_{trans.codetrans}.pdf"
     for idx, data in enumerate(detail):
         myset = (Paragraph(str(idx+1), style2) , Paragraph(data.item.codegen, style2), Paragraph(data.item.title + "<br/>" + data.item.bundle.description.replace("\n", "<br/>") , style2))
         mydata.append(myset)
@@ -965,7 +965,7 @@ def transret_form(request, pk):
     style2 = getSampleStyleSheet()
     style2 = style2["BodyText"]
     style2.wordWrap = 'CJK'
-    filename = f"form_kembali_{slugify(trans.customer.name)}.pdf"
+    filename = f"form_kembali_{trans.codetrans}.pdf"
     for idx, data in enumerate(detail):
         if data.date_return:
             date_return = data.date_return.strftime('%d %b %Y')
