@@ -13,7 +13,7 @@ from openpyxl.styles.borders import Border, Side
 
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 import io
 from reportlab.platypus import SimpleDocTemplate, Paragraph, PageTemplate, BaseDocTemplate, Frame, Spacer
 from reportlab.lib.units import inch
@@ -21,7 +21,7 @@ from reportlab.platypus.tables import Table,TableStyle,colors
 from datetime import datetime, timedelta
 from django.template.defaultfilters import slugify
 from django.db.models import Q
-
+from reportlab.lib.enums import TA_JUSTIFY, TA_LEFT, TA_CENTER, TA_RIGHT
 
 # Create your views here.
 @csrf_exempt
@@ -856,6 +856,13 @@ def trans_form(request, pk):
     elements.append(Spacer(1, 10))
     elements.append(mytable)
 
+    elements.append(Spacer(1, 32))
+    today = datetime.today().strftime('%d %B %Y')
+    rightal = ParagraphStyle(name="RightAl",alignment=TA_RIGHT)
+    elements.append(Paragraph(f'Ternate, {today}', rightal))
+    elements.append(Spacer(1, 32))
+    elements.append(Paragraph('(Petugas Arsip)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', rightal))
+
     doc.build(elements)
     pdf.seek(0)
     response = HttpResponse(pdf.read(), content_type='application/pdf')
@@ -986,6 +993,12 @@ def transret_form(request, pk):
                        ]))
     elements.append(Spacer(1, 10))
     elements.append(mytable)
+    elements.append(Spacer(1, 32))
+    today = datetime.today().strftime('%d %B %Y')
+    rightal = ParagraphStyle(name="RightAl",alignment=TA_RIGHT)
+    elements.append(Paragraph(f'Ternate, {today}', rightal))
+    elements.append(Spacer(1, 32))
+    elements.append(Paragraph('(Petugas Arsip)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', rightal))
 
     doc.build(elements)
     pdf.seek(0)
