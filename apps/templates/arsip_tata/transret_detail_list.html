@@ -12,6 +12,7 @@
         <div class="row no-gutters px-3 py-2">
           <div class="col-sm-12 mt-3 text-center">
               <p><strong>{{ d.item.title }}</strong><br/>{{ d.item.bundle.description }}</p>
+              <h5>Kode: <strong>{{ d.item.codegen }}</strong></h5>
               {% if d.date_return %}
                 <h5 style="color: red;">Kembali: {{ d.date_return|date:"d M Y" }}</h5>
               {% endif %}
