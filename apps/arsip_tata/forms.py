@@ -65,13 +65,15 @@ class ItemForm(forms.ModelForm):
 class CustomerForm(forms.ModelForm):
     class Meta:
         model = Customer
-        fields = ['name', 'phone_number', 'description']
+        fields = ['name', 'phone_number', 'description', 'photo', 'idcard']
 
     def clean_phone_number(self):
         cleaned_data = self.cleaned_data['phone_number']
+        if cleaned_data[0] == '0':
+            cleaned_data = '+62' + cleaned_data[1:]
         reg = re.compile('^\+?1?\d{9,15}$')
         if not reg.match(cleaned_data):
-            raise ValidationError(f"Format Telpon Salah, gunakan format +9999999, maximal 15 digit")
+            raise ValidationError(f"Format Telpon Salah, maximal 15 digit")
         
         return cleaned_data
         

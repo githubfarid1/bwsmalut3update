@@ -119,6 +119,9 @@ class Customer(models.Model):
     name = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=20, unique=True)
     description = models.TextField(null=True, blank=True)
+    photo = models.ImageField(upload_to='images', null=True, blank=True)
+    idcard = models.ImageField(upload_to='images', null=True, blank=True)
+
     def __str__(self) -> str:
         return self.name
 

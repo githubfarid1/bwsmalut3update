@@ -1,7 +1,7 @@
 from django.shortcuts import render
 import os
 from django.shortcuts import render, get_object_or_404, redirect, get_list_or_404
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, JsonResponse
 from .models import Year, Box, Bundle, Item, Customer, Trans, TransDetail
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -22,6 +22,8 @@ from datetime import datetime, timedelta
 from django.template.defaultfilters import slugify
 from django.db.models import Q
 from reportlab.lib.enums import TA_JUSTIFY, TA_LEFT, TA_CENTER, TA_RIGHT
+from django.conf import settings
+from os.path import exists
 
 # Create your views here.
 @csrf_exempt
@@ -60,7 +62,6 @@ def add_year(request):
         'module': 'Tambah Data'
     })
 
-
 def edit_year(request, pk):
     year = get_object_or_404(Year, pk=pk)
     # return HttpResponse(year.id)
@@ -97,7 +98,6 @@ def remove_year(request, pk):
                 "showMessage": f"{year.yeardate} deleted."
             })
         })
-
 
 def show_boxes(request, year):
     if not request.user.is_authenticated:
@@ -602,7 +602,9 @@ def customer_list(request):
 
 def add_customer(request):
     if request.method == "POST":
-        form = CustomerForm(request.POST)
+        form = CustomerForm(request.POST or None, request.FILES or None)
+        # if request.is_ajax():
+        # print(form)
         if form.is_valid():
             customer = form.save()
             return HttpResponse(
@@ -623,7 +625,7 @@ def add_customer(request):
 def edit_customer(request, pk):
     customer = get_object_or_404(Customer, pk=pk)
     if request.method == "POST":
-        form = CustomerForm(request.POST, instance=customer)
+        form = CustomerForm(request.POST, request.FILES, instance=customer)
         if form.is_valid():
             form.save()
             return HttpResponse(
@@ -646,6 +648,8 @@ def edit_customer(request, pk):
 @ require_POST
 def remove_customer(request, pk):
     customer = get_object_or_404(Customer, pk=pk)
+    customer.photo.delete(save=True)
+    customer.idcard.delete(save=True)
     customer.delete()
     return HttpResponse(
         status=204,
