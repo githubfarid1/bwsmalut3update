@@ -12,6 +12,6 @@ urlpatterns = [
     # path('register/', register_user, name="register"),
     path("logout/", LogoutView.as_view(), name="logout"),
     path('update_password/', updatePasswordRequest , name='update_password'),
-    path('getngrok/', getngrok , name='getngrok'),
+    path('ngrok/', getngrok , name='getngrok'),
 
 ]
