@@ -1,6 +1,6 @@
 {% load widget_tweaks %}
 {% with WIDGET_ERROR_CLASS='is-invalid' %}
-<form hx-post="{{ request.path }}" hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' class="modal-content"  hx-encoding='multipart/form-data'>
+<form id="upload-form" hx-post="{{ request.path }}" hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' class="modal-content"  hx-encoding='multipart/form-data'>
   <div class="modal-header">
     <h5 class="modal-title">Upload File</h5>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -8,6 +8,7 @@
   <div class="modal-body">
     <div class="mb-3">
         <input type="file" id="uploadfiles" name="uploadfiles" multiple>
+        <progress id='uploadfiles-upload-progress' value='0' max='100' style="height:24px;width:100%"></progress>
     </div>
     <input type="hidden" name="year" value="{{ year }}">
     <input type="hidden" name="slug" value="{{ slug }}">
@@ -20,4 +21,11 @@
     <button type="submit" class="btn btn-primary">Submit</button>
   </div>
 </form>
+<script>
+  htmx.on('#upload-form', 'htmx:xhr:progress', function(evt) {
+    htmx.find('#uploadfiles-upload-progress').setAttribute('value', evt.detail.loaded/evt.detail.total * 100)
+  });
+
+</script>
+
 {% endwith %}
