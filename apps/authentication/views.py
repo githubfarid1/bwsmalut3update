@@ -4,14 +4,14 @@ Copyright (c) 2019 - present AppSeed.us
 """
 
 # Create your views here.
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth import authenticate, login
 from .forms import LoginForm, SignUpForm
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import login,  logout, authenticate, update_session_auth_hash
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
-
+import requests
 
 def updatePasswordRequest(request):
     if not request.user.is_authenticated:
@@ -76,3 +76,11 @@ def register_user(request):
         form = SignUpForm()
 
     return render(request, "accounts/register.html", {"form": form, "msg": msg, "success": success})
+
+def getngrok(request):
+    try:
+        r = requests.get('http://localhost:4040/api/tunnels')
+        result = r.json()['tunnels'][0]['public_url']
+    except:
+        result = "NGROK Failed"    
+    return HttpResponse(result)
