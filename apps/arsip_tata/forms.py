@@ -22,8 +22,8 @@ class BoxForm(forms.ModelForm):
 class BundleForm(forms.ModelForm):
     class Meta:
         model = Bundle
-        fields = ['bundle_number', 'code', 'creator', 'description', 'year_bundle', 'yeardate']
-
+        fields = ['bundle_number', 'code', 'creator', 'description', 'year_bundle', 'yeardate', 'box']
+        # fields = '__all__'
         error_messages = {
                     NON_FIELD_ERRORS: {
                         'unique_together': "Nomor Berkas Sudah Ada",

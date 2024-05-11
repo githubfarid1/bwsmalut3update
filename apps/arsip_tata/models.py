@@ -31,7 +31,7 @@ class Box(models.Model):
     
     
     def __str__(self) -> str:
-        return f"{self.box_number}_{self.year.yeardate}_{self.id}"
+        return f"{self.box_number}/{self.year.yeardate}"
 
 class Bundlecode(models.Model):
     id = models.AutoField(primary_key=True)

@@ -33,7 +33,15 @@
         <label for="{{ form.year_bundle.id_for_label }}" class="form-label">Tahun Arsip</label>
         {% render_field form.year_bundle class="form-control" placeholder="" %}
         <div class="invalid-feedback">{{ form.year_bundle.errors|first }}</div>
-    </div>    
+    </div>
+    {% if bundle %}    
+    <div class="mb-3">  
+      <label for="{{ form.box.id_for_label }}" class="form-label">Nomor Box</label>
+      {% render_field form.box class="form-control" placeholder="" %}
+      <div class="invalid-feedback">{{ form.box.errors|first }}</div>
+    </div>
+    {% endif %}    
+
     {% render_field form.yeardate type="hidden" class="form-control" placeholder="" %}
   </div>
   <div class="modal-footer">
