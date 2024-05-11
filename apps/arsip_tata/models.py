@@ -31,7 +31,7 @@ class Box(models.Model):
     
     
     def __str__(self) -> str:
-        return f"{self.box_number}_{self.year.yeardate}"
+        return f"{self.box_number}_{self.year.yeardate}_{self.id}"
 
 class Bundlecode(models.Model):
     id = models.AutoField(primary_key=True)
@@ -74,7 +74,7 @@ class Bundle(models.Model):
 
 
     def __str__(self) -> str:
-        return f"{self.bundle_number}_{self.box.box_number}"
+        return f"{self.bundle_number}_{self.box.box_number}_{self.id}"
 
 class Item(models.Model):
     ACCESS_CHOICES = (
@@ -112,7 +112,7 @@ class Item(models.Model):
         unique_together = ('item_number', 'yeardate')    
 
     def __str__(self) -> str:
-        return f"{self.item_number}_{self.bundle.bundle_number}"
+        return f"{self.item_number}_{self.bundle.bundle_number}_{self.id}"
 
 
 class Customer(models.Model):

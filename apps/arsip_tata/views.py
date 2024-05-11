@@ -303,7 +303,11 @@ def add_item(request, bundle_id):
                 })
     else:
         bundle = Bundle.objects.get(id=bundle_id)
-        form = ItemForm(initial={'yeardate': bundle.yeardate})
+        try:
+            latest_item_number = Item.objects.filter(bundle__box__yeardate=bundle.box.yeardate).latest('item_number').item_number + 1
+        except:
+            latest_item_number = 1
+        form = ItemForm(initial={'yeardate': bundle.yeardate, 'item_number': latest_item_number})
     return render(request, 'arsip_tata/item_form.html', {
         'form': form,
     })
