@@ -12,9 +12,10 @@ class Year(models.Model):
 
 class Box(models.Model):
     id = models.AutoField(primary_key=True)
-    box_number = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1)]
-    )
+    # box_number = models.PositiveSmallIntegerField(
+    #     validators=[MinValueValidator(1)]
+    # )
+    box_number = models.CharField(max_length=10)
     yeardate = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(2023), MaxValueValidator(2050)]
     )
