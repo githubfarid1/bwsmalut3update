@@ -40,6 +40,8 @@
       {% render_field form.box class="form-control" placeholder="" %}
       <div class="invalid-feedback">{{ form.box.errors|first }}</div>
     </div>
+    {% else %}
+      {% render_field form.box.as_hidden %}
     {% endif %}    
 
     {% render_field form.yeardate type="hidden" class="form-control" placeholder="" %}

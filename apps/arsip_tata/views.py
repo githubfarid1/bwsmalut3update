@@ -222,7 +222,7 @@ def add_bundle(request, box_id):
                 })
     else:
         box = Box.objects.get(id=box_id)
-        form = BundleForm(initial={'yeardate': box.yeardate})
+        form = BundleForm(initial={'yeardate': box.yeardate, 'box':  Box.objects.first().id})
     return render(request, 'arsip_tata/bundle_form.html', {
         'form': form,
     })
