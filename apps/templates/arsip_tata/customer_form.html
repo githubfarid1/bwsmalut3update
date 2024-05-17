@@ -21,7 +21,7 @@
     <div class="mb-3">
       <label for="{{ form.photo.id_for_label }}" class="form-label">Foto Peminjam</label>
       {% comment %} {% render_field form.photo class="form-control" placeholder="" %} {% endcomment %}
-      <input type="file" accept="image/*" capture="document" id="tes">
+      <input type="file" accept="image/*" capture="user" name="photo" id="id_photo">
       <div class="invalid-feedback">{{ form.photo.errors|first }}</div>
       {% comment %} <div class='htmx-indicator'>Loading...</div> {% endcomment %}
       <progress id='photo-upload-progress' value='0' max='100' style="height:24px;width:100%"></progress>
