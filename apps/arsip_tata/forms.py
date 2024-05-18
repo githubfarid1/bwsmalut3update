@@ -63,8 +63,7 @@ class ItemForm(forms.ModelForm):
                 }
         
 class CustomerForm(forms.ModelForm):
-    # photo = 
-    photo = forms.CharField(widget=forms.FileInput(attrs={'capture': "user"}))
+    # photo = forms.CharField(widget=forms.FileInput(attrs={'capture': "user"}))
     class Meta:
         model = Customer
         fields = ['name', 'phone_number', 'description', 'photo', 'idcard']
