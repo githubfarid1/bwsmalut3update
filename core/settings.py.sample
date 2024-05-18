@@ -183,3 +183,6 @@ MOVEPDF_SCRIPT = "/home/farid/dev/python/arsip-utility/movepdf.py"
 FM_LOCATION = "/home/farid/fms/"
 FM_FILETYPE_LOCATION = os.path.join(BASE_DIR, "apps","static", "assets", 'filetypes')
 TIME_ZONE = 'Asia/Jayapura'
+DATE_INPUT_FORMATS = ["%d.%m.%Y"]
+ARSIP_TATA_COVER_LOCATION = 'images/arsip_tata/cover/'
+ARSIP_TATA_CUSTOMER_LOCATION = 'images/arsip_tata/customer/'

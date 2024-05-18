@@ -36,6 +36,7 @@ apps/static/assets/.temp
 /.env
 /core/settings.py
 /media/tmpfiles/*
+/media/images/*
 
 #UTILITIES
 /utilities/alihmedia_inactive/settings.py

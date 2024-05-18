@@ -1,5 +1,7 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
+import os
+from django.conf import settings
 
 class Year(models.Model):
     id = models.AutoField(primary_key=True)
@@ -77,6 +79,11 @@ class Bundle(models.Model):
         return f"{self.bundle_number}_{self.box.box_number}_{self.id}"
 
 class Item(models.Model):
+    def update_filename(instance, filename):
+        ext = filename.split("/")[-1].split(".")[-1]
+        format = instance.codegen + "." + ext
+        return os.path.join(settings.ARSIP_TATA_COVER_LOCATION, format)
+        
     ACCESS_CHOICES = (
         ('B', 'Biasa'),
         ('T', 'Terbatas'),
@@ -102,6 +109,7 @@ class Item(models.Model):
         validators=[MinValueValidator(2023), MaxValueValidator(2050)]
     )
     codegen = models.CharField(max_length=20, blank=True, null=True, unique=True)
+    cover = models.ImageField(upload_to=update_filename , null=True, blank=True)
     bundle = models.ForeignKey(
         Bundle,
         db_column='bundle_id',
@@ -116,15 +124,26 @@ class Item(models.Model):
 
 
 class Customer(models.Model):
+    def update_filename_photo(instance, filename):
+        ext = filename.split("/")[-1].split(".")[-1]
+        format =  "photo_" + str(instance.id) + "." + ext
+        return os.path.join(settings.ARSIP_TATA_CUSTOMER_LOCATION, format)
+
+    def update_filename_idcard(instance, filename):
+        ext = filename.split("/")[-1].split(".")[-1]
+        format =  "idcard_" + str(instance.id) + "." + ext
+        return os.path.join(settings.ARSIP_TATA_CUSTOMER_LOCATION, format)
+
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=20, unique=True)
     description = models.TextField(null=True, blank=True)
-    photo = models.ImageField(upload_to='images', null=True, blank=True)
-    idcard = models.ImageField(upload_to='images', null=True, blank=True)
+    photo = models.ImageField(upload_to=update_filename_photo, null=True, blank=True)
+    idcard = models.ImageField(upload_to=update_filename_idcard, null=True, blank=True)
 
     def __str__(self) -> str:
         return self.name
+    
 
 class Trans(models.Model):
     id = models.AutoField(primary_key=True)

@@ -6,8 +6,16 @@
         <button class="btn btn-primary btn-sm" hx-get="{% url 'arsip_tata_edit_item' pk=d.pk %}" hx-target="#dialog">Edit</button>
         <div class="row no-gutters px-3 py-2">
           <div class="col-lg-12 mt-3 text-center">
-            <img class="card-img border" src="{% static 'assets/icons/item.png' %}" alt="">
+            {% comment %} <img class="card-img border" src="{% static 'assets/icons/item.png' %}" alt=""> {% endcomment %}
+            {% if d.cover %}
+            <a href="{{ d.cover.url }}" target="_new"><img class="card-img border" src="{{ d.cover.url }}" width="100" height="180" alt=""></a>
+            {% else %}
+            <img class="card-img border" src="{% static 'assets/icons/item.png' %}" width="100" height="180" alt="">
+            {% endif %}
+            
           </div>
+
+
           <div class="col-sm-12 mt-3 text-center">
               <h5>No. Urut {{ d.item_number }}</h5>
               <p><small>{{ d.title }}</small></p>

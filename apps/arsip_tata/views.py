@@ -285,7 +285,8 @@ def item_list(request, bundle_id):
 
 def add_item(request, bundle_id):
     if request.method == "POST":
-        form = ItemForm(request.POST)
+        # form = ItemForm(request.POST)
+        form = ItemForm(request.POST or None, request.FILES or None)
         if form.is_valid():
             item = form.save(commit=False)
             item.bundle_id = bundle_id
@@ -315,7 +316,8 @@ def add_item(request, bundle_id):
 def edit_item(request, pk):
     item = get_object_or_404(Item, pk=pk)
     if request.method == "POST":
-        form = ItemForm(request.POST, instance=item)
+        # form = CustomerForm(request.POST, request.FILES, instance=customer)
+        form = ItemForm(request.POST, request.FILES, instance=item)
         if form.is_valid():
             itemsave = form.save(commit=False)
             itemsave.total = itemsave.copy + itemsave.original

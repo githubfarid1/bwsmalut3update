@@ -1,6 +1,8 @@
 {% load widget_tweaks %}
 {% with WIDGET_ERROR_CLASS='is-invalid' %}
-<form hx-post="{{ request.path }}" hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' class="modal-content">
+{% comment %} <form hx-post="{{ request.path }}" hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' class="modal-content"> {% endcomment %}
+<form hx-post="{{ request.path }}" hx-headers='{"X-CSRFToken":"{{ csrf_token }}"}' class="modal-content" id="item-form" enctype="multipart/form-data" action='.' method="POST" hx-encoding="multipart/form-data">
+
   <div class="modal-header">
     <h5 class="modal-title">{{ module }} Item</h5>
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -34,6 +36,14 @@
         {% render_field form.accesstype class="form-control" placeholder="" %}
         <div class="invalid-feedback">{{ form.accesstype.errors|first }}</div>
     </div>
+    <div class="mb-3">
+      <label for="{{ form.cover.id_for_label }}" class="form-label">Foto Cover Depan</label>
+      {% render_field form.cover class="form-control" placeholder="" %}
+      <div class="invalid-feedback">{{ form.cover.errors|first }}</div>
+      <progress id='cover-upload-progress' value='0' max='100' style="height:24px;width:100%"></progress>
+    </div>
+
+
     {% render_field form.yeardate type="hidden" class="form-control" placeholder="" %}
 
   </div>
@@ -48,4 +58,11 @@
     <button type="submit" class="btn btn-primary">Save</button>
   </div>
 </form>
+<script>
+  htmx.on('#item-form', 'htmx:xhr:progress', function(evt) {
+    htmx.find('#cover-upload-progress').setAttribute('value', evt.detail.loaded/evt.detail.total * 100)
+  });
+
+</script>
+
 {% endwith %}
