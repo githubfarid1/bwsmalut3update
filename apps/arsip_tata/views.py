@@ -222,7 +222,12 @@ def add_bundle(request, box_id):
                 })
     else:
         box = Box.objects.get(id=box_id)
-        form = BundleForm(initial={'yeardate': box.yeardate, 'box':  Box.objects.first().id})
+        try:
+            latest_bundle_number = Bundle.objects.filter(box__yeardate=box.yeardate).latest('bundle_number').bundle_number + 1
+        except:
+            latest_bundle_number = 1
+
+        form = BundleForm(initial={'yeardate': box.yeardate, 'box':  Box.objects.first().id, 'bundle_number': latest_bundle_number})
     return render(request, 'arsip_tata/bundle_form.html', {
         'form': form,
     })
@@ -584,6 +589,49 @@ def report(request, year):
     res = generate_data(year)
     wb = Workbook()
     filename = f"data_{__package__.split('.')[1]}_tahun_penataan_{year}.xlsx"
+    sheet = wb.active
+    create_xls(datalist=res, sheet=sheet, year=year)
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename={}'.format(filename)    
+    wb.save(response)
+    return response
+
+def generate_data_perbox(year, box_number):
+    result = []
+    yeardata = Year.objects.get(yeardate=year)
+    for box in yeardata.box_set.filter(box_number=box_number):
+        cbox = True
+        for bundle in box.bundle_set.all():
+            cbundle = True
+            for item in bundle.item_set.all().order_by('item_number'):
+                if cbox:
+                    boxnumber = box.box_number
+                    cbox = False
+                else:
+                    boxnumber = ''
+
+                if cbundle:
+                    bundlenumber = bundle.bundle_number
+                    code = bundle.code
+                    creator = bundle.creator
+                    description = f"{item.title}\n{bundle.description}"
+                    year_bundle = bundle.year_bundle
+                    cbundle = False
+                else:
+                    bundlenumber = ''
+                    code = ''
+                    creator = ''
+                    description = item.title
+                    year_bundle = ''
+                
+                dataset = (bundlenumber, item.item_number, code, creator, description, year_bundle, item.total, item.original, item.copy, boxnumber, item.get_accesstype_display())
+                result.append(dataset)
+    return result
+
+def report_perbox(request, year, box_number):
+    res = generate_data_perbox(year, box_number)
+    wb = Workbook()
+    filename = f"data_{__package__.split('.')[1]}_tahun_penataan_{year}_box_{box_number}.xlsx"
     sheet = wb.active
     create_xls(datalist=res, sheet=sheet, year=year)
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')

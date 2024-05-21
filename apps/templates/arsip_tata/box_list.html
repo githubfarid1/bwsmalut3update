@@ -13,6 +13,10 @@
               <p>{{ d.bundle_set.count }} Berkas</p>
           </div>
         </div>
+        <div class="col-lg-12">
+          <a href="{% url 'arsip_tata_report_perbox' d.yeardate d.box_number %}"><button class="w-100 btn btn-sm btn-primary">Report</button></a>
+        </div>
+
       </div>
     </div>
     {% endfor %}

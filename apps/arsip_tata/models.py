@@ -10,7 +10,7 @@ class Year(models.Model):
     )
 
     def __str__(self) -> str:
-        return self.yeardate
+        return str(self.yeardate)
 
 class Box(models.Model):
     id = models.AutoField(primary_key=True)
