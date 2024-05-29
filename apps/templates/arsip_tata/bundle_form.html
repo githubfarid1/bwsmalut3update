@@ -48,7 +48,7 @@
   </div>
   <div class="modal-footer">
     {% if bundle %}
-    <button type="button" class="btn btn-danger" hx-post="{% url 'arsip_tata_remove_bundle' pk=bundle.id %}" onclick="return confirm('Hapus Berkas?')">Remove</button>
+    <button type="button" class="btn btn-danger" hx-delete="{% url 'arsip_tata_remove_bundle' pk=bundle.id %}" hx-confirm="Hapus Berkas?">Remove</button>
     <span class="flex-grow-1"></span>
     {% endif %}
     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">

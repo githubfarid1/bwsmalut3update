@@ -108,7 +108,7 @@ class Item(models.Model):
     yeardate = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(2023), MaxValueValidator(2050)]
     )
-    codegen = models.CharField(max_length=20, blank=True, null=True, unique=True)
+    codegen = models.CharField(max_length=20, blank=True, null=True, unique=False)
     cover = models.ImageField(upload_to=update_filename , null=True, blank=True)
     bundle = models.ForeignKey(
         Bundle,
@@ -116,8 +116,8 @@ class Item(models.Model):
         on_delete=models.CASCADE, 
         default=None
     )        
-    class Meta:
-        unique_together = ('item_number', 'yeardate')    
+    # class Meta:
+    #     unique_together = ('item_number', 'yeardate')    
 
     def __str__(self) -> str:
         return f"{self.item_number}_{self.bundle.bundle_number}_{self.id}"

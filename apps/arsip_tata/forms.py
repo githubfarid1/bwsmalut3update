@@ -40,7 +40,7 @@ class BundleForm(forms.ModelForm):
     #             raise ValidationError(f"No Berkas {bundle_number} pada Tahun Penataan {yeardate} Sudah Ada")
     #     return cleaned_data
 
-
+    
     def clean_code(self):
         cleaned_data = self.cleaned_data['code']
         bundlecode = Bundlecode.objects.filter(name__icontains=cleaned_data).first()

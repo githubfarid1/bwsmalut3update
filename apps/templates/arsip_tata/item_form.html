@@ -49,7 +49,7 @@
   </div>
   <div class="modal-footer">
     {% if item %}
-    <button type="button" class="btn btn-danger" hx-post="{% url 'arsip_tata_remove_item' pk=item.id %}" onclick="return confirm('Hapus Item?')">Remove</button>
+    <button type="button" class="btn btn-danger" hx-delete="{% url 'arsip_tata_remove_item' pk=item.id %}" hx-confirm="Hapus Item?">Remove</button>
     <span class="flex-grow-1"></span>
     {% endif %}
     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">

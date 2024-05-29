@@ -24,6 +24,7 @@ from django.db.models import Q
 from reportlab.lib.enums import TA_JUSTIFY, TA_LEFT, TA_CENTER, TA_RIGHT
 from django.conf import settings
 from os.path import exists
+from django.views.decorators.http import require_http_methods
 
 # Create your views here.
 @csrf_exempt
@@ -166,7 +167,8 @@ def edit_box(request, pk):
         'module': 'Edit Data'
     })
 
-@ require_POST
+# @ require_POST
+@require_http_methods(['DELETE'])
 def remove_box(request, pk):
     box = get_object_or_404(Box, pk=pk)
     box.delete()
@@ -208,9 +210,6 @@ def add_bundle(request, box_id):
         if form.is_valid():
             bundle = form.save(commit=False)
             bundle.box_id = box_id
-            # bundle.code = bundle.bundlecode.name.split(" - ")[0]
-            # box = Box.objects.get(id=box_id)
-            # bundle.yeardate = box.yeardate
             bundle.save()
             return HttpResponse(
                 status=204,
@@ -255,7 +254,7 @@ def edit_bundle(request, pk):
         'module': 'Edit Data'
     })
 
-@ require_POST
+@require_http_methods(['DELETE'])
 def remove_bundle(request, pk):
     bundle = get_object_or_404(Bundle, pk=pk)
     bundle.delete()
@@ -346,7 +345,7 @@ def edit_item(request, pk):
         'module': 'Edit Data'
     })
 
-@ require_POST
+@require_http_methods(['DELETE'])
 def remove_item(request, pk):
     item = get_object_or_404(Item, pk=pk)
     item.delete()
@@ -699,7 +698,7 @@ def edit_customer(request, pk):
         'module': 'Edit Data'
     })
 
-@ require_POST
+@require_http_methods(['DELETE'])
 def remove_customer(request, pk):
     customer = get_object_or_404(Customer, pk=pk)
     customer.photo.delete(save=True)
