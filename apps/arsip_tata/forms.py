@@ -61,7 +61,13 @@ class ItemForm(forms.ModelForm):
                         'unique_together': "Nomor Urut Sudah Ada",
                     }
                 }
-        
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        if self.cleaned_data.get("copy") == 0 and self.cleaned_data.get("original") == 0:
+            raise ValidationError(f"Jumlah Asli atau Jumlah Copy harus terisi")
+        return cleaned_data
+    
 class CustomerForm(forms.ModelForm):
     # photo = forms.CharField(widget=forms.FileInput(attrs={'capture': "user"}))
     class Meta:

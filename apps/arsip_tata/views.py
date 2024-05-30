@@ -114,10 +114,27 @@ def show_boxes(request, year):
 def box_list(request, year_id):
     if not request.user.is_authenticated:
         return redirect('login')
-    
+    result = []
     boxes = Box.objects.filter(year_id=year_id)
+    for box in boxes:
+        bundles = Bundle.objects.filter(box_id=box.id).all()
+        bundle_numbers = []
+        for bundle in bundles:
+            bundle_numbers.append(str(bundle.bundle_number))
+            items = Item.objects.filter(bundle_id=bundle.id).all()
+            item_numbers = []
+            for item in items:
+                item_numbers.append(item.item_number)
+        bundle_numbers.sort()
+        item_numbers.sort()
+        minitem = ""
+        maxitem = ""
+        if len(item_numbers) != 0:
+            minitem = str(item_numbers[0])
+            maxitem = str(item_numbers[-1])
+        result.append({"pk": box.pk, "yeardate": box.year.yeardate, "box_number": box.box_number, "bundle_number": ", ".join(bundle_numbers),  "item_number": " - ".join([minitem, maxitem])})
     return render(request, 'arsip_tata/box_list.html', {
-        'boxes': boxes,
+        'boxes': result,
     })
 
 def add_box(request, year_id):

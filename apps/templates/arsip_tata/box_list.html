@@ -6,11 +6,13 @@
         <button class="btn btn-primary btn-sm" hx-get="{% url 'arsip_tata_edit_box' pk=d.pk %}" hx-target="#dialog">Edit</button>
         <div class="row no-gutters px-3 py-2">
           <div class="col-lg-12 mt-3 text-center">
-            <a href="{% url 'arsip_tata_show_bundles' d.year.yeardate d.box_number %}"><img class="card-img border" src="{% static 'assets/icons/box.png' %}" alt=""></a>
+            <a href="{% url 'arsip_tata_show_bundles' d.yeardate d.box_number %}"><img class="card-img border" src="{% static 'assets/icons/box.png' %}" alt=""></a>
           </div>
           <div class="col-sm-12 mt-3 text-center">
               <h5>No. Box {{ d.box_number }}</h5>
-              <p>{{ d.bundle_set.count }} Berkas</p>
+              <p>No. Berkas: {{ d.bundle_number }}<br/>
+              No. Item: {{ d.item_number }}</p>
+
           </div>
         </div>
         <div class="col-lg-12">
