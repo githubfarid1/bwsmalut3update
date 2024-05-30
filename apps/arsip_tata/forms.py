@@ -66,6 +66,11 @@ class ItemForm(forms.ModelForm):
         cleaned_data = super().clean()
         if self.cleaned_data.get("copy") == 0 and self.cleaned_data.get("original") == 0:
             raise ValidationError(f"Jumlah Asli atau Jumlah Copy harus terisi")
+        if not self.initial:
+            yeardate = self.cleaned_data.get("yeardate")
+            item_number = self.cleaned_data.get("item_number")
+            if Item.objects.filter(item_number=item_number, yeardate=yeardate).count() != 0:
+               cleaned_data['item_number'] = Item.objects.filter(yeardate=yeardate).latest('item_number').item_number + 1
         return cleaned_data
     
 class CustomerForm(forms.ModelForm):
