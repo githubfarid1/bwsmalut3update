@@ -746,7 +746,7 @@ def label_perbundle(request, year, bundle_number):
     c_width = [1.1*inch, 0.2*inch, 3.5*inch]
     
     stylesample = getSampleStyleSheet()
-    style2 = stylesample["Heading4"]
+    style2 = stylesample["Heading5"]
     style2.wordWrap = 'CJK'
     filename = f"bundlelabel_{year}_{bundle_number}.pdf"
     myset = (Paragraph("NO. BERKAS", style2), Paragraph(":", style2), Paragraph(str(bundle.bundle_number), style2))
@@ -773,7 +773,7 @@ def label_perbundle(request, year, bundle_number):
     elements.append(mytable)
     mydata = []
     c_width = [0.5*inch, 3.8*inch, 0.5*inch]
-    style2 = stylesample["Heading5"]
+    style2 = stylesample["Heading6"]
     style2.wordWrap = 'CJK'
 
     myset = (Paragraph("ITEM", style2), Paragraph("URAIAN MASALAH KEGIATAN", style2), Paragraph("JML", style2))
