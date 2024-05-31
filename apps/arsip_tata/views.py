@@ -11,12 +11,12 @@ from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.styles.borders import Border, Side
 
-from reportlab.lib.pagesizes import A4
+from reportlab.lib.pagesizes import A4, A5
 from reportlab.pdfgen import canvas
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 import io
 from reportlab.platypus import SimpleDocTemplate, Paragraph, PageTemplate, BaseDocTemplate, Frame, Spacer
-from reportlab.lib.units import inch
+from reportlab.lib.units import inch, mm
 from reportlab.platypus.tables import Table,TableStyle,colors
 from datetime import datetime, timedelta
 from django.template.defaultfilters import slugify
@@ -25,6 +25,7 @@ from reportlab.lib.enums import TA_JUSTIFY, TA_LEFT, TA_CENTER, TA_RIGHT
 from django.conf import settings
 from os.path import exists
 from django.views.decorators.http import require_http_methods
+from reportlab_qrcode import QRCodeImage
 
 # Create your views here.
 @csrf_exempt
@@ -654,6 +655,88 @@ def report_perbox(request, year, box_number):
     response['Content-Disposition'] = 'attachment; filename={}'.format(filename)    
     wb.save(response)
     return response
+
+def label_perbox(request, year, box_number):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    box = Box.objects.get(box_number=box_number, yeardate=year)
+   
+    bundles = Bundle.objects.filter(box_id=box.id).all()
+    bundle_numbers = []
+    yearbundle = ""
+    code = ""
+    if len(bundles) != 0:
+        yearbundle = str(bundles[0].year_bundle)
+        code = str(bundles[0].code)
+    for bundle in bundles:
+        bundle_numbers.append(str(bundle.bundle_number))
+        items = Item.objects.filter(bundle_id=bundle.id).all()
+        item_numbers = []
+        for item in items:
+            item_numbers.append(item.item_number)
+    bundle_numbers.sort()
+    item_numbers.sort()
+    minitem = "__"
+    maxitem = "__"
+    if len(item_numbers) != 0:
+        minitem = str(item_numbers[0])
+        maxitem = str(item_numbers[-1])
+    pdf = io.BytesIO()
+    doc = SimpleDocTemplate(pdf, pagesize=A5)
+    styles = getSampleStyleSheet()
+    title = "Form Peminjaman Dokumen"
+
+    frame = Frame(doc.leftMargin, doc.bottomMargin, doc.width, doc.height)
+    template = PageTemplate(frames=[frame], id='mytemplate')
+
+    doc.addPageTemplates([template])
+    elements = []
+    mydata = []
+    # mydata.append(("No", "Kode", "Judul Dokumen"))
+    c_width = [1.8*inch, 0.2*inch, 2*inch]
+    
+    stylesample = getSampleStyleSheet()
+    style2 = stylesample["Heading1"]
+    style2.wordWrap = 'CJK'
+    filename = f"boxlabel_{year}_{box_number}.pdf"
+    myset = (Paragraph("BWS MALUKU UTARA \n Penataan {}".format(year), stylesample["Italic"]), Paragraph("", style2), QRCodeImage(f"https://arsip.bwsmalut.my.id/arsip_tata/search_qrcode/{year}/{box_number}", size=20 * mm), )
+    mydata.append(myset)
+    myset = (Paragraph("NO. BOX", style2), Paragraph(":", style2), Paragraph(str(box_number), style2))
+    mydata.append(myset)
+    myset = (Paragraph("NO. BERKAS", style2), Paragraph(":", style2), Paragraph(", ".join(bundle_numbers), style2))
+    mydata.append(myset)
+    myset = (Paragraph("KODE", style2), Paragraph(":", style2), Paragraph(code, style2))
+    mydata.append(myset)
+    myset = (Paragraph("NO. ITEM", style2), Paragraph(":", style2), Paragraph(f"{minitem} - {maxitem}", style2))
+    mydata.append(myset)
+    myset = (Paragraph("TAHUN", style2), Paragraph(":", style2), Paragraph(yearbundle, style2))
+    mydata.append(myset)
+    
+    mytable = Table(mydata, colWidths=c_width, hAlign='LEFT')
+    mytable.setStyle(TableStyle([
+                       ('FONTSIZE',(0,0),(-1,0),16),
+                       ('ALIGN', (0,0), (-1,-1), 'RIGHT'),
+                       ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+                       ('VALIGN',(0, 0),(-1,-1),'TOP'),
+                       ('BOTTOMPADDING', (0, 0), (-1, -1), 12),
+                       ('TOPPADDING', (0, 0), (-1, -1), 12),
+                       ]))
+    # elements.append(Spacer(1, 5))
+    elements.append(mytable)
+
+
+    doc.build(elements)
+    pdf.seek(0)
+    response = HttpResponse(pdf.read(), content_type='application/pdf')
+    response['Content-Disposition'] = f'inline;filename={filename}'
+    return response
+
+def search_qrcode(request, year, box_number):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    res = generate_data_perbox(year, box_number)
+    return render(request=request, template_name='arsip_tata/search_qrcode.html', context={'datalist': res})
 
 def show_customers(request):
     if not request.user.is_authenticated:
