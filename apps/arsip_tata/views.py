@@ -116,6 +116,7 @@ def box_list(request, year_id):
     if not request.user.is_authenticated:
         return redirect('login')
     result = []
+    print(request.get_host(),request.build_absolute_uri(), request.META['HTTP_HOST'])
     boxes = Box.objects.filter(year_id=year_id)
     for box in boxes:
         bundles = Bundle.objects.filter(box_id=box.id).all()
