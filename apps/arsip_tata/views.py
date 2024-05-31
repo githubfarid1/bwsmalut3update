@@ -766,8 +766,8 @@ def label_perbundle(request, year, bundle_number):
                        ('ALIGN', (0,0), (-1,-1), 'RIGHT'),
                        ('BOX', (0,0), (-1,-1), 0.25, colors.black),
                        ('VALIGN',(0, 0),(-1,-1),'TOP'),
-                       ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
-                       ('TOPPADDING', (0, 0), (-1, -1), 6),
+                       ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+                       ('TOPPADDING', (0, 0), (-1, -1), 3),
                        ]))
     # elements.append(Spacer(1, 5))
     elements.append(mytable)
@@ -789,8 +789,8 @@ def label_perbundle(request, year, bundle_number):
                        ('ALIGN', (0,0), (-1,-1), 'RIGHT'),
                        ('BOX', (0,0), (-1,-1), 0.25, colors.black),
                        ('VALIGN',(0, 0),(-1,-1),'TOP'),
-                       ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
-                       ('TOPPADDING', (0, 0), (-1, -1), 6),
+                       ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
+                       ('TOPPADDING', (0, 0), (-1, -1), 2),
                        ]))
     elements.append(mytable)
     doc.build(elements)
