@@ -735,7 +735,8 @@ def search_qrcode(request, year, box_number):
     if not request.user.is_authenticated:
         return redirect('login')
 
-    res = generate_data_perbox(year, box_number)
+    # res = generate_data_perbox(year, box_number)
+    res = Box.objects.get(box_number=box_number, yeardate=year)
     return render(request=request, template_name='arsip_tata/search_qrcode.html', context={'datalist': res})
 
 def show_customers(request):

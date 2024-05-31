@@ -10,19 +10,56 @@
 
 <div class="container-fluid">
   {%if datalist %}
+  <h5>Tahun Penataan: {{ datalist.yeardate }}</h5>
+  <h5>No. Box: {{ datalist.box_number }}</h5>
+  <p></p>
   <section class="mx-4 mt-2">
-    <!--Table-->
-    <table class="table align-middle mb-0 bg-white table-bordered">
+    {% for bundle in datalist.bundle_set.all %}
+        <h6>No. Berkas:&nbsp;&nbsp;&nbsp;<i>{{ bundle.bundle_number }}</i></h6>
+        <h6>Kode:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>{{ bundle.code }}</i></h6>
+        <h6>Index/Judul:&nbsp;<i>{{ bundle.creator }}</i></h6>
+        <h6>Pekerjaan:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>{{ bundle.description }}</i></h6>
+        <h6>Tahun:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>{{ bundle.year_bundle }}</i></h6>
+        <br/>
+        <table class="table align-middle mb-0 bg-white table-bordered">
         <!--Table head-->
         <thead class="table-warning">
             <tr>
-                <th>No.Brks</th>
-                <th>No.Urut</th>
-                <th>Kode</th>
-                <th>Index</th>
-                <th>Uraian Masalah/Kegiatan</th>
-                <th>Tahun</th>
-                <th>Jumlah</th>
+                <th>ITEM</th>
+                <th>URAIAN MASALAH KEGIATAN</th>
+                <th>JML</th>
+            </tr>
+        </thead>
+        <!--Table head-->
+
+        <!--Table body-->
+        <tbody>
+            {% for item in bundle.item_set.all %}
+            <tr>
+                <td>{{ item.item_number }}</td>
+                <td>{{ item.title }}</td>
+                <td>{{ item.total }}</td>
+                
+            </tr>
+            {% endfor %}
+        </tbody>
+        <!--Table body-->
+    </table>
+    <!--Table--> 
+
+    {% endfor %}
+    <!--Table-->
+    {% comment %} <table class="table align-middle mb-0 bg-white table-bordered">
+        <!--Table head-->
+        <thead class="table-warning">
+            <tr>
+                <th>BKS</th>
+                <th>ITM</th>
+                <th>KODE</th>
+                <th>INDEX</th>
+                <th>URAIAN MASALAH KEGIATAN</th>
+                <th>THN</th>
+                <th>JML</th>
             </tr>
         </thead>
         <!--Table head-->
@@ -44,7 +81,7 @@
         </tbody>
         <!--Table body-->
     </table>
-    <!--Table-->
+    <!--Table--> {% endcomment %}
 </section>
   {% endif %}
   
