@@ -683,8 +683,6 @@ def label_perbox(request, year, box_number):
         maxitem = str(item_numbers[-1])
     pdf = io.BytesIO()
     doc = SimpleDocTemplate(pdf, pagesize=A5)
-    styles = getSampleStyleSheet()
-    title = "Form Peminjaman Dokumen"
 
     frame = Frame(doc.leftMargin, doc.bottomMargin, doc.width, doc.height)
     template = PageTemplate(frames=[frame], id='mytemplate')
@@ -725,6 +723,76 @@ def label_perbox(request, year, box_number):
     elements.append(mytable)
 
 
+    doc.build(elements)
+    pdf.seek(0)
+    response = HttpResponse(pdf.read(), content_type='application/pdf')
+    response['Content-Disposition'] = f'inline;filename={filename}'
+    return response
+
+def label_perbundle(request, year, bundle_number):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    bundle = Bundle.objects.get(bundle_number=bundle_number, yeardate=year)
+    pdf = io.BytesIO()
+    doc = SimpleDocTemplate(pdf, pagesize=A5)
+
+    frame = Frame(doc.leftMargin-50, doc.bottomMargin, doc.width, doc.height)
+    template = PageTemplate(frames=[frame], id='mytemplate')
+
+    doc.addPageTemplates([template])
+    elements = []
+    mydata = []
+    # mydata.append(("No", "Kode", "Judul Dokumen"))
+    c_width = [1.1*inch, 0.2*inch, 3.5*inch]
+    
+    stylesample = getSampleStyleSheet()
+    style2 = stylesample["Heading4"]
+    style2.wordWrap = 'CJK'
+    filename = f"bundlelabel_{year}_{bundle_number}.pdf"
+    myset = (Paragraph("NO. BERKAS", style2), Paragraph(":", style2), Paragraph(str(bundle.bundle_number), style2))
+    mydata.append(myset)
+    myset = (Paragraph("PEKERJAAN", style2), Paragraph(":", style2), Paragraph(str(bundle.description), style2))
+    mydata.append(myset)
+    myset = (Paragraph("KODE", style2), Paragraph(":", style2), Paragraph(str(bundle.code), style2))
+    mydata.append(myset)
+    myset = (Paragraph("INDEX", style2), Paragraph(":", style2), Paragraph(str(bundle.creator), style2))
+    mydata.append(myset)
+    myset = (Paragraph("TAHUN", style2), Paragraph(":", style2), Paragraph(str(bundle.year_bundle), style2))
+    mydata.append(myset)
+    
+    mytable = Table(mydata, colWidths=c_width, hAlign='LEFT')
+    mytable.setStyle(TableStyle([
+                       ('FONTSIZE',(0,0),(-1,0),16),
+                       ('ALIGN', (0,0), (-1,-1), 'RIGHT'),
+                       ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+                       ('VALIGN',(0, 0),(-1,-1),'TOP'),
+                       ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+                       ('TOPPADDING', (0, 0), (-1, -1), 6),
+                       ]))
+    # elements.append(Spacer(1, 5))
+    elements.append(mytable)
+    mydata = []
+    c_width = [0.5*inch, 3.8*inch, 0.5*inch]
+    style2 = stylesample["Heading5"]
+    style2.wordWrap = 'CJK'
+
+    myset = (Paragraph("ITEM", style2), Paragraph("URAIAN MASALAH KEGIATAN", style2), Paragraph("JML", style2))
+    mydata.append(myset)
+
+    for item in bundle.item_set.all():
+        myset = (Paragraph(str(item.item_number), style2), Paragraph(str(item.title), style2), Paragraph(str(item.total), style2))
+        mydata.append(myset)
+    mytable = Table(mydata, colWidths=c_width, hAlign='LEFT')
+    mytable.setStyle(TableStyle([
+                       ('FONTSIZE',(0,0),(-1,0),16),
+                       ('INNERGRID', (0,0), (-1,-1), 0.25, colors.red),
+                       ('ALIGN', (0,0), (-1,-1), 'RIGHT'),
+                       ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+                       ('VALIGN',(0, 0),(-1,-1),'TOP'),
+                       ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+                       ('TOPPADDING', (0, 0), (-1, -1), 6),
+                       ]))
+    elements.append(mytable)
     doc.build(elements)
     pdf.seek(0)
     response = HttpResponse(pdf.read(), content_type='application/pdf')

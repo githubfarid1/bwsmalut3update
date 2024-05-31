@@ -29,6 +29,7 @@ urlpatterns = [
     path(route='report/<int:year>', view=views.report, name=prefix + 'report'),
     path(route='report_perbox/<int:year>/<str:box_number>', view=views.report_perbox, name=prefix + 'report_perbox'),
     path(route='label_perbox/<int:year>/<str:box_number>', view=views.label_perbox, name=prefix + 'label_perbox'),
+    path(route='label_perbundle/<int:year>/<str:bundle_number>', view=views.label_perbundle, name=prefix + 'label_perbundle'),
     path(route='search_qrcode/<int:year>/<str:box_number>', view=views.search_qrcode, name=prefix + 'search_qrcode'),
 
     path(route='customers', view=views.show_customers, name=prefix + "show_customers"),
