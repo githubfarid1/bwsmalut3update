@@ -726,7 +726,7 @@ def label_perbox(request, year, box_number):
     doc.build(elements)
     pdf.seek(0)
     response = HttpResponse(pdf.read(), content_type='application/pdf')
-    response['Content-Disposition'] = f'inline;filename={filename}'
+    response['Content-Disposition'] = f'attachment;filename={filename}'
     return response
 
 def label_perbundle(request, year, bundle_number):
@@ -795,8 +795,8 @@ def label_perbundle(request, year, bundle_number):
     elements.append(mytable)
     doc.build(elements)
     pdf.seek(0)
-    response = HttpResponse(pdf.read(), content_type='application/pdf')
-    response['Content-Disposition'] = f'inline;filename={filename}'
+    response = HttpResponse(pdf.read(), content_type='application/pdf', )
+    response['Content-Disposition'] = f'attachment;filename={filename}'
     return response
 
 def search_qrcode(request, year, box_number):
