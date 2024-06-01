@@ -26,6 +26,8 @@ from django.conf import settings
 from os.path import exists
 from django.views.decorators.http import require_http_methods
 from reportlab_qrcode import QRCodeImage
+from django.contrib.auth.models import Group
+from django.contrib.auth.decorators import permission_required, user_passes_test
 
 # Create your views here.
 @csrf_exempt
@@ -137,7 +139,7 @@ def box_list(request, year_id):
     return render(request, 'arsip_tata/box_list.html', {
         'boxes': result,
     })
-
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def add_box(request, year_id):
     if request.method == "POST":
         form = BoxForm(request.POST)
@@ -162,6 +164,7 @@ def add_box(request, year_id):
         'form': form,
     })
 
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def edit_box(request, pk):
     box = get_object_or_404(Box, pk=pk)
     if request.method == "POST":
@@ -222,6 +225,7 @@ def bundle_list(request, box_id):
         'bundles': bundles,
     })
 
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def add_bundle(request, box_id):
     if request.method == "POST":
         form = BundleForm(request.POST)
