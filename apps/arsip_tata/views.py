@@ -785,7 +785,7 @@ def label_perbundle(request, year, bundle_number):
     mytable = Table(mydata, colWidths=c_width, hAlign='LEFT')
     mytable.setStyle(TableStyle([
                        ('FONTSIZE',(0,0),(-1,0),16),
-                    #    ('INNERGRID', (0,0), (-1,-1), 0.25, colors.red),
+                       ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
                        ('ALIGN', (0,0), (-1,-1), 'RIGHT'),
                        ('BOX', (0,0), (-1,-1), 0.25, colors.black),
                        ('VALIGN',(0, 0),(-1,-1),'TOP'),
