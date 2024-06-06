@@ -701,7 +701,7 @@ def label_perbox(request, year, box_number):
     style2 = stylesample["Heading1"]
     style2.wordWrap = 'CJK'
     filename = f"boxlabel_{year}_{box_number}.pdf"
-    myset = (Paragraph("BWS MALUKU UTARA \n Penataan {}".format(year), stylesample["Italic"]), Paragraph("", style2), QRCodeImage(f"{request.get_host()}/arsip_tata/search_qrcode/{year}/{box_number}", size=20 * mm), )
+    myset = (Paragraph("BWS MALUKU UTARA \n Penataan {}".format(year), stylesample["Italic"]), Paragraph("", style2), QRCodeImage(f"{settings.DOMAIN}/arsip_tata/search_qrcode/{year}/{box_number}", size=20 * mm), )
     mydata.append(myset)
     myset = (Paragraph("NO. BOX", style2), Paragraph(":", style2), Paragraph(str(box_number), style2))
     mydata.append(myset)
