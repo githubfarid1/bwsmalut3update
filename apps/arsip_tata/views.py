@@ -695,7 +695,7 @@ def label_perbox(request, year, box_number):
     elements = []
     mydata = []
     # mydata.append(("No", "Kode", "Judul Dokumen"))
-    c_width = [2.1*inch, 0.2*inch, 2*inch]
+    c_width = [2.2*inch, 0.2*inch, 2*inch]
     
     stylesample = getSampleStyleSheet()
     style2 = stylesample["Heading1"]
