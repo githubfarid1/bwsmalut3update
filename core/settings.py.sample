@@ -186,4 +186,4 @@ TIME_ZONE = 'Asia/Jayapura'
 DATE_INPUT_FORMATS = ["%d.%m.%Y"]
 ARSIP_TATA_COVER_LOCATION = 'images/arsip_tata/cover/'
 ARSIP_TATA_CUSTOMER_LOCATION = 'images/arsip_tata/customer/'
-DOMAIN = 'arsip.bwsmalut.my,id'
+DOMAIN = 'arsip.bwsmalut.my.id'
