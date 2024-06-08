@@ -688,7 +688,7 @@ def label_perbox(request, year, box_number):
     pdf = io.BytesIO()
     doc = SimpleDocTemplate(pdf, pagesize=A5)
 
-    frame = Frame(doc.leftMargin, doc.bottomMargin, doc.width, doc.height)
+    frame = Frame(doc.leftMargin-30, doc.bottomMargin, doc.width, doc.height)
     template = PageTemplate(frames=[frame], id='mytemplate')
 
     doc.addPageTemplates([template])
@@ -701,7 +701,7 @@ def label_perbox(request, year, box_number):
     style2 = stylesample["Heading1"]
     style2.wordWrap = 'CJK'
     filename = f"boxlabel_{year}_{box_number}.pdf"
-    myset = (Paragraph("BWS MALUKU UTARA \n Penataan {}".format(year), stylesample["Italic"]), Paragraph("", style2), QRCodeImage(f"{settings.DOMAIN}/arsip_tata/search_qrcode/{year}/{box_number}", size=20 * mm), )
+    myset = (Paragraph("Tahun Penataan {}".format(year), stylesample["Italic"]), Paragraph("", style2), QRCodeImage(f"{settings.DOMAIN}/arsip_tata/search_qrcode/{year}/{box_number}", size=25 * mm), )
     mydata.append(myset)
     myset = (Paragraph("NO. BOX", style2), Paragraph(":", style2), Paragraph(str(box_number), style2))
     mydata.append(myset)
@@ -720,8 +720,8 @@ def label_perbox(request, year, box_number):
                        ('ALIGN', (0,0), (-1,-1), 'RIGHT'),
                        ('BOX', (0,0), (-1,-1), 0.25, colors.black),
                        ('VALIGN',(0, 0),(-1,-1),'TOP'),
-                       ('BOTTOMPADDING', (0, 0), (-1, -1), 12),
-                       ('TOPPADDING', (0, 0), (-1, -1), 12),
+                       ('BOTTOMPADDING', (0, 0), (-1, -1), 7),
+                       ('TOPPADDING', (0, 0), (-1, -1), 7),
                        ]))
     # elements.append(Spacer(1, 5))
     elements.append(mytable)
