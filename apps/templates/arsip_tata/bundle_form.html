@@ -10,8 +10,12 @@
     <div class="btn btn-warning">{{ form.non_field_errors|first }}</div>
     {% endif %}
     <div class="mb-3">
+      {% if bundle %}
         <label for="{{ form.bundle_number.id_for_label }}" class="form-label">Nomor Berkas</label>
         {% render_field form.bundle_number class="form-control" placeholder="" %}
+        {%else%}
+        {% render_field form.bundle_number class="form-control" type="hidden" placeholder="" %}
+        {%endif%}
         <div class="invalid-feedback">{{ form.bundle_number.errors|first }}</div>
     </div>
     <div class="mb-3">  

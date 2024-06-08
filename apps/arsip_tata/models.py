@@ -71,8 +71,8 @@ class Bundle(models.Model):
     #     default=None
     # )        
     
-    class Meta:
-        unique_together = ('bundle_number', 'yeardate')    
+    # class Meta:
+    #     unique_together = ('bundle_number', 'yeardate')    
 
 
     def __str__(self) -> str:

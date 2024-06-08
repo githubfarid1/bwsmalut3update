@@ -39,6 +39,14 @@ class BundleForm(forms.ModelForm):
     #         if searchbundle:
     #             raise ValidationError(f"No Berkas {bundle_number} pada Tahun Penataan {yeardate} Sudah Ada")
     #     return cleaned_data
+    def clean(self):
+        cleaned_data = super().clean()
+        if not self.initial:
+            yeardate = self.cleaned_data.get("yeardate")
+            bundle_number = self.cleaned_data.get("bundle_number")
+            if Bundle.objects.filter(bundle_number=bundle_number, yeardate=yeardate).count() != 0:
+               cleaned_data['bundle_number'] = Bundle.objects.filter(yeardate=yeardate).latest('bundle_number').bundle_number + 1
+        return cleaned_data
 
     
     def clean_code(self):

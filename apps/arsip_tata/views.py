@@ -122,10 +122,10 @@ def box_list(request, year_id):
     for box in boxes:
         bundles = Bundle.objects.filter(box_id=box.id).all()
         bundle_numbers = []
+        item_numbers = []
         for bundle in bundles:
             bundle_numbers.append(str(bundle.bundle_number))
             items = Item.objects.filter(bundle_id=bundle.id).all()
-            item_numbers = []
             for item in items:
                 item_numbers.append(item.item_number)
         bundle_numbers.sort()
@@ -225,7 +225,7 @@ def bundle_list(request, box_id):
         'bundles': bundles,
     })
 
-@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
+# @user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def add_bundle(request, box_id):
     if request.method == "POST":
         form = BundleForm(request.POST)
