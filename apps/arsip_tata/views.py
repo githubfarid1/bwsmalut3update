@@ -289,13 +289,13 @@ def remove_bundle(request, pk):
             })
         })
 
-def show_items(request, year_date, bundle_number):
+def show_items(request, bundle_id):
     if not request.user.is_authenticated:
         return redirect('login')
-    bundle = Bundle.objects.filter(yeardate=year_date, bundle_number=bundle_number).first()
+    bundle = Bundle.objects.get(id=bundle_id)
     context = {
         'bundle': bundle,
-        'year_date': year_date
+        # 'year_date': year_date
     }
     return render(request=request, template_name='arsip_tata/show_item.html', context=context)
 

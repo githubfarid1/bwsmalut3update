@@ -21,7 +21,9 @@ urlpatterns = [
     path(route='bundle/<int:pk>/edit', view=views.edit_bundle, name=prefix + "edit_bundle"),
     path(route='bundle/<int:pk>/remove', view=views.remove_bundle, name=prefix + 'remove_bundle'),
 
-    path(route='items/<int:year_date>/<int:bundle_number>', view=views.show_items, name=prefix + "show_items"),
+    # path(route='items/<int:year_date>/<int:bundle_number>', view=views.show_items, name=prefix + "show_items"),
+    path(route='items/<int:bundle_id>', view=views.show_items, name=prefix + "show_items"),
+
     path(route='item_list/<int:bundle_id>', view=views.item_list, name=prefix + "item_list"),
     path(route='add_item/<int:bundle_id>', view=views.add_item, name=prefix + "add_item"),
     path(route='item/<int:pk>/edit', view=views.edit_item, name=prefix + "edit_item"),
