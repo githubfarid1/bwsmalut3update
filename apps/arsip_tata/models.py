@@ -122,6 +122,9 @@ class Item(models.Model):
     def __str__(self) -> str:
         return f"{self.item_number}_{self.bundle.bundle_number}_{self.id}"
 
+    def save(self, *args, **kwargs):
+            self.codegen = "-".join([str(self.yeardate), str(self.bundle.box.box_number), str(self.bundle.bundle_number),  str(self.item_number)])
+            super(Item, self).save(*args, **kwargs) # Call the "real" save() method.
 
 class Customer(models.Model):
     def update_filename_photo(instance, filename):

@@ -317,8 +317,8 @@ def add_item(request, bundle_id):
             item = form.save(commit=False)
             item.bundle_id = bundle_id
             item.total = item.copy + item.original
-            bundle = Bundle.objects.get(id=bundle_id)
-            item.codegen = "-".join([str(item.yeardate), str(bundle.box.box_number), str(bundle.bundle_number), str(item.item_number)])
+            # bundle = Bundle.objects.get(id=bundle_id)
+            # item.codegen = "-".join([str(item.yeardate), str(bundle.box.box_number), str(bundle.bundle_number), str(item.item_number)])
             item.save()
             return HttpResponse(
                 status=204,
@@ -348,7 +348,7 @@ def edit_item(request, pk):
             itemsave = form.save(commit=False)
             itemsave.total = itemsave.copy + itemsave.original
             # bundle = Bundle.objects.get(id=item.bundle_id)
-            itemsave.codegen = "-".join([str(itemsave.yeardate), str(item.bundle.box.box_number), str(item.bundle.bundle_number), str(itemsave.item_number)])
+            # itemsave.codegen = "-".join([str(itemsave.yeardate), str(item.bundle.box.box_number), str(item.bundle.bundle_number), str(itemsave.item_number)])
             itemsave.save()
             return HttpResponse(
                 status=204,
