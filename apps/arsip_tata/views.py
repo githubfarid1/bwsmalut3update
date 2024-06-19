@@ -28,6 +28,7 @@ from django.views.decorators.http import require_http_methods
 from reportlab_qrcode import QRCodeImage
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import permission_required, user_passes_test
+from django.core.files.storage import FileSystemStorage
 
 # Create your views here.
 @csrf_exempt
@@ -1262,3 +1263,35 @@ def search_item(request):
 
     context['form'] = SearchItemForm()
     return render(request,'arsip_tata/search_item_form.html', context=context)
+
+@csrf_exempt
+def item_upload_pdf(request):
+    if request.method == "POST":
+        if request.FILES:
+            item_id = request.POST.get("item_id")
+            item = Item.objects.get(id=item_id)
+            filename = f"{__package__.split('.')[1]}$${item.codegen}.pdf"
+            upload = request.FILES.getlist('uploadfile')[0]
+            tmppath = os.path.join(settings.MEDIA_ROOT, "tmpfiles", filename)
+            # pdfpath = os.path.join(settings.PDF_LOCATION, __package__.split('.')[1], filename)
+            fss = FileSystemStorage()
+            if exists(tmppath):
+                os.remove(tmppath)
+            fss.save(tmppath, upload)
+
+            return HttpResponse(
+                status=204,
+                headers={
+                    'HX-Trigger': json.dumps({
+                        "movieListChanged": None,
+                        "showMessage": 'Upload File Sukses, tunggu beberapa saat kemudian refresh halaman'
+                    })
+                })
+    else:
+        item_id = request.GET.get("item_id")
+        # year = str(request.GET.get("year"))
+        # folder = request.GET.get("folder")
+        # print(item_id)
+    return render(request, 'arsip_tata/item_upload_pdf.html', {
+        'item_id': item_id,
+    })

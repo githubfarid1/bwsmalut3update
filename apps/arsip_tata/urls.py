@@ -33,6 +33,7 @@ urlpatterns = [
     path(route='label_perbox/<int:year>/<str:box_number>', view=views.label_perbox, name=prefix + 'label_perbox'),
     path(route='label_perbundle/<int:year>/<str:bundle_number>', view=views.label_perbundle, name=prefix + 'label_perbundle'),
     path(route='search_qrcode/<int:year>/<str:box_number>', view=views.search_qrcode, name=prefix + 'search_qrcode'),
+    path(route='item_upload_pdf', view=views.item_upload_pdf, name=prefix + "item_upload_pdf"),
 
     path(route='customers', view=views.show_customers, name=prefix + "show_customers"),
     path(route='customer_list', view=views.customer_list, name=prefix + "customer_list"),

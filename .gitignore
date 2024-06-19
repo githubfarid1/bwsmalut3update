@@ -55,5 +55,11 @@ apps/static/assets/.temp
 
 /utilities/file_manager/settings.py
 /utilities/file_manager/runmovefile.sh
+
+/utilities/arsip_tata/rungencover.sh
+/utilities/arsip_tata/runmovepdf.sh
+/utilities/arsip_tata/settings.py
+
+
 /tester
 /apps/arsip_tata/migrations
