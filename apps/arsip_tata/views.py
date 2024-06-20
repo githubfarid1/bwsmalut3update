@@ -745,7 +745,7 @@ def label_perbundle(request, year, bundle_number):
     pdf = io.BytesIO()
     doc = SimpleDocTemplate(pdf, pagesize=A5)
 
-    frame = Frame(doc.leftMargin-50, doc.bottomMargin, doc.width, doc.height)
+    frame = Frame(doc.leftMargin-50, doc.bottomMargin-30, doc.width, doc.height)
     template = PageTemplate(frames=[frame], id='mytemplate')
 
     doc.addPageTemplates([template])
@@ -758,6 +758,8 @@ def label_perbundle(request, year, bundle_number):
     style2 = stylesample["Italic"]
     style2.wordWrap = 'CJK'
     filename = f"bundlelabel_{year}_{bundle_number}.pdf"
+    myset = (Paragraph("NO. BOX", style2), Paragraph(":", style2), Paragraph(str(bundle.box.box_number), style2))
+    mydata.append(myset)
     myset = (Paragraph("NO. BERKAS", style2), Paragraph(":", style2), Paragraph(str(bundle.bundle_number), style2))
     mydata.append(myset)
     myset = (Paragraph("PEKERJAAN", style2), Paragraph(":", style2), Paragraph(str(bundle.description), style2))
