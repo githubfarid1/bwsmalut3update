@@ -689,7 +689,7 @@ def label_perbox(request, year, box_number):
     pdf = io.BytesIO()
     doc = SimpleDocTemplate(pdf, pagesize=A5)
 
-    frame = Frame(doc.leftMargin-50, doc.bottomMargin, doc.width, doc.height)
+    frame = Frame(doc.leftMargin-60, doc.bottomMargin, doc.width, doc.height)
     template = PageTemplate(frames=[frame], id='mytemplate')
 
     doc.addPageTemplates([template])
