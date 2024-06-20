@@ -745,7 +745,7 @@ def label_perbundle(request, year, bundle_number):
     pdf = io.BytesIO()
     doc = SimpleDocTemplate(pdf, pagesize=A5)
 
-    frame = Frame(doc.leftMargin-50, doc.bottomMargin-30, doc.width, doc.height)
+    frame = Frame(doc.leftMargin-50, doc.bottomMargin+30, doc.width, doc.height)
     template = PageTemplate(frames=[frame], id='mytemplate')
 
     doc.addPageTemplates([template])
