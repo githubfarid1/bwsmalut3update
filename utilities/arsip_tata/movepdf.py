@@ -6,7 +6,7 @@ import os
 import fitz
 from os.path import exists
 from settings import *
-from dbclass import Doc, Department, Bundle
+from dbclass import Box, Item, Bundle
 import argparse
 import sys
 import pathlib
