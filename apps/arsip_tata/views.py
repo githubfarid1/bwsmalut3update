@@ -805,7 +805,7 @@ def label_perbundle(request, year, bundle_number):
     doc.build(elements)
     pdf.seek(0)
     response = HttpResponse(pdf.read(), content_type='application/pdf', )
-    response['Content-Disposition'] = f'attachment;filename={filename}'
+    response['Content-Disposition'] = f'inline;filename={filename}'
     return response
 
 def search_qrcode(request, year, box_number):
