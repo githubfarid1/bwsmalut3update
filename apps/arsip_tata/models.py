@@ -110,6 +110,8 @@ class Item(models.Model):
     )
     codegen = models.CharField(max_length=20, blank=True, null=True, unique=False)
     cover = models.ImageField(upload_to=update_filename , null=True, blank=True)
+    filesize = models.IntegerField(null=True)
+    page_count = models.SmallIntegerField(null=True)
     bundle = models.ForeignKey(
         Bundle,
         db_column='bundle_id',

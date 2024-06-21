@@ -56,5 +56,7 @@ class Item(Base):
     yeardate: Mapped[int] = mapped_column(SmallInteger)
     codegen: Mapped[str] = mapped_column(String(20))
     cover: Mapped[str] = mapped_column(String(255))
+    page_count: Mapped[str] = mapped_column(SmallInteger, nullable=True)
+    filesize: Mapped[int] = mapped_column(Integer, nullable=True)
     bundle = relationship("Bundle")
 

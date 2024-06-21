@@ -6,7 +6,7 @@ import os
 import fitz
 from os.path import exists
 from settings import *
-from dbclass import Doc, Department, Bundle
+from dbclass import Item, Bundle, Box
 import argparse
 import sys
 
@@ -36,8 +36,6 @@ def generatecover(pdffile, coverfilename):
     doc.close()
     print("Success")
 
-
-
 def main():
     parser = argparse.ArgumentParser(description="Get data from json and save them to database")
     parser.add_argument('-r', '--replace', type=str,help="is replace?")
@@ -48,13 +46,12 @@ def main():
 
     Session = sessionmaker(bind = engine)
     session = Session()    
-    result = session.query(Doc).join(Bundle).join(Department).all()
+    result = session.query(Item).join(Bundle).join(Box).all()
     for row in result:
-        path = os.path.join(PDF_LOCATION, APP_NAME, row.bundle.department.folder, str(row.bundle.box_number), str(row.doc_number) + ".pdf")
+        path = os.path.join(PDF_LOCATION, APP_NAME,  row.bundle.yeardate , row.codegen + ".pdf")
         # print(path)
         if exists(path):
-            coverfilename = "{}{}_{}_{}.png".format(TABLE_PREFIX, row.bundle.department.folder, row.bundle.box_number, row.doc_number)
-            
+            coverfilename = "{}_.png".format(APP_NAME, row.codegen)
             if args.replace == 'Yes' or args.replace == 'yes':
                 generatecover(pdffile=path, coverfilename=coverfilename)
             else:
@@ -63,7 +60,7 @@ def main():
 
             filesize = get_size(path, "kb")
             pagecount = get_page_count(pdffile=path)
-            session.query(Doc).filter(Doc.id == row.id).update({Doc.filesize: filesize, Doc.page_count: pagecount})
+            session.query(Item).filter(Item.id == row.id).update({Item.filesize: filesize, Item.page_count: pagecount})
             session.commit()
 
 if __name__ == '__main__':

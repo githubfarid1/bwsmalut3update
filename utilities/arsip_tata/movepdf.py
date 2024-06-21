@@ -1,4 +1,3 @@
-#ok
 import json
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -23,16 +22,11 @@ for pdf in list(tmppdfs.iterdir()):
     filename = pathlib.Path(pdf).name
     if filename[:len(APP_NAME)] != APP_NAME:
         continue
-    docid = filename.replace(".pdf", "").replace(APP_NAME + "-", "")
-    result = session.query(Doc).filter(Doc.id == docid).first()
-    box_number = result.bundle.box_number
-    doc_number = result.doc_number
-    folder = result.bundle.department.folder
-    # print(box_number, doc_number, link)
-    if not exists(os.path.join(PDF_LOCATION, APP_NAME, folder)):
-        os.mkdir(os.path.join(PDF_LOCATION, APP_NAME, folder))
+    gencode = filename.replace(".pdf", "").replace(APP_NAME + "$$", "")
+    result = session.query(Item).filter(Item.codegen == gencode).first()
+    year = gencode.split("-")[0]
+    if not exists(os.path.join(PDF_LOCATION, APP_NAME, year)):
+        os.mkdir(os.path.join(PDF_LOCATION, APP_NAME, year))
 
-    if not exists(os.path.join(PDF_LOCATION, APP_NAME, folder, str(box_number))):
-        os.mkdir(os.path.join(PDF_LOCATION, APP_NAME, folder, str(box_number)))
-    print("File",pathlib.Path(pdf).name, "Dipindah Ke: " + os.path.join(PDF_LOCATION, APP_NAME, folder, str(box_number), str(doc_number) + ".pdf"))
-    shutil.move(pdf, os.path.join(PDF_LOCATION, APP_NAME, folder, str(box_number), str(doc_number) + ".pdf"))
+    print("File",pathlib.Path(pdf).name, "Dipindah Ke: " + os.path.join(PDF_LOCATION, APP_NAME, year,  gencode + ".pdf"))
+    shutil.move(pdf, os.path.join(PDF_LOCATION, APP_NAME, year, gencode + ".pdf"))
