@@ -60,6 +60,5 @@ apps/static/assets/.temp
 /utilities/arsip_tata/runmovepdf.sh
 /utilities/arsip_tata/settings.py
 
-
 /tester
 /apps/arsip_tata/migrations

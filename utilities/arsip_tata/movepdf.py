@@ -18,7 +18,6 @@ session = Session()
 
 tmppdfs = pathlib.Path(TMPPDF_LOCATION)
 for pdf in list(tmppdfs.iterdir()):
-    # print(tmp)
     filename = pathlib.Path(pdf).name
     if filename[:len(APP_NAME)] != APP_NAME:
         continue
