@@ -17,6 +17,7 @@ venv
 
 # other
 .DS_Store
+tmp.pdf
 
 # javascript
 package-lock.json
