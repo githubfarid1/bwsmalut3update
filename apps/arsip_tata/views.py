@@ -29,6 +29,7 @@ from reportlab_qrcode import QRCodeImage
 from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import permission_required, user_passes_test
 from django.core.files.storage import FileSystemStorage
+import fitz
 
 # Create your views here.
 @csrf_exempt
@@ -308,7 +309,36 @@ def item_list(request, bundle_id):
     items = Item.objects.filter(bundle_id=bundle_id).order_by('item_number')
     return render(request, 'arsip_tata/item_list.html', {
         'items': items,
+        'coverpath': settings.COVER_URL + __package__.split('.')[1] + "_",
     })
+
+def item_download_pdf(request, pk):
+    
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    item = Item.objects.get(id=pk)
+    
+    path = os.path.join(settings.PDF_LOCATION, __package__.split('.')[1], str(item.yeardate), item.codegen + ".pdf")
+    print(path)
+    if exists(path):
+        doc = fitz.open(path)
+        for i in range(0, len(doc)):
+            page = doc[i]
+            tw = fitz.TextWriter(page.rect, opacity=0.3)
+            tw.append((50, 100), "COPY")
+            page.clean_contents()
+            page.write_text(rect=page.rect, writers=tw)
+        
+        doc.save("tmp.pdf")            
+            
+        filename = f"{__package__.split('.')[1]}_{item.codegen}.pdf"
+        # with open(path, 'rb') as pdf:
+        with open("tmp.pdf", 'rb') as pdf:
+            response = HttpResponse(pdf.read(), content_type='application/pdf')
+            response['Content-Disposition'] = f'inline;filename={filename}'
+            return response
+    raise Http404
 
 def add_item(request, bundle_id):
     if request.method == "POST":

@@ -48,10 +48,10 @@ def main():
     session = Session()    
     result = session.query(Item).join(Bundle).join(Box).all()
     for row in result:
-        path = os.path.join(PDF_LOCATION, APP_NAME,  row.bundle.yeardate , row.codegen + ".pdf")
+        path = os.path.join(PDF_LOCATION, APP_NAME,  str(row.bundle.yeardate), row.codegen + ".pdf")
         # print(path)
         if exists(path):
-            coverfilename = "{}_.png".format(APP_NAME, row.codegen)
+            coverfilename = "{}_{}.png".format(APP_NAME, row.codegen)
             if args.replace == 'Yes' or args.replace == 'yes':
                 generatecover(pdffile=path, coverfilename=coverfilename)
             else:
@@ -60,7 +60,7 @@ def main():
 
             filesize = get_size(path, "kb")
             pagecount = get_page_count(pdffile=path)
-            session.query(Item).filter(Item.id == row.id).update({Item.filesize: filesize, Item.page_count: pagecount})
+            session.query(Item).filter(Item.id == row.id).update({Item.filesize: filesize, Item.page_count: pagecount, Item.cover: os.path.join(COVER_URL, coverfilename)})
             session.commit()
 
 if __name__ == '__main__':

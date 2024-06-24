@@ -24,6 +24,9 @@ for pdf in list(tmppdfs.iterdir()):
     gencode = filename.replace(".pdf", "").replace(APP_NAME + "$$", "")
     result = session.query(Item).filter(Item.codegen == gencode).first()
     year = gencode.split("-")[0]
+    if not exists(os.path.join(PDF_LOCATION, APP_NAME)):
+        os.mkdir(os.path.join(PDF_LOCATION, APP_NAME))
+
     if not exists(os.path.join(PDF_LOCATION, APP_NAME, year)):
         os.mkdir(os.path.join(PDF_LOCATION, APP_NAME, year))
 

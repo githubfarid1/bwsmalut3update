@@ -41,12 +41,12 @@
         {% render_field form.accesstype class="form-control" placeholder="" %}
         <div class="invalid-feedback">{{ form.accesstype.errors|first }}</div>
     </div>
-    <div class="mb-3">
+    {% comment %} <div class="mb-3">
       <label for="{{ form.cover.id_for_label }}" class="form-label">Foto Cover Depan</label>
       {% render_field form.cover class="form-control" placeholder="" %}
       <div class="invalid-feedback">{{ form.cover.errors|first }}</div>
       <progress id='cover-upload-progress' value='0' max='100' style="height:24px;width:100%"></progress>
-    </div>
+    </div> {% endcomment %}
 
 
     {% render_field form.yeardate type="hidden" class="form-control" placeholder="" %}
