@@ -28,6 +28,7 @@ def get_page_count(pdffile):
 
 def generatecover(pdffile, coverfilename):
     path = os.path.join(COVER_LOCATION, coverfilename)
+    breakpoint()
     print("Membuat cover: " + coverfilename, "...", end="", flush=True)
     doc = fitz.open(pdffile)
     page = doc.load_page(0)
