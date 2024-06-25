@@ -28,6 +28,11 @@
                 </div>
               </div>
             </div>
+            {% else %}
+            <div class="col-lg-12">
+              <a hx-get="{% url 'arsip_tata_item_upload_pdf' %}?item_id={{ d.pk }}" hx-target="#dialog"><button class="w-100 btn btn-sm btn-warning">Upload</button></a>
+            </div>
+
             {% endif %}
         </div>
       </div>
