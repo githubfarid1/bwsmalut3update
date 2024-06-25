@@ -17,19 +17,18 @@
               <p>No: {{ d.item_number }} | {{ d.title }} | {{ d.page_count|default_if_none:"0" }} hal.</p>
               <!-- Trigger -->
           </div>
-          <div class="col-lg-12">
-            <div class="row no-gutters">
-            <div class="col-lg-6">
-            <a hx-get="{% url 'arsip_tata_item_upload_pdf' %}?item_id={{ d.pk }}" hx-target="#dialog"><button class="w-100 btn btn-sm btn-warning">Upload</button></a>
-            </div>
             {% if d.cover %}
-            <div class="col-lg-6">
-            <a href="{% url 'arsip_tata_item_download_pdf' d.pk %}" target="_new"><button class="w-100 btn btn-sm btn-success">Dwnld</button></a>
+            <div class="col-lg-12">
+              <div class="row no-gutters">
+                <div class="col-lg-6">
+                  <a hx-get="{% url 'arsip_tata_item_upload_pdf' %}?item_id={{ d.pk }}" hx-target="#dialog"><button class="w-100 btn btn-sm btn-warning">Upload</button></a>
+                </div>
+                <div class="col-lg-6">
+                  <a href="{% url 'arsip_tata_item_download_pdf' d.pk %}" target="_new"><button class="w-100 btn btn-sm btn-success">Dwnld</button></a>
+                </div>
+              </div>
             </div>
             {% endif %}
-          </div>
-          </div>
-
         </div>
       </div>
     </div>
