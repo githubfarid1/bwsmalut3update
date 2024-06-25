@@ -27,7 +27,7 @@ def get_page_count(pdffile):
     return doc.page_count
 
 def generatecover(pdffile, coverfilename):
-    coverfilename = str(coverfilename).replace(TABLE_PREFIX, "")
+    # coverfilename = str(coverfilename).replace(TABLE_PREFIX, "")
     path = os.path.join(COVER_LOCATION, coverfilename)
     # breakpoint()
     print("Membuat cover: " + coverfilename, "...", end="", flush=True)
