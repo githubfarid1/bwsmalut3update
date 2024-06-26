@@ -841,12 +841,14 @@ def label_perbundle(request, year, bundle_number):
     return response
 
 def search_qrcode(request, year, box_number):
-    # if not request.user.is_authenticated:
-    #     return redirect('login')
-    # res = generate_data_perbox(year, box_number)
-    res = Box.objects.get(box_number=box_number, yeardate=year)
-    return render(request=request, template_name='arsip_tata/search_qrcode.html', context={'datalist': res})
-
+    if not request.user.is_authenticated:
+        res = Box.objects.get(box_number=box_number, yeardate=year)
+        return render(request=request, template_name='arsip_tata/search_qrcode.html', context={'datalist': res})
+    else:
+        # TODO: ADD MORE FEATURE FOR LOGIN USER
+        res = Box.objects.get(box_number=box_number, yeardate=year)
+        return render(request=request, template_name='arsip_tata/search_qrcode.html', context={'datalist': res})
+        
 def show_customers(request):
     if not request.user.is_authenticated:
         return redirect('login')
