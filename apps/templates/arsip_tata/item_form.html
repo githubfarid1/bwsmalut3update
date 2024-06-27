@@ -54,11 +54,11 @@
     <div class="mb-3">  
       <label for="{{ form.bundle.id_for_label }}" class="form-label">Nomor Berkas</label>
       {% render_field form.bundle class="form-control" placeholder="" %}
-      <div class="invalid-feedback">{{ form.box.errors|first }}</div>
+      <div class="invalid-feedback">{{ form.bundle.errors|first }}</div>
     </div>
     {% else %}
-      {% render_field form.box.as_hidden %}
-    {% endif %}    
+      {% render_field form.bundle.as_hidden %}
+    {% endif %}
 
   </div>
   <div class="modal-footer">

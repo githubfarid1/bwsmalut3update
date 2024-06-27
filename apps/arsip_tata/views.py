@@ -344,10 +344,12 @@ def add_item(request, bundle_id):
     if request.method == "POST":
         # form = ItemForm(request.POST)
         form = ItemForm(request.POST or None, request.FILES or None)
+        print(request.POST)
         if form.is_valid():
             item = form.save(commit=False)
             item.bundle_id = bundle_id
             item.total = item.copy + item.original
+            item.bundle_id = bundle_id
             # bundle = Bundle.objects.get(id=bundle_id)
             # item.codegen = "-".join([str(item.yeardate), str(bundle.box.box_number), str(bundle.bundle_number), str(item.item_number)])
             item.save()
@@ -365,7 +367,7 @@ def add_item(request, bundle_id):
             latest_item_number = Item.objects.filter(bundle__box__yeardate=bundle.box.yeardate).latest('item_number').item_number + 1
         except:
             latest_item_number = 1
-        form = ItemForm(initial={'yeardate': bundle.yeardate, 'item_number': latest_item_number})
+        form = ItemForm(initial={'yeardate': bundle.yeardate, 'item_number': latest_item_number, 'bundle':  Bundle.objects.first().id})
     return render(request, 'arsip_tata/item_form.html', {
         'form': form,
     })
