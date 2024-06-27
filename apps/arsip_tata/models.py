@@ -33,7 +33,7 @@ class Box(models.Model):
     
     
     def __str__(self) -> str:
-        return f"{self.box_number}/{self.year.yeardate}"
+        return f"{self.year.yeardate}-{self.box_number}"
 
 class Bundlecode(models.Model):
     id = models.AutoField(primary_key=True)
@@ -76,7 +76,8 @@ class Bundle(models.Model):
 
 
     def __str__(self) -> str:
-        return f"{self.bundle_number}_{self.box.box_number}_{self.id}"
+        # return f"{self.bundle_number}_{self.box.box_number}_{self.id}"
+        return f"{self.box.year.yeardate}-{self.box.box_number}-{self.bundle_number}"
 
 class Item(models.Model):
     def update_filename(instance, filename):
