@@ -222,7 +222,7 @@ def bundle_list(request, box_id):
     if not request.user.is_authenticated:
         return redirect('login')
     
-    bundles = Bundle.objects.filter(box_id=box_id)
+    bundles = Bundle.objects.filter(box_id=box_id).order_by("bundle_numbar")
     return render(request, 'arsip_tata/bundle_list.html', {
         'bundles': bundles,
     })
