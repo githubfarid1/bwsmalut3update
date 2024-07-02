@@ -320,15 +320,15 @@ def item_download_pdf(request, pk):
     item = Item.objects.get(id=pk)
     
     path = os.path.join(settings.PDF_LOCATION, __package__.split('.')[1], str(item.yeardate), item.codegen + ".pdf")
-    print(path)
+    # print(path)
     if exists(path):
         doc = fitz.open(path)
-        for i in range(0, len(doc)):
-            page = doc[i]
-            tw = fitz.TextWriter(page.rect, opacity=0.3)
-            tw.append((50, 100), "COPY")
-            page.clean_contents()
-            page.write_text(rect=page.rect, writers=tw)
+        # for i in range(0, len(doc)):
+        #     page = doc[i]
+        #     tw = fitz.TextWriter(page.rect, opacity=0.3)
+        #     tw.append((50, 100), "COPY")
+        #     page.clean_contents()
+        #     page.write_text(rect=page.rect, writers=tw)
         
         doc.save("tmp.pdf")            
             
@@ -770,10 +770,10 @@ def label_perbox(request, year, box_number):
 
     return response
 
-def label_perbundle(request, year, bundle_number):
+def label_perbundle(request, pk):
     if not request.user.is_authenticated:
         return redirect('login')
-    bundle = Bundle.objects.get(bundle_number=bundle_number, yeardate=year)
+    bundle = Bundle.objects.get(pk=pk)
     pdf = io.BytesIO()
     doc = SimpleDocTemplate(pdf, pagesize=A5)
 
@@ -789,7 +789,7 @@ def label_perbundle(request, year, bundle_number):
     stylesample = getSampleStyleSheet()
     style2 = stylesample["Italic"]
     style2.wordWrap = 'CJK'
-    filename = f"bundlelabel_{year}_{bundle_number}.pdf"
+    filename = f"bundlelabel_{bundle.yeardate}_{bundle.bundle_number}.pdf"
     myset = (Paragraph("NO. BOX", style2), Paragraph(":", style2), Paragraph(str(bundle.box.box_number), style2))
     mydata.append(myset)
     myset = (Paragraph("NO. BERKAS", style2), Paragraph(":", style2), Paragraph(str(bundle.bundle_number), style2))
