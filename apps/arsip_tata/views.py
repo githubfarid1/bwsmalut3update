@@ -125,19 +125,23 @@ def box_list(request, year_id):
         bundles = Bundle.objects.filter(box_id=box.id).all()
         bundle_numbers = []
         item_numbers = []
+        bundle_years = []
         for bundle in bundles:
             bundle_numbers.append(str(bundle.bundle_number))
+            bundle_years.append(str(bundle.year_bundle))
             items = Item.objects.filter(bundle_id=bundle.id).all()
             for item in items:
                 item_numbers.append(item.item_number)
         bundle_numbers.sort()
         item_numbers.sort()
+        bundle_years.sort()
+        
         minitem = ""
         maxitem = ""
         if len(item_numbers) != 0:
             minitem = str(item_numbers[0])
             maxitem = str(item_numbers[-1])
-        result.append({"pk": box.pk, "yeardate": box.year.yeardate, "box_number": box.box_number, "bundle_number": ", ".join(bundle_numbers),  "item_number": " - ".join([minitem, maxitem])})
+        result.append({"pk": box.pk, "yeardate": box.year.yeardate, "box_number": box.box_number, "bundle_number": ", ".join(bundle_numbers),  "item_number": " - ".join([minitem, maxitem]), "year_bundle": ", ".join(list(set(bundle_years)))})
     return render(request, 'arsip_tata/box_list.html', {
         'boxes': result,
     })
