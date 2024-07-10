@@ -1482,18 +1482,18 @@ def create_dadigital_xls(datalist, sheet):
     result = datalist
     no = 0
     for res in result:
-        sheet['{}{}'.format('A', i)].border = thin_border7
-        sheet['{}{}'.format('B', i)].border = thin_border6
-        sheet['{}{}'.format('C', i)].border = thin_border6
-        sheet['{}{}'.format('D', i)].border = thin_border6
-        sheet['{}{}'.format('E', i)].border = thin_border6
-        sheet['{}{}'.format('F', i)].border = thin_border6
-        sheet['{}{}'.format('G', i)].border = thin_border6
-        sheet['{}{}'.format('H', i)].border = thin_border8
+        # sheet['{}{}'.format('A', i)].border = thin_border7
+        # sheet['{}{}'.format('B', i)].border = thin_border6
+        # sheet['{}{}'.format('C', i)].border = thin_border6
+        # sheet['{}{}'.format('D', i)].border = thin_border6
+        # sheet['{}{}'.format('E', i)].border = thin_border6
+        # sheet['{}{}'.format('F', i)].border = thin_border6
+        # sheet['{}{}'.format('G', i)].border = thin_border6
+        # sheet['{}{}'.format('H', i)].border = thin_border8
    
-        sheet['{}{}'.format('B', i)].value = res["title"]
-        sheet['{}{}'.format('B', i)].alignment = leftvh
-        i += 1
+        # sheet['{}{}'.format('B', i)].value = res["title"]
+        # sheet['{}{}'.format('B', i)].alignment = leftvh
+        # i += 1
         for data in res['data']:
             no += 1
             sheet['{}{}'.format('A', i)].value = no
