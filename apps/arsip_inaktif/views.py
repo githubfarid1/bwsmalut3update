@@ -1415,7 +1415,7 @@ def create_dadigital_xls(datalist, sheet):
 
     sheet.title = "DATA SUDAH ALIHMEDIA"
     sheet.column_dimensions['A'].width = 7
-    sheet.column_dimensions['B'].width = 40
+    sheet.column_dimensions['B'].width = 80
     sheet.column_dimensions['C'].width = 3
     sheet.column_dimensions['D'].width = 7
     sheet.column_dimensions['E'].width = 10
@@ -1498,7 +1498,7 @@ def create_dadigital_xls(datalist, sheet):
             no += 1
             sheet['{}{}'.format('A', i)].value = no
 
-            sheet['{}{}'.format('B', i)].value = data["description"]
+            sheet['{}{}'.format('B', i)].value = " ".join([data["description"], res["title"]]).replace("\n","")
             sheet['{}{}'.format('B', i)].alignment = leftvh
             
             sheet['{}{}'.format('C', i)].value = data["doc_count"]
