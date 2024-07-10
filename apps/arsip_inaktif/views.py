@@ -1010,9 +1010,9 @@ def create_year_xls(datalist, sheet, year):
     sheet['A2'].alignment = aligncenter
     sheet['A2'].font = headerfont
     today = date.today()
-    sheet['A3'] = "TAHUN PENATAAN {}".format(today.year)
-    sheet['A3'].alignment = aligncenter
-    sheet['A3'].font = headerfont
+    # sheet['A3'] = "TAHUN PENATAAN {}".format(today.year)
+    # sheet['A3'].alignment = aligncenter
+    # sheet['A3'].font = headerfont
     
     centervh = Alignment(horizontal='center', vertical='center', wrap_text=True)
     centerv = Alignment(vertical='center', wrap_text=True)
