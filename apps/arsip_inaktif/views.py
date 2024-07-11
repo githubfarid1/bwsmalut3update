@@ -367,7 +367,7 @@ def pdfdownload(request, uuid_id):
         with open(path, 'rb') as pdf:
         # with open("tmp.pdf", 'rb') as pdf:
             response = HttpResponse(pdf.read(), content_type='application/pdf')
-            response['Content-Disposition'] = f'inline;filename={filename}'
+            response['Content-Disposition'] = f'attachment;filename={filename}'
             return response
     raise Http404
 
