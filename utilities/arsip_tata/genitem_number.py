@@ -19,17 +19,21 @@ def parse(startbox, endbox, firstbundle, firstitem):
     genitemnumber = firstitem
     genbundlenumber = firstbundle
     session = Session(engine)
-    boxes = session.query(Box).filter(Box.box_number>=startbox).filter(Box.box_number<=endbox).order_by(Box.box_number).all()
+    boxes = session.query(Box).filter(Box.box_number>=startbox).filter(Box.box_number<=endbox).all()
+    listbox = []
     for box in boxes:
-        bundles = session.query(Bundle).filter(Bundle.box_id==box.id).order_by(Bundle.bundle_number).all()
+        listbox.append({"box_number":int(box.box_number), "id":box.id, "yeardate": box.yeardate})
+    sorted_list = sorted(listbox, key=lambda x: x['box_number'])
+    for box in sorted_list:
+        bundles = session.query(Bundle).filter(Bundle.box_id==box['id']).order_by(Bundle.bundle_number).all()
         for bundle in bundles:
-            print("No Box:", box.box_number, "No Bundle:", bundle.bundle_number, "Diupdate ke", genbundlenumber)
+            print("No Box:", box['box_number'], "No Bundle:", bundle.bundle_number, "Diupdate ke", genbundlenumber)
             session.query(Bundle).filter(Bundle.id==bundle.id).update({'bundle_number': genbundlenumber})
             genbundlenumber += 1
             items = session.query(Item).filter(Item.bundle_id==bundle.id).order_by(Item.item_number).all()
             for item in items:
-                print("No Box:", box.box_number, "No Item:", item.item_number, "Diupdate ke", genitemnumber)
-                session.query(Item).filter(Item.id==item.id).update({'item_number': genitemnumber, 'codegen': "-".join([str(box.yeardate) ,str(box.box_number), str(bundle.bundle_number), str(genitemnumber)])})
+                print("No Box:", box['box_number'], "No Item:", item.item_number, "Diupdate ke", genitemnumber)
+                session.query(Item).filter(Item.id==item.id).update({'item_number': genitemnumber, 'codegen': "-".join([str(box['yeardate']) ,str(box['box_number']), str(bundle.bundle_number), str(genitemnumber)])})
                 genitemnumber += 1
     jawab = input("Simpan Perubahan (Y/N)?")
     if jawab == 'Y' or jawab == 'y':
