@@ -756,7 +756,7 @@ def label_perbox(request, year, box_number):
     mydata.append(myset)
     myset = (Paragraph("NO. ITEM", style2), Paragraph(":", style2), Paragraph(f"{minitem} - {maxitem}", style2))
     mydata.append(myset)
-    myset = (Paragraph("TAHUN", style2), Paragraph(":", style2), Paragraph(", ".join(bundle_years), style2))
+    myset = (Paragraph("TAHUN", style2), Paragraph(":", style2), Paragraph(", ".join(list(set(bundle_years))), style2))
     mydata.append(myset)
     
     mytable = Table(mydata, colWidths=c_width, hAlign='LEFT')
