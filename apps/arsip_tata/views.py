@@ -709,17 +709,20 @@ def label_perbox(request, year, box_number):
     bundle_numbers = []
     yearbundle = ""
     code = ""
+    bundle_years = []
     if len(bundles) != 0:
         yearbundle = str(bundles[0].year_bundle)
         code = str(bundles[0].code)
     for bundle in bundles:
         bundle_numbers.append(str(bundle.bundle_number))
+        bundle_years.append(str(bundle.year_bundle))
         items = Item.objects.filter(bundle_id=bundle.id).all()
         item_numbers = []
         for item in items:
             item_numbers.append(item.item_number)
     bundle_numbers.sort()
     item_numbers.sort()
+    bundle_years.sort()
     minitem = "__"
     maxitem = "__"
     if len(item_numbers) != 0:
@@ -753,7 +756,7 @@ def label_perbox(request, year, box_number):
     mydata.append(myset)
     myset = (Paragraph("NO. ITEM", style2), Paragraph(":", style2), Paragraph(f"{minitem} - {maxitem}", style2))
     mydata.append(myset)
-    myset = (Paragraph("TAHUN", style2), Paragraph(":", style2), Paragraph(yearbundle, style2))
+    myset = (Paragraph("TAHUN", style2), Paragraph(":", style2), Paragraph(", ".join(bundle_years), style2))
     mydata.append(myset)
     
     mytable = Table(mydata, colWidths=c_width, hAlign='LEFT')
