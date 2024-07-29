@@ -141,7 +141,7 @@ def box_list(request, year_id):
         if len(item_numbers) != 0:
             minitem = str(item_numbers[0])
             maxitem = str(item_numbers[-1])
-        result.append({"pk": box.pk, "yeardate": box.year.yeardate, "box_number": box.box_number, "bundle_number": ", ".join(bundle_numbers),  "item_number": " - ".join([minitem, maxitem]), "year_bundle": ", ".join(list(set(bundle_years)))})
+        result.append({"pk": box.pk, "yeardate": box.year.yeardate, "box_number": box.box_number, "bundle_number": ", ".join(bundle_numbers),  "item_number": " - ".join([minitem, maxitem]), "year_bundle": ", ".join(list(set(bundle_years))), "notes": box.notes})
     return render(request, 'arsip_tata/box_list.html', {
         'boxes': result,
     })
@@ -217,7 +217,8 @@ def show_bundles(request, year_date, box_number):
     context = {
         'box_id': box.id,
         'box_number': box_number,
-        'year_date': year_date
+        'year_date': year_date,
+        'notes': box.notes
     }
     return render(request=request, template_name='arsip_tata/show_bundle.html', context=context)
 
