@@ -2,12 +2,12 @@
   {% if boxes %}
     {% for d in boxes %}
     <div class="col-12 col-lg-2 mt-3">
-      {% if d.notes != None %}
-      {% with classcard="card border-primary mb-3 bg-danger text-white" %}
+      {% if d.notes == '' or d.notes == None %}
+      {% with classcard="card border-primary mb-3" %}
       <div class="{{ classcard }}" >
       {% endwith %}
       {% else %}
-      {% with classcard="card border-primary mb-3" %}
+      {% with classcard="card border-primary mb-3 bg-danger text-white" %}
       <div class="{{ classcard }}">
         {% endwith %}
       {% endif %}
