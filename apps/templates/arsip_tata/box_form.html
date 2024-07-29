@@ -14,6 +14,13 @@
       {% render_field form.box_number class="form-control" placeholder="" %}
       <div class="invalid-feedback">{{ form.box_number.errors|first }}</div>
     </div>
+    {% if box %}
+    <div class="mb-3">
+      <label for="{{ form.notes.id_for_label }}" class="form-label">Catatan</label>
+      {% render_field form.notes class="form-control" placeholder="" %}
+      <div class="invalid-feedback">{{ form.notes.errors|first }}</div>
+    </div>
+    {% endif %}
     {% render_field form.yeardate type="hidden" class="form-control" placeholder="" %}
 
   </div>

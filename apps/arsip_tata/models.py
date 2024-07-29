@@ -21,7 +21,7 @@ class Box(models.Model):
     yeardate = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(2023), MaxValueValidator(2050)]
     )
-
+    notes = models.TextField(null=True, blank=True)
     year = models.ForeignKey(
         Year,
         db_column='year_id',

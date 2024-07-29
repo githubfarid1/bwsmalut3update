@@ -12,7 +12,7 @@ class YearForm(forms.ModelForm):
 class BoxForm(forms.ModelForm):
     class Meta:
         model = Box
-        fields = ['box_number', 'yeardate']
+        fields = ['box_number', 'yeardate', 'notes']
         error_messages = {
                     NON_FIELD_ERRORS: {
                         'unique_together': "Nomor Box Sudah Ada",
