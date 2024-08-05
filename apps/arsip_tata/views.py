@@ -141,7 +141,7 @@ def box_list(request, year_id):
         if len(item_numbers) != 0:
             minitem = str(item_numbers[0])
             maxitem = str(item_numbers[-1])
-        result.append({"pk": box.pk, "yeardate": box.year.yeardate, "box_number": box.box_number, "bundle_number": ", ".join(bundle_numbers),  "item_number": " - ".join([minitem, maxitem]), "year_bundle": ", ".join(list(set(bundle_years))), "notes": box.notes})
+        result.append({"pk": box.pk, "yeardate": box.year.yeardate, "box_number": box.box_number, "bundle_number": ", ".join(bundle_numbers),  "item_number": " - ".join([minitem, maxitem]), "year_bundle": ", ".join(list(set(bundle_years))), "notes": box.notes, "itemcount": len(item_numbers)})
     return render(request, 'arsip_tata/box_list.html', {
         'boxes': result,
     })
@@ -1292,6 +1292,7 @@ def search_item(request):
     if request.GET.get("title") or request.GET.get("description"):
         title = request.GET.get("title")
         description = request.GET.get("description")
+        print(description)
         if title != None and description == None:
             items = Item.objects.filter(title__icontains=title)
         elif title == None and description != None:

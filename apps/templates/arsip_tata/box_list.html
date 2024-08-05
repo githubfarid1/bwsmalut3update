@@ -19,9 +19,10 @@
             <a href="{% url 'arsip_tata_show_bundles' d.yeardate d.box_number %}"><img class="card-img border" src="{% static 'assets/icons/box.png' %}" alt=""></a>
           </div>
           <div class="col-sm-12 mt-1 text-center">
-              <p>No. Berkas: {{ d.bundle_number }}<br/>
+              <p><small>No. Berkas: {{ d.bundle_number }}<br/>
               No. Item: {{ d.item_number }}<br/>
-              Tahun: {{ d.year_bundle }}</p>
+              Jumlah: {{ d.itemcount }}<br/>
+              Tahun: {{ d.year_bundle }}</small></p>
           </div>
         </div>
         <div class="row">
