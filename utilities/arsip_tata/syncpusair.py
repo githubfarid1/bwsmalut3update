@@ -111,6 +111,7 @@ def main():
     for data in datalist:
         session.query(Box).filter(Box.box_number==data["boxno"], Box.yeardate==data["year"]).update({'token': str(data["link"]).split("/")[-1]})
         for detail in data["data"]:
+            breakpoint()
             session.query(Item).filter(Item.item_number==detail["nourut"], Item.yeardate==data["year"]).update({'token': detail["id"]})
     jawab = input("Simpan Perubahan (Y/N)?")
     if jawab == 'Y' or jawab == 'y':
