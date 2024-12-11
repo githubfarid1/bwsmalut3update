@@ -27,6 +27,7 @@ class Box(Base):
     year_id: Mapped[int] = mapped_column(ForeignKey(TABLE_PREFIX + "year" + ".id"))
     box_number: Mapped[str] = mapped_column(String(10))
     yeardate: Mapped[int] = mapped_column(SmallInteger)
+    token: Mapped[str] = mapped_column(String(50))
     year = relationship("Year")
 
 
@@ -58,5 +59,6 @@ class Item(Base):
     cover: Mapped[str] = mapped_column(String(255))
     page_count: Mapped[str] = mapped_column(SmallInteger, nullable=True)
     filesize: Mapped[int] = mapped_column(Integer, nullable=True)
+    token: Mapped[str] = mapped_column(String(50))
     bundle = relationship("Bundle")
 
