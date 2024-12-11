@@ -16,8 +16,8 @@ from dbclass import Bundle, Base, Box, Item
 import time
 engine = create_engine('mysql+pymysql://{}:{}@localhost:{}/{}'.format(USER, PASSWORD, PORT, DBNAME) , echo=False)
 
-def parse(playwright: Playwright):
-    url = 'https://arsip-sda.pusair-pu.go.id/admin/archive/2024'
+def parse(playwright: Playwright, start: Integer, end: Integer, year: Integer):
+    url = 'https://arsip-sda.pusair-pu.go.id/admin/archive/{}'.format(year)
     username = PUSAIR_USER
     password = PUSAIR_PASSWORD
     firefox = playwright.firefox
@@ -36,10 +36,11 @@ def parse(playwright: Playwright):
         
         for idx in range(0, trscount):
             # print(trscount)
-            boxno = trs.nth(idx).locator('td').nth(1).locator("h6").inner_text()
-            href = trs.nth(idx).locator('td').nth(4).locator("a").get_attribute("href")
-            print(boxno, href.split("/")[-1])
-            datalist.append({"boxno": boxno, "link": href, "data": {}})
+            if boxno >= start and boxno <= end:
+                boxno = trs.nth(idx).locator('td').nth(1).locator("h6").inner_text()
+                href = trs.nth(idx).locator('td').nth(4).locator("a").get_attribute("href")
+                print(boxno, href.split("/")[-1])
+                datalist.append({"boxno": boxno, "link": href, "year": year, "data": {}})
         time.sleep(0.5)    
         try:
             # breakpoint()
@@ -84,7 +85,7 @@ def parse(playwright: Playwright):
             except:
                 page.click("li[id='dt-box-year_next']", timeout=1000)
             # breakpoint()
-        break
+        # break
 
 
     browser.close()
@@ -94,20 +95,20 @@ def parse(playwright: Playwright):
 
 def main():
     parser = argparse.ArgumentParser(description="UPDATE BOX ID BOT")
-    args = parser.parse_args()
-    # if not args.input:
-    #     print('use: python arsipbot.py -i <filename>')
-    #     exit()
+    parser.add_argument('-s', '--start', type=str,help="Start Box Number")
+    parser.add_argument('-e', '--end', type=str,help="End Box Number")
+    parser.add_argument('-t', '--year', type=str,help="Year")
 
-    # if args.input[-5:] != '.xlsx':
-    #     print('File input have to XLSX file')
-    #     exit()
-    # page = browser_init()
+    args = parser.parse_args()
+    if not args.start or not args.end or not args.year:
+        print("use command python syncpusair.py -s [start_box] -e [end_box] -t [year]")
+        sys.exit()
+
     with sync_playwright() as playwright:
-        datalist = parse(playwright)    
+        datalist = parse(playwright, start=int(args.start), end=int(args.end), year=int(args.year))    
     
-    breakpoint()
-    # breakpoint()
+    # for data in datalist:
+
     print("End Process...")
 if __name__ == '__main__':
     main()
