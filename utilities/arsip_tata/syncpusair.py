@@ -36,8 +36,8 @@ def parse(playwright: Playwright, start: Integer, end: Integer, year: Integer):
         
         for idx in range(0, trscount):
             # print(trscount)
+            boxno = trs.nth(idx).locator('td').nth(1).locator("h6").inner_text()
             if boxno >= start and boxno <= end:
-                boxno = trs.nth(idx).locator('td').nth(1).locator("h6").inner_text()
                 href = trs.nth(idx).locator('td').nth(4).locator("a").get_attribute("href")
                 print(boxno, href.split("/")[-1])
                 datalist.append({"boxno": boxno, "link": href, "year": year, "data": {}})
