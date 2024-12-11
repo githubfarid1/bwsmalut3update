@@ -112,10 +112,14 @@ def main():
         session.query(Box).filter(Box.box_number==data["boxno"], Box.yeardate==data["year"]).update({'token': str(data["link"]).split("/")[-1]})
         for detail in data["data"].values():
             session.query(Item).filter(Item.item_number==detail["nourut"], Item.yeardate==data["year"]).update({'token': detail["id"]})
-    jawab = input("Simpan Perubahan (Y/N)?")
-    if jawab == 'Y' or jawab == 'y':
+    
         session.flush()
         session.commit()
+
+    # jawab = input("Simpan Perubahan (Y/N)?")
+    # if jawab == 'Y' or jawab == 'y':
+    #     session.flush()
+    #     session.commit()
 
     print("End Process...")
 if __name__ == '__main__':
