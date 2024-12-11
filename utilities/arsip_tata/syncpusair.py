@@ -14,6 +14,7 @@ import sys
 from settings import *
 from dbclass import Bundle, Base, Box, Item
 import time
+
 engine = create_engine('mysql+pymysql://{}:{}@localhost:{}/{}'.format(USER, PASSWORD, PORT, DBNAME) , echo=False)
 
 def parse(playwright: Playwright, start: int, end: int, year: int):
@@ -103,11 +104,17 @@ def main():
     if not args.start or not args.end or not args.year:
         print("use command python syncpusair.py -s [start_box] -e [end_box] -t [year]")
         sys.exit()
-
+    session = Session(engine)
     with sync_playwright() as playwright:
         datalist = parse(playwright, start=int(args.start), end=int(args.end), year=int(args.year))    
     
-    # for data in datalist:
+    for data in datalist:
+        session.query(Box).filter(Box.box_number==data["boxno"], Box.yeardate==data["year"]).update({'token': str(data["link"]).strip("/")[-1]})
+    
+    jawab = input("Simpan Perubahan (Y/N)?")
+    if jawab == 'Y' or jawab == 'y':
+        session.flush()
+        session.commit()
 
     print("End Process...")
 if __name__ == '__main__':
