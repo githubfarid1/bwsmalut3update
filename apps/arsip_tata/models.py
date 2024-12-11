@@ -22,7 +22,7 @@ class Box(models.Model):
         validators=[MinValueValidator(2023), MaxValueValidator(2050)]
     )
     notes = models.TextField(null=True, blank=True)
-    token = models.TextField(null=True, blank=True)
+    token = models.CharField(null=True, blank=True, max_length=50)
     year = models.ForeignKey(
         Year,
         db_column='year_id',
@@ -114,7 +114,7 @@ class Item(models.Model):
     cover = models.ImageField(upload_to=update_filename , null=True, blank=True)
     filesize = models.IntegerField(null=True)
     page_count = models.SmallIntegerField(null=True)
-    token = models.TextField(null=True, blank=True)
+    token = models.CharField(null=True, blank=True, max_length=50)
     bundle = models.ForeignKey(
         Bundle,
         db_column='bundle_id',
