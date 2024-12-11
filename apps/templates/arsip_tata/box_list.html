@@ -25,14 +25,14 @@
               Tahun: {{ d.year_bundle }}</small></p>
           </div>
         </div>
-        <div class="row">
-          <div class="col-lg-4">
+        {% comment %} <div class="row"> {% endcomment %}
+          <div class="col-lg-12">
             <a href="{% url 'arsip_tata_report_perbox' d.yeardate d.box_number %}"><button class="w-100 btn btn-sm btn-primary">Report</button></a>
           </div>
-          <div class="col-lg-4">
+          <div class="col-lg-12">
             <a href="{% url 'arsip_tata_label_perbox' d.yeardate d.box_number %}" target="_new"><button class="w-100 btn btn-sm btn-success">Label</button></a>
           </div>
-        </div>
+        {% comment %} </div> {% endcomment %}
 
       </div>
     </div>
