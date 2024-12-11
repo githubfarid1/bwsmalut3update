@@ -109,7 +109,7 @@ def main():
         datalist = parse(playwright, start=int(args.start), end=int(args.end), year=int(args.year))    
     
     for data in datalist:
-        session.query(Box).filter(Box.box_number==data["boxno"], Box.yeardate==data["year"]).update({'token': str(data["link"]).strip("/")[-1]})
+        session.query(Box).filter(Box.box_number==data["boxno"], Box.yeardate==data["year"]).update({'token': str(data["link"]).split("/")[-1]})
     
     jawab = input("Simpan Perubahan (Y/N)?")
     if jawab == 'Y' or jawab == 'y':
