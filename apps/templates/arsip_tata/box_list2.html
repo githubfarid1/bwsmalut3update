@@ -1,0 +1,38 @@
+{% load static %}
+  {% if boxes %}
+  <div class="table-scrollable">
+    <table class="table table-striped table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>Box</th>
+                <th>Berkas</th>
+                <th>Item</th>
+                <th>Jumlah</th>
+                <th>Tahun</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+
+  {% for d in boxes %}
+                <tr>
+                    <td>Box {{ d.box_number }}</td>
+                    <td>{{ d.bundle_number }}</td>
+                    <td>{{ d.item_number }}</td>
+                    <td>{{ d.itemcount }}</td>
+                    <td>{{ d.year_bundle }}</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" hx-get="{% url 'arsip_tata_edit_item' pk=d.pk %}" hx-target="#dialog">Edit</button>
+                        <a href="{% url 'arsip_tata_show_bundles' d.yeardate d.box_number %}"><button class="btn btn-success btn-sm">Isi Box</button></a>
+                                
+
+                                
+                    </td>
+
+                </tr>
+    {% endfor %}
+</tbody>
+</table>
+</div>
+
+{% endif %}
