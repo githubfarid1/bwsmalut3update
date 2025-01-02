@@ -5,7 +5,7 @@ from django.http import HttpResponse, Http404, JsonResponse
 from .models import Year, Box, Bundle, Item, Customer, Trans, TransDetail
 from django.views.decorators.csrf import csrf_exempt
 import json
-from .forms import YearForm, BoxForm, BundleForm, ItemForm, CustomerForm, TransForm, AddTransDetailForm, EditTransDetailForm, SearchItemForm
+from .forms import YearForm, BoxForm, BundleForm, ItemForm, CustomerForm, TransForm, AddTransDetailForm, EditTransDetailForm, SearchItemForm, SearchBundleForm
 from django.views.decorators.http import require_POST
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Alignment, Font, PatternFill
@@ -30,6 +30,7 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import permission_required, user_passes_test
 from django.core.files.storage import FileSystemStorage
 import fitz
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # Create your views here.
 @csrf_exempt
@@ -109,18 +110,105 @@ def show_boxes(request, year):
     if not request.user.is_authenticated:
         return redirect('login')
     year = Year.objects.get(yeardate=year)
+    if request.GET.get("page"):
+        page = request.GET.get("page")
+    else:
+        page = 1
+    if request.GET.get("search"):
+        search = request.GET.get("search")
+    else:
+        search = "None"    
+    # page = request.GET.get('page', 1)
+    # search = request.GET.get('search', None)
     context = {
         'year_id': year.id,
-        'year_date': year.yeardate
+        'year_date': year.yeardate,
+        'page': page,
+        'search': search
+    }
+    return render(request=request, template_name='arsip_tata/show_box.html', context=context)
+
+def show_boxes_old(request, year):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    year = Year.objects.get(yeardate=year)
+    context = {
+        'year_id': year.id,
+        'year_date': year.yeardate,
     }
     return render(request=request, template_name='arsip_tata/show_box.html', context=context)
 
 @csrf_exempt
-def box_list(request, year_id):
+def box_list(request, year_id, page, search):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    result = {}
+    if search == "None":
+        boxes = Box.objects.filter(year_id=year_id).order_by("id")
+    else:
+        boxes = Box.objects.filter(bundle__description__icontains=search)
+    paginator = Paginator(boxes, 50)
+    
+    try:
+        boxes = paginator.page(page)
+    except PageNotAnInteger:
+        boxes = paginator.page(1)
+    except EmptyPage:
+        boxes = paginator.page(paginator.num_pages)
+    # breakpoint()
+    recs = []
+    for box in boxes:
+        bundles = Bundle.objects.filter(box_id=box.id).all()
+        bundle_numbers = []
+        item_numbers = []
+        bundle_years = []
+        for bundle in bundles:
+            bundle_numbers.append(str(bundle.bundle_number))
+            bundle_years.append(str(bundle.year_bundle))
+            items = Item.objects.filter(bundle_id=bundle.id).all()
+            for item in items:
+                item_numbers.append(item.item_number)
+        bundle_numbers.sort()
+        item_numbers.sort()
+        bundle_years.sort()
+        
+        minitem = ""
+        maxitem = ""
+        if len(item_numbers) != 0:
+            minitem = str(item_numbers[0])
+            maxitem = str(item_numbers[-1])
+        recs.append({"pk": box.pk, "yeardate": box.year.yeardate, "box_number": box.box_number, "bundle_number": ", ".join(bundle_numbers),  "item_number": " - ".join([minitem, maxitem]), "year_bundle": ", ".join(list(set(bundle_years))), "notes": box.notes, "itemcount": len(item_numbers), "token": box.token})
+    result['data'] = recs
+    # print(result)
+    result['has_other_pages'] = boxes.has_other_pages()
+    try:
+        result['has_previous'] = boxes.has_previous()
+        result['previous_page_number'] = boxes.previous_page_number()
+    except:
+        result['previous_page_number'] = False
+    
+    result['number'] = boxes.number
+    result['page_range'] = boxes.paginator.page_range
+    try:
+        result['has_next'] = boxes.has_next()
+        result['next_page_number'] = boxes.next_page_number()
+    except:
+        result['next_page_number'] = False
+    result['num_pages'] = boxes.paginator.num_pages    
+    return render(request, 'arsip_tata/box_list2.html', {
+        'boxes': result,
+        'form': SearchBundleForm(),
+        'search': search
+    })
+
+
+@csrf_exempt
+def box_list_old(request, year_id):
     if not request.user.is_authenticated:
         return redirect('login')
     result = []
     boxes = Box.objects.filter(year_id=year_id)
+
     for box in boxes:
         bundles = Bundle.objects.filter(box_id=box.id).all()
         bundle_numbers = []
@@ -145,6 +233,7 @@ def box_list(request, year_id):
     return render(request, 'arsip_tata/box_list.html', {
         'boxes': result,
     })
+
 @user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def add_box(request, year_id):
     if request.method == "POST":
@@ -1292,7 +1381,10 @@ def search_item(request):
     if request.GET.get("title") or request.GET.get("description"):
         title = request.GET.get("title")
         description = request.GET.get("description")
-        print(description)
+        context['description'] = description 
+        context['title'] = title 
+
+        # print(description)
         if title != None and description == None:
             items = Item.objects.filter(title__icontains=title)
         elif title == None and description != None:
@@ -1301,6 +1393,20 @@ def search_item(request):
             items = Item.objects.filter(Q(bundle__description__icontains=description) & Q(title__icontains=title))       
     else:
         items = Item.objects.all()
+
+    if request.GET.get("page"):
+        page = request.GET.get("page")
+    else:
+        page = 1
+    paginator = Paginator(items, 100)
+    
+    try:
+        items = paginator.page(page)
+    except PageNotAnInteger:
+        items = paginator.page(1)
+    except EmptyPage:
+        items = paginator.page(paginator.num_pages)
+    context['data'] = {}
     data = []
     for item in items:
         status = 'Ada'
@@ -1311,6 +1417,21 @@ def search_item(request):
         myset = (item.codegen, item.title, item.bundle.description, status, trans_id)
         data.append(myset)
     context['data'] = data
+    context['has_other_pages'] = items.has_other_pages()
+    try:
+        context['has_previous'] = items.has_previous()
+        context['previous_page_number'] = items.previous_page_number()
+    except:
+        context['previous_page_number'] = False
+    
+    context['number'] = items.number
+    context['page_range'] = items.paginator.page_range
+    try:
+        context['has_next'] = items.has_next()
+        context['next_page_number'] = items.next_page_number()
+    except:
+        context['next_page_number'] = False
+    context['num_pages'] = items.paginator.num_pages    
 
     context['form'] = SearchItemForm()
     return render(request,'arsip_tata/search_item_form.html', context=context)

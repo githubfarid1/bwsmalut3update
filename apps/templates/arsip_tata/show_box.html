@@ -28,7 +28,7 @@
       </button>
     </div>
   </div>
-  <div class="row" hx-trigger="load, boxListChanged from:body" hx-get="{% url 'arsip_tata_box_list' year_id %}" hx-target="this">
+  <div class="row" hx-trigger="load, boxListChanged from:body" hx-get="{% url 'arsip_tata_box_list' year_id page search %}" hx-target="this">
       <span class="visually-hidden">Loading...</span>
   </div>
     <!-- Placeholder for the modal -->

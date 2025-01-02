@@ -10,7 +10,7 @@ urlpatterns = [
     path(route='year/<int:pk>/remove', view=views.remove_year, name=prefix + 'remove_year'),
 
     path(route='boxes/<int:year>', view=views.show_boxes, name=prefix + "show_boxes"),
-    path(route='box_list/<int:year_id>', view=views.box_list, name=prefix + "box_list"),
+    path(route='box_list/<int:year_id>/<int:page>/<str:search>', view=views.box_list, name=prefix + "box_list"),
     path(route='add_box/<int:year_id>', view=views.add_box, name=prefix + "add_box"),
     path(route='box/<int:pk>/edit', view=views.edit_box, name=prefix + "edit_box"),
     path(route='box/<int:pk>/remove', view=views.remove_box, name=prefix + 'remove_box'),

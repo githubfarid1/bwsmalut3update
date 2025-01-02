@@ -1,5 +1,16 @@
 {% load static %}
+{% load crispy_forms_tags %}
+
   {% if boxes %}
+  <div class="row justify-content-right">
+    <div class="col-lg-4 col-md-6 col-sm-12 border">  
+      <form action="" method="get">
+        {{form|crispy}}
+        <button type="submit" class="btn btn-primary mt-2">Cari</button>
+      </form>
+    </div>
+  </div>  
+  
   <div class="table-scrollable">
     <table class="table table-striped table-bordered table-hover">
         <thead>
@@ -14,25 +25,59 @@
         </thead>
         <tbody>
 
-  {% for d in boxes %}
-                <tr>
-                    <td>Box {{ d.box_number }}</td>
-                    <td>{{ d.bundle_number }}</td>
-                    <td>{{ d.item_number }}</td>
-                    <td>{{ d.itemcount }}</td>
-                    <td>{{ d.year_bundle }}</td>
-                    <td>
-                        <button class="btn btn-primary btn-sm" hx-get="{% url 'arsip_tata_edit_item' pk=d.pk %}" hx-target="#dialog">Edit</button>
-                        <a href="{% url 'arsip_tata_show_bundles' d.yeardate d.box_number %}"><button class="btn btn-success btn-sm">Isi Box</button></a>
-                                
+  {% for d in boxes.data %}
+  {% if d.notes == '' or d.notes == None %}
+    <tr>
+  {% else %}
+    <tr class="table-warning">
+  {% endif %}
+        <td>Box {{ d.box_number }}</td>
+        <td>{{ d.bundle_number }}</td>
+        <td>{{ d.item_number }}</td>
+        <td>{{ d.itemcount }}</td>
+        <td>{{ d.year_bundle }}</td>
+        <td>
+            <a href="{% url 'arsip_tata_show_bundles' d.yeardate d.box_number %}"><button class="btn btn-success btn-sm">Isi Box</button></a>
+            <button class="btn btn-primary btn-sm" hx-get="{% url 'arsip_tata_edit_box' pk=d.pk %}" hx-target="#dialog">Edit</button>
+            <a href="{% url 'arsip_tata_report_perbox' d.yeardate d.box_number %}"><button class="btn btn-sm btn-warning">Report</button></a>
+            <a href="{% url 'arsip_tata_label_perbox' d.yeardate d.box_number %}" target="_new"><button class="btn btn-sm btn-secondary">Label</button></a>
+            <a href="https://arsip-sda.pusair-pu.go.id/admin/archive/box/{{d.token}}" target="_new"><button class="btn btn-sm btn-danger">e-Arsip</button></a>
+        </td>
 
-                                
-                    </td>
-
-                </tr>
-    {% endfor %}
+    </tr>
+  {% endfor %}
 </tbody>
 </table>
+{% if boxes.has_other_pages %}
+<nav aria-label="Page navigation example">
+  <ul class="pagination">
+    {% if boxes.has_previous %}
+    <li class="page-item"><a class="page-link" href="?page=1&search={{search}}">First</a></li>
+    <li class="page-item"><a class="page-link" href="?page={{ boxes.previous_page_number }}&search={{search}}">Prev</a></li>
+    {% else %}
+      <li class="disabled page-item"><a class="page-link">First</a></li>
+      <li class="disabled page-item"><a class="page-link">Prev</a></li>
+    {% endif %}
+    {% for i in boxes.page_range %}
+      {% if boxes.number == i %}
+        <li class="page-item active"><a class="page-link" href="#"> {{ i }}</a></li>
+      {% else %}
+        <li class="page-item"><a class="page-link" href="?page={{ i }}&search={{search}}">{{ i }}</a></li>
+      {% endif %}
+    {% endfor %}
+    {% if boxes.has_next %}
+      <li class="page-item"><a class="page-link" href="?page={{ boxes.next_page_number }}&search={{search}}">Next</a></li>
+      <li class="page-item"><a class="page-link" href="?page={{ boxes.num_pages }}&search={{search}}">Last</a></li>
+    {% else %}
+    <li class="disabled page-item"><a class="page-link">Next</a></li>
+    <li class="disabled page-item"><a class="page-link">Last</a></li>
+    {% endif %}
+  </ul>
+
+  {% endif %}
+
+
+  
 </div>
 
 {% endif %}

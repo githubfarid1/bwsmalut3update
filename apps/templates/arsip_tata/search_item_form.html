@@ -50,6 +50,34 @@
         </tbody>
         <!--Table body-->
     </table>
+    {% if has_other_pages %}
+    <nav aria-label="Page navigation example">
+      <ul class="pagination">
+        {% if has_previous %}
+        <li class="page-item"><a class="page-link" href="?title={{title}}&description={{description}}&page=1">First</a></li>
+        <li class="page-item"><a class="page-link" href="?title={{title}}&description={{description}}&?page={{ previous_page_number }}">Prev</a></li>
+        {% else %}
+          <li class="disabled page-item"><a class="page-link">First</a></li>
+          <li class="disabled page-item"><a class="page-link">Prev</a></li>
+        {% endif %}
+        {% for i in page_range %}
+          {% if number == i %}
+            <li class="page-item active"><a class="page-link" href="#"> {{ i }}</a></li>
+          {% else %}
+            <li class="page-item"><a class="page-link" href="?title={{title}}&description={{description}}&page={{ i }}">{{ i }}</a></li>
+          {% endif %}
+        {% endfor %}
+        {% if has_next %}
+          <li class="page-item"><a class="page-link" href="?title={{title}}&description={{description}}&page={{ next_page_number }}">Next</a></li>
+          <li class="page-item"><a class="page-link" href="?title={{title}}&description={{description}}&page={{ num_pages }}">Last</a></li>
+        {% else %}
+        <li class="disabled page-item"><a class="page-link">Next</a></li>
+        <li class="disabled page-item"><a class="page-link">Last</a></li>
+        {% endif %}
+      </ul>
+    
+      {% endif %}
+    
     <!--Table-->
 </section>
   {% endif %}
