@@ -31,6 +31,8 @@ from django.contrib.auth.decorators import permission_required, user_passes_test
 from django.core.files.storage import FileSystemStorage
 import fitz
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from urllib.parse import unquote, quote, unquote_plus, quote_plus
+# from django.utils.http import urlquote, urlquote_plus
 
 # Create your views here.
 @csrf_exempt
@@ -118,13 +120,11 @@ def show_boxes(request, year):
         search = request.GET.get("search")
     else:
         search = "None"    
-    # page = request.GET.get('page', 1)
-    # search = request.GET.get('search', None)
     context = {
         'year_id': year.id,
         'year_date': year.yeardate,
         'page': page,
-        'search': search
+        'search': quote_plus(search)
     }
     return render(request=request, template_name='arsip_tata/show_box.html', context=context)
 
@@ -146,7 +146,8 @@ def box_list(request, year_id, page, search):
     if search == "None":
         boxes = Box.objects.filter(year_id=year_id).order_by("id")
     else:
-        boxes = Box.objects.filter(bundle__description__icontains=search)
+        boxes = Box.objects.filter(bundle__description__icontains=unquote_plus(search))
+    print(boxes)
     paginator = Paginator(boxes, 50)
     
     try:
@@ -179,7 +180,7 @@ def box_list(request, year_id, page, search):
             maxitem = str(item_numbers[-1])
         recs.append({"pk": box.pk, "yeardate": box.year.yeardate, "box_number": box.box_number, "bundle_number": ", ".join(bundle_numbers),  "item_number": " - ".join([minitem, maxitem]), "year_bundle": ", ".join(list(set(bundle_years))), "notes": box.notes, "itemcount": len(item_numbers), "token": box.token})
     result['data'] = recs
-    # print(result)
+    
     result['has_other_pages'] = boxes.has_other_pages()
     try:
         result['has_previous'] = boxes.has_previous()
