@@ -1568,7 +1568,7 @@ def bundle_sync(request, pk):
     
     def input_page_detail(page, bundledict, item, url):
         page.goto(url, wait_until="networkidle")
-        login(page)
+        # login(page)
         page.fill("input[name='file_num']", bundledict['noberkas'])
         page.fill("input[name='item_num']", item['item_number'])
         page.locator("input[name='year_file']").click()
@@ -1597,19 +1597,18 @@ def bundle_sync(request, pk):
         url = f"https://arsip-sda.pusair-pu.go.id/admin/archive/box/{bundledict['box_token']}"
         with sync_playwright() as playwright:
             # firefox = playwright.webkit
-            browser = playwright.chromium.launch(headless=True)
+            browser = playwright.chromium.launch(headless=False)
             # browser = firefox.launch(headless=True)
             context = browser.new_context()
 
             page = context.new_page()
             page.goto(url, wait_until="networkidle")
             login(page)
-            page.wait_for_selector("ul.pagination")
-            page.get_by_label('Show').select_option('100')
-            # breakpoint()
-            trs = page.locator("tbody > tr")
-            trscount = trs.count()
             for item in bundledict['items']:
+                page.wait_for_selector("ul.pagination")
+                page.get_by_label('Show').select_option('100')
+                trs = page.locator("tbody > tr")
+                trscount = trs.count()
                 itemfound = False
                 # breakpoint()
                 if page.locator("td[class='dataTables_empty']").count() == 0:
@@ -1621,17 +1620,17 @@ def bundle_sync(request, pk):
                             break
                 
                 if itemfound:
-                    page2 = context.new_page()
+                    # page2 = context.new_page()
                     if item['token'] != None:
                         url2 = f"https://arsip-sda.pusair-pu.go.id/admin/archive/{item['token']}/doc" 
                     else:
                         url2 = "https://arsip-sda.pusair-pu.go.id/admin/archive/add"
                     
-                    input_page_detail(page2, bundledict, item, url2)
+                    input_page_detail(page, bundledict, item, url2)
                     # tes = page.locator("span[class='year']")
                     # tes.get_by_text("2018")
-                    page2.evaluate("window.scrollTo(0, document.body.scrollHeight)")
-                    submit = page2.wait_for_selector("button[type='submit']")
+                    page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+                    submit = page.wait_for_selector("button[type='submit']")
                     try:
                         submit.click()
                     except:
@@ -1639,15 +1638,15 @@ def bundle_sync(request, pk):
                         submit.click()
                     
                     time.sleep(1)
-                    page2.close()
+                    page.close()
                 else:
-                    page2 = browser.new_page()
+                    # page2 = browser.new_page()
                     url2 = "https://arsip-sda.pusair-pu.go.id/admin/archive/add"
-                    input_page_detail(page2, bundledict, item, url2)
+                    input_page_detail(page, bundledict, item, url2)
                     # tes = page.locator("span[class='year']")
                     # tes.get_by_text("2018")
-                    page2.evaluate("window.scrollTo(0, document.body.scrollHeight)")
-                    submit = page2.wait_for_selector("button[type='submit']")
+                    page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+                    submit = page.wait_for_selector("button[type='submit']")
                     try:
                         submit.click()
                     except:
@@ -1655,8 +1654,9 @@ def bundle_sync(request, pk):
                         submit.click()
                     
                     time.sleep(1)
-                    itemtokenlist.append({"id": item['id'], "token":page2.url.split("/")[-2]})
-                    page2.close()
+                    itemtokenlist.append({"id": item['id'], "token":page.url.split("/")[-2]})
+                    page.goto(url, wait_until="networkidle")
+                    # page.close()
                     
 
     if request.method == "POST":
