@@ -1490,12 +1490,14 @@ def box_sync(request, pk):
             bundle_number = bundle_maxnumber+1
             item_number = item_maxnumber+1
             bundles = Bundle.objects.filter(box=box)
+            itemcounter = 0
             for idx, bundle in enumerate(bundles):
                 bundle.bundle_number = bundle_number+idx
                 bundle.save()
                 items = Item.objects.filter(bundle=bundle)
-                for idx2, item in enumerate(items):
-                    item.item_number = item_number+idx2
+                for item in items:
+                    item.item_number = item_number+itemcounter
+                    itemcounter += 1
                     item.save()
             message = "Sinkronisasi Sukses"
         else:
@@ -1609,7 +1611,7 @@ def bundle_sync(request, pk):
             for item in bundledict['items']:
                 itemfound = False
                 # breakpoint()
-                if page.locator("td[class='dataTables_empty']").count() != 1:
+                if page.locator("td[class='dataTables_empty']").count() == 0:
                     for idx in range(0, trscount):
                         bundle_number = trs.nth(idx).locator('td').nth(1).inner_text()
                         item_number = trs.nth(idx).locator('td').nth(2).inner_text()
@@ -1623,6 +1625,7 @@ def bundle_sync(request, pk):
                         url2 = f"https://arsip-sda.pusair-pu.go.id/admin/archive/{item['token']}/doc" 
                     else:
                         url2 = "https://arsip-sda.pusair-pu.go.id/admin/archive/add"
+                    
                     input_page_detail(page2, bundledict, item, url2)
                     # tes = page.locator("span[class='year']")
                     # tes.get_by_text("2018")
