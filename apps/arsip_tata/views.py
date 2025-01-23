@@ -1596,8 +1596,9 @@ def bundle_sync(request, pk):
         PUSAIR_RAK='1 - Kelurahan Ngade'
         url = f"https://arsip-sda.pusair-pu.go.id/admin/archive/box/{bundledict['box_token']}"
         with sync_playwright() as playwright:
-            firefox = playwright.webkit
-            browser = firefox.launch(headless=True)
+            # firefox = playwright.webkit
+            browser = playwright.webkit.launch(headless=True)
+            # browser = firefox.launch(headless=True)
             context = browser.new_context()
 
             page = context.new_page()
