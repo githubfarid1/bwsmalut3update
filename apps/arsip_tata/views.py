@@ -1541,7 +1541,6 @@ def getbox_token(boxnumber, year):
                 if boxno == boxnumber:
                     itemcount = trs.nth(idx).locator('td').nth(3).inner_text()
                     if itemcount == "0":
-                        breakpoint()
                         boxtoken = trs.nth(idx).locator("a").nth(1).get_attribute('href').split("/")[-1]
                         return boxtoken
             try:
