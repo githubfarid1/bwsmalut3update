@@ -1556,6 +1556,7 @@ def getbox_token(boxnumber, year):
 
 @csrf_exempt
 def bundle_sync(request, pk):
+    itemtokenlist = []
     def login(page):
         username='bwsmalukuutara'
         password='P@sswd2022!'
@@ -1602,22 +1603,24 @@ def bundle_sync(request, pk):
             login(page)
             page.wait_for_selector("ul.pagination")
             page.get_by_label('Show').select_option('100')
-        
+            # breakpoint()
             trs = page.locator("tbody > tr")
             trscount = trs.count()
             for item in bundledict['items']:
                 itemfound = False
-                for idx in range(0, trscount):
-                    bundle_number = trs.nth(idx).locator('td').nth(1).inner_text()
-                    item_number = trs.nth(idx).locator('td').nth(2).inner_text()
-                    if bundle_number == bundledict['noberkas'] and item_number == item['item_number']:
-                        itemfound = True
-                        break
+                # breakpoint()
+                if page.locator("td[class='dataTables_empty']").count() != 1:
+                    for idx in range(0, trscount):
+                        bundle_number = trs.nth(idx).locator('td').nth(1).inner_text()
+                        item_number = trs.nth(idx).locator('td').nth(2).inner_text()
+                        if bundle_number == bundledict['noberkas'] and item_number == item['item_number']:
+                            itemfound = True
+                            break
+                
                 if itemfound:
                     page2 = browser.new_page()
                     if item['token'] != None:
                         url2 = f"https://arsip-sda.pusair-pu.go.id/admin/archive/{item['token']}/doc" 
-                        
                     else:
                         url2 = "https://arsip-sda.pusair-pu.go.id/admin/archive/add"
                     input_page_detail(page2, bundledict, item, url2)
@@ -1633,7 +1636,23 @@ def bundle_sync(request, pk):
                     
                     time.sleep(1)
                     page2.close()
-
+                else:
+                    page2 = browser.new_page()
+                    url2 = "https://arsip-sda.pusair-pu.go.id/admin/archive/add"
+                    input_page_detail(page2, bundledict, item, url2)
+                    # tes = page.locator("span[class='year']")
+                    # tes.get_by_text("2018")
+                    page2.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+                    submit = page2.wait_for_selector("button[type='submit']")
+                    try:
+                        submit.click()
+                    except:
+                        time.sleep(0.5)
+                        submit.click()
+                    
+                    time.sleep(1)
+                    itemtokenlist.append({"id": item['id'], "token":page2.url.split("/")[-2]})
+                    page2.close()
                     
 
     if request.method == "POST":
@@ -1664,7 +1683,8 @@ def bundle_sync(request, pk):
                     "accestype": item.get_accesstype_display(),
                     "token": item.token,
                     "bentukarsip": 'Buku',
-                    "ket": "COPY"
+                    "ket": "COPY",
+                    "id": item.id
                 }
                 itemlist.append(itemdict)
             bundledict["items"] = itemlist
@@ -1674,6 +1694,10 @@ def bundle_sync(request, pk):
                 message = "Sinkronisasi Sukses"
                 bundle.issync = True
                 bundle.save()
+                for ditem in itemtokenlist:
+                    updateitem = Item.objects.get(pk=ditem['id'])
+                    updateitem.token = ditem['token']
+                    updateitem.save()
             except Exception as e:
                 message = "Sinkronisasi Gagal {}".format(str(e))    
         else:

@@ -49,6 +49,9 @@
     {% endif %}    
 
     {% render_field form.yeardate type="hidden" class="form-control" placeholder="" %}
+    {% if bundle %}
+        {% render_field form.issync type="hidden" class="form-control" placeholder="" checked="0"%}
+    {% endif %}
   </div>
   <div class="modal-footer">
     {% if bundle %}
