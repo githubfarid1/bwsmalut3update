@@ -1597,7 +1597,7 @@ def bundle_sync(request, pk):
         url = f"https://arsip-sda.pusair-pu.go.id/admin/archive/box/{bundledict['box_token']}"
         with sync_playwright() as playwright:
             # firefox = playwright.webkit
-            browser = playwright.chromium.launch(headless=True)
+            browser = playwright.firefox.launch(headless=True)
             # browser = firefox.launch(headless=True)
             context = browser.new_context()
 
