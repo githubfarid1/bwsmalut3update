@@ -1522,7 +1522,7 @@ def getbox_token(boxnumber, year):
     boxtoken = False
     with sync_playwright() as playwright:
         firefox = playwright.chromium
-        browser = firefox.launch(headless=False)
+        browser = firefox.launch(headless=True)
         page = browser.new_page()
         page.goto(url, wait_until="networkidle")
         page.fill('input[name="login"]', username)
