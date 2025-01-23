@@ -1598,7 +1598,7 @@ def bundle_sync(request, pk):
         # with sync_playwright() as playwright:
         # firefox = playwright.webkit
         playwright = sync_playwright().start()
-        browser = playwright.firefox.launch(headless=False)
+        browser = playwright.firefox.launch(headless=True)
         # browser = firefox.launch(headless=True)
         context = browser.new_context()
 
