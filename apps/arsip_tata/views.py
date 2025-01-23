@@ -1595,69 +1595,71 @@ def bundle_sync(request, pk):
         year='2024'
         PUSAIR_RAK='1 - Kelurahan Ngade'
         url = f"https://arsip-sda.pusair-pu.go.id/admin/archive/box/{bundledict['box_token']}"
-        with sync_playwright() as playwright:
-            # firefox = playwright.webkit
-            browser = playwright.firefox.launch(headless=True)
-            # browser = firefox.launch(headless=True)
-            context = browser.new_context()
+        # with sync_playwright() as playwright:
+        # firefox = playwright.webkit
+        playwright = sync_playwright().start()
+        browser = playwright.firefox.launch(headless=False)
+        # browser = firefox.launch(headless=True)
+        context = browser.new_context()
 
-            page = context.new_page()
-            page.goto(url, wait_until="networkidle")
-            login(page)
-            for item in bundledict['items']:
-                page.wait_for_selector("ul.pagination")
-                page.get_by_label('Show').select_option('100')
-                trs = page.locator("tbody > tr")
-                trscount = trs.count()
-                itemfound = False
-                # breakpoint()
-                if page.locator("td[class='dataTables_empty']").count() == 0:
-                    for idx in range(0, trscount):
-                        bundle_number = trs.nth(idx).locator('td').nth(1).inner_text()
-                        item_number = trs.nth(idx).locator('td').nth(2).inner_text()
-                        if bundle_number == bundledict['noberkas'] and item_number == item['item_number']:
-                            itemfound = True
-                            break
-                
-                if itemfound:
-                    # page2 = context.new_page()
-                    if item['token'] != None:
-                        url2 = f"https://arsip-sda.pusair-pu.go.id/admin/archive/{item['token']}/doc" 
-                    else:
-                        url2 = "https://arsip-sda.pusair-pu.go.id/admin/archive/add"
-                    
-                    input_page_detail(page, bundledict, item, url2)
-                    # tes = page.locator("span[class='year']")
-                    # tes.get_by_text("2018")
-                    page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
-                    submit = page.wait_for_selector("button[type='submit']")
-                    try:
-                        submit.click()
-                    except:
-                        time.sleep(0.5)
-                        submit.click()
-                    
-                    time.sleep(1)
-                    page.close()
+        page = context.new_page()
+        page.goto(url, wait_until="networkidle")
+        login(page)
+        for item in bundledict['items']:
+            page.wait_for_selector("ul.pagination")
+            page.get_by_label('Show').select_option('100')
+            trs = page.locator("tbody > tr")
+            trscount = trs.count()
+            itemfound = False
+            # breakpoint()
+            if page.locator("td[class='dataTables_empty']").count() == 0:
+                for idx in range(0, trscount):
+                    bundle_number = trs.nth(idx).locator('td').nth(1).inner_text()
+                    item_number = trs.nth(idx).locator('td').nth(2).inner_text()
+                    if bundle_number == bundledict['noberkas'] and item_number == item['item_number']:
+                        itemfound = True
+                        break
+            
+            if itemfound:
+                # page2 = context.new_page()
+                if item['token'] != None:
+                    url2 = f"https://arsip-sda.pusair-pu.go.id/admin/archive/{item['token']}/doc" 
                 else:
-                    # page2 = browser.new_page()
                     url2 = "https://arsip-sda.pusair-pu.go.id/admin/archive/add"
-                    input_page_detail(page, bundledict, item, url2)
-                    # tes = page.locator("span[class='year']")
-                    # tes.get_by_text("2018")
-                    page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
-                    submit = page.wait_for_selector("button[type='submit']")
-                    try:
-                        submit.click()
-                    except:
-                        time.sleep(1)
-                        submit.click()
-                    
+                
+                input_page_detail(page, bundledict, item, url2)
+                # tes = page.locator("span[class='year']")
+                # tes.get_by_text("2018")
+                page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+                submit = page.wait_for_selector("button[type='submit']")
+                try:
+                    submit.click()
+                except:
+                    time.sleep(0.5)
+                    submit.click()
+                
+                time.sleep(1)
+                page.close()
+            else:
+                # page2 = browser.new_page()
+                url2 = "https://arsip-sda.pusair-pu.go.id/admin/archive/add"
+                input_page_detail(page, bundledict, item, url2)
+                # tes = page.locator("span[class='year']")
+                # tes.get_by_text("2018")
+                page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+                submit = page.wait_for_selector("button[type='submit']")
+                try:
+                    submit.click()
+                except:
                     time.sleep(1)
-                    itemtokenlist.append({"id": item['id'], "token":page.url.split("/")[-2]})
-                    page.goto(url, wait_until="networkidle")
-                    # page.close()
-                    
+                    submit.click()
+                
+                time.sleep(1)
+                itemtokenlist.append({"id": item['id'], "token":page.url.split("/")[-2]})
+                page.goto(url, wait_until="networkidle")
+        
+                # page.close()
+        page.close()            
 
     if request.method == "POST":
         bundle = get_object_or_404(Bundle, pk=pk)
