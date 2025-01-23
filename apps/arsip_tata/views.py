@@ -1650,7 +1650,7 @@ def bundle_sync(request, pk):
                     try:
                         submit.click()
                     except:
-                        time.sleep(0.5)
+                        time.sleep(1)
                         submit.click()
                     
                     time.sleep(1)
