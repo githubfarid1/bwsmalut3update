@@ -1521,8 +1521,8 @@ def getbox_token(boxnumber, year):
     url = 'https://arsip-sda.pusair-pu.go.id/admin/archive/{}'.format(year)
     boxtoken = False
     with sync_playwright() as playwright:
-        firefox = playwright.firefox
-        browser = firefox.launch(headless=True)
+        firefox = playwright.chromium
+        browser = firefox.launch(headless=False)
         page = browser.new_page()
         page.goto(url, wait_until="networkidle")
         page.fill('input[name="login"]', username)
@@ -1541,7 +1541,8 @@ def getbox_token(boxnumber, year):
                 if boxno == boxnumber:
                     itemcount = trs.nth(idx).locator('td').nth(3).inner_text()
                     if itemcount == "0":
-                        boxtoken = trs.nth(4).locator("a").nth(1).get_attribute('href').split("/")[-1]
+                        breakpoint()
+                        boxtoken = trs.nth(idx).locator("a").nth(1).get_attribute('href').split("/")[-1]
                         return boxtoken
             try:
                 # breakpoint()
