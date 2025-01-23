@@ -1674,8 +1674,8 @@ def bundle_sync(request, pk):
                 message = "Sinkronisasi Sukses"
                 bundle.issync = True
                 bundle.save()
-            except:
-                message = "Sinkronisasi Gagal"    
+            except Exception as e:
+                message = "Sinkronisasi Gagal {}".format(str(e))    
         else:
             message = "Sinkronisasi Gagal"
         
