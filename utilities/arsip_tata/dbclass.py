@@ -43,7 +43,7 @@ class Bundle(Base):
     description: Mapped[str] = mapped_column(Text)
     year_bundle: Mapped[int] = mapped_column(SmallInteger)
     yeardate: Mapped[int] = mapped_column(SmallInteger)
-    # issync: Mapped[bool] =  mapped_column(bool)
+    syncstatus: Mapped[int] =  mapped_column(SmallInteger)
     box = relationship("Box")
 
 

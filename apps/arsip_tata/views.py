@@ -179,7 +179,7 @@ def box_list(request, year_id, page, search):
         if len(item_numbers) != 0:
             minitem = str(item_numbers[0])
             maxitem = str(item_numbers[-1])
-        recs.append({"pk": box.pk, "yeardate": box.year.yeardate, "box_number": box.box_number, "bundle_number": ", ".join(bundle_numbers),  "item_number": " - ".join([minitem, maxitem]), "year_bundle": ", ".join(list(set(bundle_years))), "notes": box.notes, "itemcount": len(item_numbers), "token": box.token, "issync": box.issync})
+        recs.append({"pk": box.pk, "yeardate": box.year.yeardate, "box_number": box.box_number, "bundle_number": ", ".join(bundle_numbers),  "item_number": " - ".join([minitem, maxitem]), "year_bundle": ", ".join(list(set(bundle_years))), "notes": box.notes, "itemcount": len(item_numbers), "token": box.token})
     result['data'] = recs
     
     result['has_other_pages'] = boxes.has_other_pages()
@@ -318,6 +318,7 @@ def bundle_list(request, box_id):
         return redirect('login')
     
     bundles = Bundle.objects.filter(box_id=box_id).order_by("bundle_number")
+    # print(bundles[0].syncstatus)
     return render(request, 'arsip_tata/bundle_list.html', {
         'bundles': bundles,
     })
@@ -1470,6 +1471,7 @@ def item_upload_pdf(request):
     })
 
 @csrf_exempt
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def box_sync(request, pk):
     if request.method == "POST":
         box = get_object_or_404(Box, pk=pk)
@@ -1493,6 +1495,7 @@ def box_sync(request, pk):
             itemcounter = 0
             for idx, bundle in enumerate(bundles):
                 bundle.bundle_number = bundle_number+idx
+                bundle.syncstatus = 2
                 bundle.save()
                 items = Item.objects.filter(bundle=bundle)
                 for item in items:
