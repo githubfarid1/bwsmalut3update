@@ -1597,7 +1597,7 @@ def bundle_sync(request, pk):
         url = f"https://arsip-sda.pusair-pu.go.id/admin/archive/box/{bundledict['box_token']}"
         with sync_playwright() as playwright:
             # firefox = playwright.webkit
-            browser = playwright.webkit.launch(headless=True)
+            browser = playwright.chromium.launch(headless=True)
             # browser = firefox.launch(headless=True)
             context = browser.new_context()
 
@@ -1621,7 +1621,7 @@ def bundle_sync(request, pk):
                             break
                 
                 if itemfound:
-                    page2 = browser.new_page()
+                    page2 = context.new_page()
                     if item['token'] != None:
                         url2 = f"https://arsip-sda.pusair-pu.go.id/admin/archive/{item['token']}/doc" 
                     else:
