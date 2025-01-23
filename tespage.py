@@ -10,7 +10,7 @@ def scrape_post_info(context, post):
     page.close()
 
 with sync_playwright() as p:
-    browser = p.chromium.launch(headless=True)
+    browser = p.webkit.launch(headless=True)
     context = browser.new_context()
     for post in posts:
         scrape_post_info(context, post)
