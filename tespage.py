@@ -10,11 +10,11 @@ def scrape_post_info(context, post):
     page.close()
 
 with sync_playwright() as p:
-    browser = p.chromium.launch(headless=False)
+    browser = p.chromium.launch(headless=True)
     context = browser.new_context()
     for post in posts:
         scrape_post_info(context, post)
         # some time delay
         time.sleep(2)
-    breakpoint()
+    # breakpoint()
     browser.close()
