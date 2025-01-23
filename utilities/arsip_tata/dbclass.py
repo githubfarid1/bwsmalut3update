@@ -28,6 +28,8 @@ class Box(Base):
     box_number: Mapped[str] = mapped_column(String(10))
     yeardate: Mapped[int] = mapped_column(SmallInteger)
     token: Mapped[str] = mapped_column(String(50))
+    # issync: Mapped[bool] =  mapped_column(bool)
+
     year = relationship("Year")
 
 
@@ -41,6 +43,7 @@ class Bundle(Base):
     description: Mapped[str] = mapped_column(Text)
     year_bundle: Mapped[int] = mapped_column(SmallInteger)
     yeardate: Mapped[int] = mapped_column(SmallInteger)
+    # issync: Mapped[bool] =  mapped_column(bool)
     box = relationship("Box")
 
 
@@ -60,5 +63,6 @@ class Item(Base):
     page_count: Mapped[str] = mapped_column(SmallInteger, nullable=True)
     filesize: Mapped[int] = mapped_column(Integer, nullable=True)
     token: Mapped[str] = mapped_column(String(50))
+    # issync: Mapped[bool] =  mapped_column(bool)
     bundle = relationship("Bundle")
 

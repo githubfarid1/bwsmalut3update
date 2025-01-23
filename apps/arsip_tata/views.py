@@ -20,7 +20,7 @@ from reportlab.lib.units import inch, mm
 from reportlab.platypus.tables import Table,TableStyle,colors
 from datetime import datetime, timedelta
 from django.template.defaultfilters import slugify
-from django.db.models import Q
+from django.db.models import Q, Max
 from reportlab.lib.enums import TA_JUSTIFY, TA_LEFT, TA_CENTER, TA_RIGHT
 from django.conf import settings
 from os.path import exists
@@ -33,7 +33,8 @@ import fitz
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from urllib.parse import unquote, quote, unquote_plus, quote_plus
 # from django.utils.http import urlquote, urlquote_plus
-
+from playwright.sync_api import sync_playwright, Playwright
+import time
 # Create your views here.
 @csrf_exempt
 def year_list(request):
@@ -147,7 +148,7 @@ def box_list(request, year_id, page, search):
         boxes = Box.objects.filter(year_id=year_id).order_by("id")
     else:
         boxes = Box.objects.filter(bundle__description__icontains=unquote_plus(search))
-    print(boxes)
+    # print(boxes)
     paginator = Paginator(boxes, 50)
     
     try:
@@ -178,7 +179,7 @@ def box_list(request, year_id, page, search):
         if len(item_numbers) != 0:
             minitem = str(item_numbers[0])
             maxitem = str(item_numbers[-1])
-        recs.append({"pk": box.pk, "yeardate": box.year.yeardate, "box_number": box.box_number, "bundle_number": ", ".join(bundle_numbers),  "item_number": " - ".join([minitem, maxitem]), "year_bundle": ", ".join(list(set(bundle_years))), "notes": box.notes, "itemcount": len(item_numbers), "token": box.token})
+        recs.append({"pk": box.pk, "yeardate": box.year.yeardate, "box_number": box.box_number, "bundle_number": ", ".join(bundle_numbers),  "item_number": " - ".join([minitem, maxitem]), "year_bundle": ", ".join(list(set(bundle_years))), "notes": box.notes, "itemcount": len(item_numbers), "token": box.token, "issync": box.issync})
     result['data'] = recs
     
     result['has_other_pages'] = boxes.has_other_pages()
@@ -201,7 +202,6 @@ def box_list(request, year_id, page, search):
         'form': SearchBundleForm(),
         'search': search
     })
-
 
 @csrf_exempt
 def box_list_old(request, year_id):
@@ -1467,4 +1467,226 @@ def item_upload_pdf(request):
         # print(item_id)
     return render(request, 'arsip_tata/item_upload_pdf.html', {
         'item_id': item_id,
+    })
+
+@csrf_exempt
+def box_sync(request, pk):
+    if request.method == "POST":
+        box = get_object_or_404(Box, pk=pk)
+        
+        boxtoken = getbox_token(box.box_number, str(box.yeardate))
+        # print(boxtoken)
+        if boxtoken:
+            # breakpoint()
+            box.token = boxtoken
+            box.save()
+            prevbox = Box.objects.get(box_number=str(int(box.box_number)-1), yeardate=box.yeardate)
+            bundles = Bundle.objects.filter(box=prevbox)
+            bundle_maxnumber = bundles.aggregate(Max("bundle_number"))['bundle_number__max']
+            # breakpoint()
+            bundle_maxid = bundles.aggregate(Max("id"))['id__max']
+            item_maxnumber = Item.objects.filter(bundle_id=bundle_maxid).aggregate(Max("item_number"))['item_number__max']
+            
+            bundle_number = bundle_maxnumber+1
+            item_number = item_maxnumber+1
+            bundles = Bundle.objects.filter(box=box)
+            for idx, bundle in enumerate(bundles):
+                bundle.bundle_number = bundle_number+idx
+                bundle.save()
+                items = Item.objects.filter(bundle=bundle)
+                for idx2, item in enumerate(items):
+                    item.item_number = item_number+idx2
+                    item.save()
+            message = "Sinkronisasi Sukses"
+        else:
+            message = "Sinkronisasi Gagal"
+        
+        return HttpResponse(
+            status=204,
+            headers={
+                'HX-Trigger': json.dumps({
+                    "boxListChanged": None,
+                    "showMessage": message
+                })
+            })
+        
+    return render(request, 'arsip_tata/box_sync.html', {
+    })
+
+def getbox_token(boxnumber, year):
+    username='bwsmalukuutara'
+    password='P@sswd2022!'
+    # year='2024'
+    PUSAIR_RAK='1 - Kelurahan Ngade'
+    url = 'https://arsip-sda.pusair-pu.go.id/admin/archive/{}'.format(year)
+    boxtoken = False
+    with sync_playwright() as playwright:
+        firefox = playwright.firefox
+        browser = firefox.launch(headless=True)
+        page = browser.new_page()
+        page.goto(url, wait_until="networkidle")
+        page.fill('input[name="login"]', username)
+        page.fill('input[name="password"]', password)
+        page.click('text=Log in', timeout=20000)
+        while True:
+            page.wait_for_selector("ul.pagination")
+            page.get_by_label('Show').select_option('100')
+            trs = page.locator("tbody > tr")
+            trscount = trs.count()
+            
+            for idx in range(0, trscount):
+                # print(trscount)
+                boxno = trs.nth(idx).locator('td').nth(1).locator("h6").inner_text()
+                # print(boxno)
+                if boxno == boxnumber:
+                    itemcount = trs.nth(idx).locator('td').nth(3).inner_text()
+                    if itemcount == "0":
+                        boxtoken = trs.nth(4).locator("a").nth(1).get_attribute('href').split("/")[-1]
+                        return boxtoken
+            try:
+                # breakpoint()
+                page.wait_for_selector("li[class='paginate_button page-item next disabled']", timeout=1000)
+                break
+            except:
+                page.click("li[id='dt-box-year_next']", timeout=1000)
+        
+        browser.close()
+        return boxtoken
+
+
+@csrf_exempt
+def bundle_sync(request, pk):
+    def login(page):
+        username='bwsmalukuutara'
+        password='P@sswd2022!'
+        page.fill('input[name="login"]', username)
+        page.fill('input[name="password"]', password)
+        page.click('text=Log in', timeout=20000)
+    
+    def input_page_detail(page, bundledict, item, url):
+        page.goto(url, wait_until="networkidle")
+        login(page)
+        page.fill("input[name='file_num']", bundledict['noberkas'])
+        page.fill("input[name='item_num']", item['item_number'])
+        page.locator("input[name='year_file']").click()
+        page.keyboard.press("Escape")
+        page.locator("input[name='year_file']").fill(bundledict["thcipta"], force=True)
+        page.locator("input[name='year_archive']").click()
+        page.keyboard.press("Escape")
+        page.locator("input[name='year_archive']").fill(bundledict['thtata'], force=True)
+        page.locator("span[class='select2-selection__rendered']").nth(1).click()
+        page.fill("input[class='select2-search__field']", bundledict['klasifikasi'])
+        page.locator("li[class='select2-results__option select2-results__option--highlighted']").click()
+        page.locator("span[class='select2-selection__rendered']").nth(2).click()
+        page.fill("input[class='select2-search__field']", f"{bundledict['nobox']} - Rak/Lemari {bundledict['rak']}({bundledict['thtata']})")
+        page.locator("li[class='select2-results__option select2-results__option--highlighted']").click()
+        page.fill("input[name='document_name']", bundledict['title'])
+        page.fill("textarea[name='document_note']", item['title'])
+        page.locator("select[name='daftar_archive']").select_option(item["accestype"])
+        page.locator("select[name='archive_type']").select_option(bundledict["jenisarsip"])
+        page.locator("select[name='satuan']").select_option(item["bentukarsip"])
+        page.fill("input[name='total']", item['total'])
+        page.locator("input[id='inline-{}']".format(item['ket'])).click()
+
+    def input_data(bundledict):
+        year='2024'
+        PUSAIR_RAK='1 - Kelurahan Ngade'
+        url = f"https://arsip-sda.pusair-pu.go.id/admin/archive/box/{bundledict['box_token']}"
+        with sync_playwright() as playwright:
+            firefox = playwright.chromium
+            browser = firefox.launch(headless=False)
+            context = browser.new_context()
+
+            page = context.new_page()
+            page.goto(url, wait_until="networkidle")
+            login(page)
+            page.wait_for_selector("ul.pagination")
+            page.get_by_label('Show').select_option('100')
+        
+            trs = page.locator("tbody > tr")
+            trscount = trs.count()
+            for item in bundledict['items']:
+                itemfound = False
+                for idx in range(0, trscount):
+                    bundle_number = trs.nth(idx).locator('td').nth(1).inner_text()
+                    item_number = trs.nth(idx).locator('td').nth(2).inner_text()
+                    if bundle_number == bundledict['noberkas'] and item_number == item['item_number']:
+                        itemfound = True
+                        break
+                if itemfound:
+                    page2 = browser.new_page()
+                    if item['token'] != None:
+                        url2 = f"https://arsip-sda.pusair-pu.go.id/admin/archive/{item['token']}/doc" 
+                        
+                    else:
+                        url2 = "https://arsip-sda.pusair-pu.go.id/admin/archive/add"
+                    input_page_detail(page2, bundledict, item, url2)
+                    # tes = page.locator("span[class='year']")
+                    # tes.get_by_text("2018")
+                    page2.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+                    submit = page2.wait_for_selector("button[type='submit']")
+                    try:
+                        submit.click()
+                    except:
+                        time.sleep(0.5)
+                        submit.click()
+                    
+                    time.sleep(1)
+                    page2.close()
+
+                    
+
+    if request.method == "POST":
+        bundle = get_object_or_404(Bundle, pk=pk)
+        if not bundle.issync:
+            bundledict = {
+            "noberkas": str(bundle.bundle_number),
+            "thcipta": str(bundle.year_bundle),
+            "thtata": str(bundle.yeardate),
+            "klasifikasi": bundle.code,
+            "nobox": str(bundle.box.box_number),
+            "title": bundle.creator,
+            "uraian": bundle.description,
+            "rak": '1',
+            "box_token": bundle.box.token,
+            "jenisarsip": "Dinamis"}
+            
+            items = Item.objects.filter(bundle=bundle).order_by("item_number")
+            itemlist = []
+            for idx, item in enumerate(items):
+                title = item.title
+                if idx == 0:
+                    title = item.title + "\n" + bundledict["uraian"] 
+                itemdict = {
+                    "title": title,
+                    "total": str(item.total),
+                    "item_number": str(item.item_number),
+                    "accestype": item.get_accesstype_display(),
+                    "token": item.token,
+                    "bentukarsip": 'Buku',
+                    "ket": "COPY"
+                }
+                itemlist.append(itemdict)
+            bundledict["items"] = itemlist
+            # print(bundledict)
+            try:
+                input_data(bundledict)
+                message = "Sinkronisasi Sukses"
+                bundle.issync = True
+                bundle.save()
+            except:
+                message = "Sinkronisasi Gagal"    
+        else:
+            message = "Sinkronisasi Gagal"
+        
+        return HttpResponse(
+            status=204,
+            headers={
+                'HX-Trigger': json.dumps({
+                    "bundleListChanged": None,
+                    "showMessage": message
+                })
+            })
+        
+    return render(request, 'arsip_tata/bundle_sync.html', {
     })

@@ -41,6 +41,12 @@
         {% render_field form.accesstype class="form-control" placeholder="" %}
         <div class="invalid-feedback">{{ form.accesstype.errors|first }}</div>
     </div>
+    <div class="mb-3">  
+      <label for="{{ form.token.id_for_label }}" class="form-label">Token</label>
+      {% render_field form.token class="form-control" placeholder="" %}
+      <div class="invalid-feedback">{{ form.token.errors|first }}</div>
+  </div>
+
     {% comment %} <div class="mb-3">
       <label for="{{ form.cover.id_for_label }}" class="form-label">Foto Cover Depan</label>
       {% render_field form.cover class="form-control" placeholder="" %}

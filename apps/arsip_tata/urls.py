@@ -14,12 +14,15 @@ urlpatterns = [
     path(route='add_box/<int:year_id>', view=views.add_box, name=prefix + "add_box"),
     path(route='box/<int:pk>/edit', view=views.edit_box, name=prefix + "edit_box"),
     path(route='box/<int:pk>/remove', view=views.remove_box, name=prefix + 'remove_box'),
+    path(route='box/<int:pk>/sync', view=views.box_sync, name=prefix + "box_sync"),
+
 
     path(route='bundles/<int:year_date>/<str:box_number>', view=views.show_bundles, name=prefix + "show_bundles"),
     path(route='bundle_list/<int:box_id>', view=views.bundle_list, name=prefix + "bundle_list"),
     path(route='add_bundle/<int:box_id>', view=views.add_bundle, name=prefix + "add_bundle"),
     path(route='bundle/<int:pk>/edit', view=views.edit_bundle, name=prefix + "edit_bundle"),
     path(route='bundle/<int:pk>/remove', view=views.remove_bundle, name=prefix + 'remove_bundle'),
+    path(route='bundle/<int:pk>/sync', view=views.bundle_sync, name=prefix + "bundle_sync"),
 
     # path(route='items/<int:year_date>/<int:bundle_number>', view=views.show_items, name=prefix + "show_items"),
     path(route='items/<int:bundle_id>', view=views.show_items, name=prefix + "show_items"),

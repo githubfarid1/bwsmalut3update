@@ -63,7 +63,7 @@ class BundleForm(forms.ModelForm):
 class ItemForm(forms.ModelForm):
     class Meta:
         model = Item
-        fields = ['item_number', 'title', 'copy', 'original', 'accesstype', 'yeardate', 'cover', 'bundle']
+        fields = ['item_number', 'title', 'copy', 'original', 'accesstype', 'yeardate', 'cover', 'bundle', 'token']
         error_messages = {
                     NON_FIELD_ERRORS: {
                         'unique_together': "Nomor Urut Sudah Ada",
