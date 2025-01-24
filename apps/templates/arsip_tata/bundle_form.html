@@ -50,7 +50,8 @@
 
     {% render_field form.yeardate type="hidden" class="form-control" placeholder="" %}
     {% if bundle %}
-        {% render_field form.syncstatus type="hidden" class="form-control" placeholder="" value="1"%}
+        {% render_field form.syncstatus type="hidden" class="form-control" placeholder=""%}
+        
     {% endif %}
   </div>
   <div class="modal-footer">
