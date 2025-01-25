@@ -1478,8 +1478,6 @@ def box_sync(request, pk):
     if request.method == "POST":
         box = get_object_or_404(Box, pk=pk)
         
-        box.token = 'PROSES'
-        box.save()
         prevbox = Box.objects.get(box_number=str(int(box.box_number)-1), yeardate=box.yeardate)
         if prevbox:
             bundles = Bundle.objects.filter(box=prevbox)
@@ -1495,19 +1493,28 @@ def box_sync(request, pk):
             bundle_number = 1
             item_number = 1
         bundles = Bundle.objects.filter(box=box)
-        itemcounter = 0
-        for idx, bundle in enumerate(bundles):
-            bundle.bundle_number = bundle_number+idx
-            bundle.syncstatus = 2
-            bundle.save()
-            items = Item.objects.filter(bundle=bundle)
-            for item in items:
-                item.item_number = item_number+itemcounter
-                itemcounter += 1
-                item.save()
-        message = "Sinkronisasi akan segera di proses"
-        # else:
-        #     message = "Sinkronisasi Gagal"
+        # cek isi bundle harus ada isi semua
+        errorfound = False
+        for bundle in bundles:
+            if Item.objects.filter(bundle=bundle).count() == 0:
+                errorfound = True
+        if not errorfound:
+            itemcounter = 0
+            for idx, bundle in enumerate(bundles):
+                bundle.bundle_number = bundle_number+idx
+                bundle.syncstatus = 2
+                bundle.save()
+                items = Item.objects.filter(bundle=bundle)
+                for item in items:
+                    item.item_number = item_number+itemcounter
+                    itemcounter += 1
+                    item.save()
+            box.token = 'PROSES'
+            box.save()
+
+            message = "Sinkronisasi akan segera di proses"
+        else:
+            message = "Sinkronisasi Gagal, Ada bundle yang kosong"
         
         return HttpResponse(
             status=204,
