@@ -1478,8 +1478,8 @@ def box_sync(request, pk):
     if request.method == "POST":
         box = get_object_or_404(Box, pk=pk)
         
-        # box.token = 'PROSES'
-        # box.save()
+        box.token = 'PROSES'
+        box.save()
         prevbox = Box.objects.get(box_number=str(int(box.box_number)-1), yeardate=box.yeardate)
         bundles = Bundle.objects.filter(box=prevbox)
         bundle_maxnumber = bundles.aggregate(Max("bundle_number"))['bundle_number__max']
