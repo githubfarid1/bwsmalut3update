@@ -27,8 +27,11 @@ def getboxtoken(page, nobox, url):
     while True:
         for idx in range(0, trscount):
             # bundle_number = trs.nth(idx).locator('td').nth(1).inner_text()
-            breakpoint()
-            boxno = trs.nth(idx).locator('td').nth(1).locator("h6").inner_text()
+            # breakpoint()
+            try:
+                boxno = trs.nth(idx).locator('td').nth(1).locator("h6").inner_text()
+            except:
+                breakpoint()
             # print(boxno)
             if boxno == nobox:
                 boxtoken = trs.nth(idx).locator("a").nth(1).get_attribute('href').split("/")[-1]
