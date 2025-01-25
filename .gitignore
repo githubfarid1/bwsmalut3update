@@ -63,3 +63,4 @@ apps/static/assets/.temp
 
 /tester
 /apps/arsip_tata/migrations
+/debug.log
