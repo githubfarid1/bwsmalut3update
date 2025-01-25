@@ -1489,9 +1489,9 @@ def box_sync(request, pk):
         bundles = Bundle.objects.filter(box=prevbox)
         bundle_maxnumber = bundles.aggregate(Max("bundle_number"))['bundle_number__max']
         # breakpoint()
-        bundle_maxid = bundles.aggregate(Max("id"))['id__max']
-        item_maxnumber = Item.objects.filter(bundle_id=bundle_maxid).aggregate(Max("item_number"))['item_number__max']
-        print(bundle_maxnumber, item_maxnumber)
+        # bundle_maxid = bundles.aggregate(Max("id"))['id__max']
+        item_maxnumber = Item.objects.filter(bundle_number=bundle_maxnumber, yeardate=prevbox.yeardate).aggregate(Max("item_number"))['item_number__max']
+        # raise (bundle_maxnumber, item_maxnumber)
         bundle_number = bundle_maxnumber+1
         item_number = item_maxnumber+1
         bundles = Bundle.objects.filter(box=box)
