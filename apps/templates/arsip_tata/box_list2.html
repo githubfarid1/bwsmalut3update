@@ -42,7 +42,7 @@
             <a href="{% url 'arsip_tata_report_perbox' d.yeardate d.box_number %}"><button class="btn btn-sm btn-warning">Report</button></a>
             <a href="{% url 'arsip_tata_label_perbox' d.yeardate d.box_number %}" target="_new"><button class="btn btn-sm btn-secondary">Label</button></a>
             <a href="https://arsip-sda.pusair-pu.go.id/admin/archive/box/{{d.token}}" target="_new"><button class="btn btn-sm btn-danger">e-Arsip</button></a>
-            {% if d.token != "" and d.token != "PROSES" %}
+            {% if d.token != "" %}
             <button class="btn btn-warning btn-sm" hx-get="{% url 'arsip_tata_box_sync' pk=d.pk %}" hx-target="#dialog">Sync</button>
             {% endif %}
           </td>
