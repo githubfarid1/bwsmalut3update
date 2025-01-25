@@ -21,18 +21,21 @@ def getboxtoken(page, nobox, url):
     page.goto(url, wait_until="networkidle")
     page.wait_for_selector("ul.pagination")
     page.get_by_label('Show').select_option('100')
-    trs = page.locator("tbody > tr")
-    trscount = trs.count()
+
     boxtoken = ""
     while True:
+        trs = page.locator("tbody > tr")
+        trscount = trs.count()
+
         for idx in range(0, trscount):
             # bundle_number = trs.nth(idx).locator('td').nth(1).inner_text()
             # breakpoint()
-            try:
-                boxno = trs.nth(idx).locator('td').nth(1).locator("h6").inner_text()
-            except:
-                breakpoint()
+            # try:
+                # boxno = trs.nth(idx).locator('td').nth(1).locator("h6").inner_text()
+            # except:
+            #     breakpoint()
             # print(boxno)
+            boxno = trs.nth(idx).locator('td').nth(1).locator("h6").inner_text()
             if boxno == nobox:
                 boxtoken = trs.nth(idx).locator("a").nth(1).get_attribute('href').split("/")[-1]
                 break
