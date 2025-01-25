@@ -1481,15 +1481,19 @@ def box_sync(request, pk):
         box.token = 'PROSES'
         box.save()
         prevbox = Box.objects.get(box_number=str(int(box.box_number)-1), yeardate=box.yeardate)
-        bundles = Bundle.objects.filter(box=prevbox)
-        bundle_maxnumber = bundles.aggregate(Max("bundle_number"))['bundle_number__max']
-        # breakpoint()
-        # bundle_maxid = bundles.aggregate(Max("id"))['id__max']
-        bundle_maxid = Bundle.objects.get(bundle_number=bundle_maxnumber, yeardate=prevbox.yeardate).id
-        item_maxnumber = Item.objects.filter(bundle_id=bundle_maxid).aggregate(Max("item_number"))['item_number__max']
-        # raise (bundle_maxnumber, item_maxnumber)
-        bundle_number = bundle_maxnumber+1
-        item_number = item_maxnumber+1
+        if prevbox:
+            bundles = Bundle.objects.filter(box=prevbox)
+            bundle_maxnumber = bundles.aggregate(Max("bundle_number"))['bundle_number__max']
+            # breakpoint()
+            # bundle_maxid = bundles.aggregate(Max("id"))['id__max']
+            bundle_maxid = Bundle.objects.get(bundle_number=bundle_maxnumber, yeardate=prevbox.yeardate).id
+            item_maxnumber = Item.objects.filter(bundle_id=bundle_maxid).aggregate(Max("item_number"))['item_number__max']
+            # raise (bundle_maxnumber, item_maxnumber)
+            bundle_number = bundle_maxnumber+1
+            item_number = item_maxnumber+1
+        else:
+            bundle_number = 1
+            item_number = 1
         bundles = Bundle.objects.filter(box=box)
         itemcounter = 0
         for idx, bundle in enumerate(bundles):
