@@ -17,13 +17,37 @@ import time
 
 engine = create_engine('mysql+pymysql://{}:{}@localhost:{}/{}'.format(USER, PASSWORD, PORT, DBNAME) , echo=False)
 
+def getboxtoken(page, nobox, url):
+    page.goto(url, wait_until="networkidle")
+    page.wait_for_selector("ul.pagination")
+    page.get_by_label('Show').select_option('100')
+    trs = page.locator("tbody > tr")
+    trscount = trs.count()
+    boxtoken = ""
+    while True:
+        for idx in range(0, trscount):
+            # bundle_number = trs.nth(idx).locator('td').nth(1).inner_text()
+            boxno = trs.nth(idx).locator('td').nth(1).locator("h6").inner_text()
+            # print(boxno)
+            if boxno == nobox:
+                boxtoken = trs.nth(idx).locator("a").nth(1).get_attribute('href').split("/")[-1]
+                break
+        if boxtoken != "":
+            break
+        try:
+            # breakpoint()
+            page.wait_for_selector("li[class='paginate_button page-item next disabled']", timeout=1000)
+            break
+        except:
+            page.click("li[id='dt-box-year_next']", timeout=1000)
+    
+    return boxtoken
 
 def main():
     
     while True:
         session = Session(engine)
         bundles = session.query(Bundle).filter(Bundle.syncstatus==2)
-        # breakpoint()
         print(bundles.count())
         for bundle in bundles:
             bundledict = {
@@ -36,7 +60,9 @@ def main():
             "uraian": bundle.description,
             "rak": '1',
             "box_token": bundle.box.token,
-            "jenisarsip": "Dinamis"}
+            "jenisarsip": "Dinamis",
+            "boxid": bundle.box.id
+            }
             items = session.query(Item).filter(Item.bundle==bundle)
             itemlist = []
             for idx, item in enumerate(items):
@@ -65,9 +91,10 @@ def main():
             
             username = PUSAIR_USER
             password = PUSAIR_PASSWORD
+            RAK = '1 - Kelurahan Ngade'
             itemtokenlist = []
             with sync_playwright() as playwright:
-                browser = playwright.chromium.launch(headless=True)
+                browser = playwright.chromium.launch(headless=False)
                 context = browser.new_context()
                 page = context.new_page()
                 url = "https://arsip-sda.pusair-pu.go.id/login"
@@ -75,8 +102,44 @@ def main():
                 page.fill('input[name="login"]', username)
                 page.fill('input[name="password"]', password)
                 page.click('text=Log in', timeout=20000)
+                boxtoken = ""
+                if bundledict['box_token'] == "PROSES" or bundledict['box_token'] == "":
+                    url = 'https://arsip-sda.pusair-pu.go.id/admin/archive/{}'.format(bundledict['thtata'])
+                    # breakpoint()
+                    boxtoken = getboxtoken(page=page, nobox=bundledict['nobox'], url=url)
+                    # breakpoint()
+                    if boxtoken == "":
+                        url = "https://arsip-sda.pusair-pu.go.id/admin/master/box"
+                        page.goto(url, wait_until="networkidle")
+                        page.wait_for_selector("input[name='name_box']")
+                        page.fill("input[name='name_box']", bundledict['nobox'])
+
+                        page.locator("input[name='year_box']").click()
+                        page.keyboard.press("Escape")
+                        page.locator("input[name='year_box']").fill(bundledict['thtata'], force=True)
+
+                        page.locator("span[class='select2-selection__rendered']").nth(0).click()
+                        page.fill("input[class='select2-search__field']", RAK)
+                        page.locator("li[class='select2-results__option select2-results__option--highlighted']").click()
+                        submit = page.wait_for_selector("button[type='submit']")
+                        # breakpoint()
+                        try:
+                            submit.click()
+                        except:
+                            time.sleep(0.5)
+                            submit.click()
+                        time.sleep(1)
+                        # breakpoint()
+                        url = 'https://arsip-sda.pusair-pu.go.id/admin/archive/{}'.format(bundledict['thtata'])
+                        boxtoken = getboxtoken(page=page, nobox=bundledict['nobox'], url=url)
+
+                else:
+                    boxtoken = bundledict['box_token']
+                
+                session.query(Box).filter(Box.id==bundledict['boxid']).update({'token': boxtoken})
+                session.commit()
                 for item in bundledict['items']:
-                    url = f"https://arsip-sda.pusair-pu.go.id/admin/archive/box/{bundledict['box_token']}"
+                    url = f"https://arsip-sda.pusair-pu.go.id/admin/archive/box/{boxtoken}"
                     page.goto(url, wait_until="networkidle")
                     page.wait_for_selector("ul.pagination")
                     page.get_by_label('Show').select_option('100')
@@ -102,18 +165,23 @@ def main():
                     # login(page)
                     page.fill("input[name='file_num']", bundledict['noberkas'])
                     page.fill("input[name='item_num']", item['item_number'])
+                    
                     page.locator("input[name='year_file']").click()
                     page.keyboard.press("Escape")
                     page.locator("input[name='year_file']").fill(bundledict["thcipta"], force=True)
+                    
                     page.locator("input[name='year_archive']").click()
                     page.keyboard.press("Escape")
                     page.locator("input[name='year_archive']").fill(bundledict['thtata'], force=True)
+                    
                     page.locator("span[class='select2-selection__rendered']").nth(1).click()
                     page.fill("input[class='select2-search__field']", bundledict['klasifikasi'])
                     page.locator("li[class='select2-results__option select2-results__option--highlighted']").click()
+                    
                     page.locator("span[class='select2-selection__rendered']").nth(2).click()
                     page.fill("input[class='select2-search__field']", f"{bundledict['nobox']} - Rak/Lemari {bundledict['rak']}({bundledict['thtata']})")
                     page.locator("li[class='select2-results__option select2-results__option--highlighted']").click()
+                    
                     page.fill("input[name='document_name']", bundledict['title'])
                     page.fill("textarea[name='document_note']", item['title'])
                     page.locator("select[name='daftar_archive']").select_option(item["accestype"])

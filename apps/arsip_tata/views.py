@@ -1477,36 +1477,37 @@ def item_upload_pdf(request):
 def box_sync(request, pk):
     if request.method == "POST":
         box = get_object_or_404(Box, pk=pk)
-        
-        boxtoken = getbox_token(box.box_number, str(box.yeardate))
+        # boxtoken = getbox_token(box.box_number, str(box.yeardate))
         # print(boxtoken)
-        if boxtoken:
+        # if boxtoken:
             # breakpoint()
-            box.token = boxtoken
-            box.save()
-            prevbox = Box.objects.get(box_number=str(int(box.box_number)-1), yeardate=box.yeardate)
-            bundles = Bundle.objects.filter(box=prevbox)
-            bundle_maxnumber = bundles.aggregate(Max("bundle_number"))['bundle_number__max']
-            # breakpoint()
-            bundle_maxid = bundles.aggregate(Max("id"))['id__max']
-            item_maxnumber = Item.objects.filter(bundle_id=bundle_maxid).aggregate(Max("item_number"))['item_number__max']
-            
-            bundle_number = bundle_maxnumber+1
-            item_number = item_maxnumber+1
-            bundles = Bundle.objects.filter(box=box)
-            itemcounter = 0
-            for idx, bundle in enumerate(bundles):
-                bundle.bundle_number = bundle_number+idx
-                bundle.syncstatus = 2
-                bundle.save()
-                items = Item.objects.filter(bundle=bundle)
-                for item in items:
-                    item.item_number = item_number+itemcounter
-                    itemcounter += 1
-                    item.save()
-            message = "Sinkronisasi Sukses"
-        else:
-            message = "Sinkronisasi Gagal"
+            # box.token = boxtoken
+            # box.save()
+        box.token = 'PROSES'
+        box.save()
+        prevbox = Box.objects.get(box_number=str(int(box.box_number)-1), yeardate=box.yeardate)
+        bundles = Bundle.objects.filter(box=prevbox)
+        bundle_maxnumber = bundles.aggregate(Max("bundle_number"))['bundle_number__max']
+        # breakpoint()
+        bundle_maxid = bundles.aggregate(Max("id"))['id__max']
+        item_maxnumber = Item.objects.filter(bundle_id=bundle_maxid).aggregate(Max("item_number"))['item_number__max']
+        
+        bundle_number = bundle_maxnumber+1
+        item_number = item_maxnumber+1
+        bundles = Bundle.objects.filter(box=box)
+        itemcounter = 0
+        for idx, bundle in enumerate(bundles):
+            bundle.bundle_number = bundle_number+idx
+            bundle.syncstatus = 2
+            bundle.save()
+            items = Item.objects.filter(bundle=bundle)
+            for item in items:
+                item.item_number = item_number+itemcounter
+                itemcounter += 1
+                item.save()
+        message = "Sinkronisasi akan segera di proses"
+        # else:
+        #     message = "Sinkronisasi Gagal"
         
         return HttpResponse(
             status=204,
@@ -1562,6 +1563,7 @@ def getbox_token(boxnumber, year):
 
 
 @csrf_exempt
+@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def bundle_sync(request, pk):
     # itemtokenlist = []
     # def login(page):
