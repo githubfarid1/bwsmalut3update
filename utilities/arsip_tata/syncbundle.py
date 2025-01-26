@@ -28,13 +28,6 @@ def getboxtoken(page, nobox, url):
         trscount = trs.count()
 
         for idx in range(0, trscount):
-            # bundle_number = trs.nth(idx).locator('td').nth(1).inner_text()
-            # breakpoint()
-            # try:
-                # boxno = trs.nth(idx).locator('td').nth(1).locator("h6").inner_text()
-            # except:
-            #     breakpoint()
-            # print(boxno)
             boxno = trs.nth(idx).locator('td').nth(1).locator("h6").inner_text()
             if boxno == nobox:
                 boxtoken = trs.nth(idx).locator("a").nth(1).get_attribute('href').split("/")[-1]
@@ -49,9 +42,7 @@ def getboxtoken(page, nobox, url):
             page.click("li[id='dt-box-year_next']", timeout=1000)
     
     return boxtoken
-
-def main():
-    
+def parse():
     while True:
         session = Session(engine)
         bundles = session.query(Bundle).filter(Bundle.syncstatus==2)
@@ -213,5 +204,14 @@ def main():
         idletime = 60
         print("Idle", idletime, "Seconds...")
         time.sleep(idletime)
+
+def main():
+    while True:
+        try:
+            parse()
+        except:
+            time.sleep(60)
+            continue
+    
 if __name__ == '__main__':
     main()

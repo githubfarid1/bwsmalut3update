@@ -32,9 +32,7 @@ from django.core.files.storage import FileSystemStorage
 import fitz
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from urllib.parse import unquote, quote, unquote_plus, quote_plus
-# from django.utils.http import urlquote, urlquote_plus
-from playwright.sync_api import sync_playwright, Playwright
-import time
+
 # Create your views here.
 @csrf_exempt
 def year_list(request):
@@ -1482,11 +1480,8 @@ def box_sync(request, pk):
         if prevbox:
             bundles = Bundle.objects.filter(box=prevbox)
             bundle_maxnumber = bundles.aggregate(Max("bundle_number"))['bundle_number__max']
-            # breakpoint()
-            # bundle_maxid = bundles.aggregate(Max("id"))['id__max']
             bundle_maxid = Bundle.objects.get(bundle_number=bundle_maxnumber, yeardate=prevbox.yeardate).id
             item_maxnumber = Item.objects.filter(bundle_id=bundle_maxid).aggregate(Max("item_number"))['item_number__max']
-            # raise (bundle_maxnumber, item_maxnumber)
             bundle_number = bundle_maxnumber+1
             item_number = item_maxnumber+1
         else:
@@ -1528,200 +1523,13 @@ def box_sync(request, pk):
     return render(request, 'arsip_tata/box_sync.html', {
     })
 
-def getbox_token(boxnumber, year):
-    username='bwsmalukuutara'
-    password='P@sswd2022!'
-    # year='2024'
-    PUSAIR_RAK='1 - Kelurahan Ngade'
-    url = 'https://arsip-sda.pusair-pu.go.id/admin/archive/{}'.format(year)
-    boxtoken = False
-    with sync_playwright() as playwright:
-        firefox = playwright.chromium
-        browser = firefox.launch(headless=True)
-        page = browser.new_page()
-        page.goto(url, wait_until="networkidle")
-        page.fill('input[name="login"]', username)
-        page.fill('input[name="password"]', password)
-        page.click('text=Log in', timeout=20000)
-        while True:
-            page.wait_for_selector("ul.pagination")
-            page.get_by_label('Show').select_option('100')
-            trs = page.locator("tbody > tr")
-            trscount = trs.count()
-            
-            for idx in range(0, trscount):
-                # print(trscount)
-                boxno = trs.nth(idx).locator('td').nth(1).locator("h6").inner_text()
-                # print(boxno)
-                if boxno == boxnumber:
-                    itemcount = trs.nth(idx).locator('td').nth(3).inner_text()
-                    if itemcount == "0":
-                        boxtoken = trs.nth(idx).locator("a").nth(1).get_attribute('href').split("/")[-1]
-                        return boxtoken
-            try:
-                # breakpoint()
-                page.wait_for_selector("li[class='paginate_button page-item next disabled']", timeout=1000)
-                break
-            except:
-                page.click("li[id='dt-box-year_next']", timeout=1000)
-        
-        browser.close()
-        return boxtoken
-
 
 @csrf_exempt
 @user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def bundle_sync(request, pk):
-    # itemtokenlist = []
-    # def login(page):
-    #     username='bwsmalukuutara'
-    #     password='P@sswd2022!'
-    #     page.fill('input[name="login"]', username)
-    #     page.fill('input[name="password"]', password)
-    #     page.click('text=Log in', timeout=20000)
-    
-    # def input_page_detail(page, bundledict, item, url):
-    #     page.goto(url, wait_until="networkidle")
-    #     # login(page)
-    #     page.fill("input[name='file_num']", bundledict['noberkas'])
-    #     page.fill("input[name='item_num']", item['item_number'])
-    #     page.locator("input[name='year_file']").click()
-    #     page.keyboard.press("Escape")
-    #     page.locator("input[name='year_file']").fill(bundledict["thcipta"], force=True)
-    #     page.locator("input[name='year_archive']").click()
-    #     page.keyboard.press("Escape")
-    #     page.locator("input[name='year_archive']").fill(bundledict['thtata'], force=True)
-    #     page.locator("span[class='select2-selection__rendered']").nth(1).click()
-    #     page.fill("input[class='select2-search__field']", bundledict['klasifikasi'])
-    #     page.locator("li[class='select2-results__option select2-results__option--highlighted']").click()
-    #     page.locator("span[class='select2-selection__rendered']").nth(2).click()
-    #     page.fill("input[class='select2-search__field']", f"{bundledict['nobox']} - Rak/Lemari {bundledict['rak']}({bundledict['thtata']})")
-    #     page.locator("li[class='select2-results__option select2-results__option--highlighted']").click()
-    #     page.fill("input[name='document_name']", bundledict['title'])
-    #     page.fill("textarea[name='document_note']", item['title'])
-    #     page.locator("select[name='daftar_archive']").select_option(item["accestype"])
-    #     page.locator("select[name='archive_type']").select_option(bundledict["jenisarsip"])
-    #     page.locator("select[name='satuan']").select_option(item["bentukarsip"])
-    #     page.fill("input[name='total']", item['total'])
-    #     page.locator("input[id='inline-{}']".format(item['ket'])).click()
-
-    # def input_data(bundledict):
-    #     year='2024'
-    #     PUSAIR_RAK='1 - Kelurahan Ngade'
-    #     url = f"https://arsip-sda.pusair-pu.go.id/admin/archive/box/{bundledict['box_token']}"
-    #     # with sync_playwright() as playwright:
-    #     # firefox = playwright.webkit
-    #     playwright = sync_playwright().start()
-    #     browser = playwright.firefox.launch(headless=True)
-    #     # browser = firefox.launch(headless=True)
-    #     context = browser.new_context()
-
-    #     page = context.new_page()
-    #     page.goto(url, wait_until="networkidle")
-    #     login(page)
-    #     for item in bundledict['items']:
-    #         page.wait_for_selector("ul.pagination")
-    #         page.get_by_label('Show').select_option('100')
-    #         trs = page.locator("tbody > tr")
-    #         trscount = trs.count()
-    #         itemfound = False
-    #         # breakpoint()
-    #         if page.locator("td[class='dataTables_empty']").count() == 0:
-    #             for idx in range(0, trscount):
-    #                 bundle_number = trs.nth(idx).locator('td').nth(1).inner_text()
-    #                 item_number = trs.nth(idx).locator('td').nth(2).inner_text()
-    #                 if bundle_number == bundledict['noberkas'] and item_number == item['item_number']:
-    #                     itemfound = True
-    #                     break
-            
-    #         if itemfound:
-    #             # page2 = context.new_page()
-    #             if item['token'] != None:
-    #                 url2 = f"https://arsip-sda.pusair-pu.go.id/admin/archive/{item['token']}/doc" 
-    #             else:
-    #                 url2 = "https://arsip-sda.pusair-pu.go.id/admin/archive/add"
-                
-    #             input_page_detail(page, bundledict, item, url2)
-    #             # tes = page.locator("span[class='year']")
-    #             # tes.get_by_text("2018")
-    #             page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
-    #             submit = page.wait_for_selector("button[type='submit']")
-    #             try:
-    #                 submit.click()
-    #             except:
-    #                 time.sleep(0.5)
-    #                 submit.click()
-                
-    #             time.sleep(1)
-    #             page.close()
-    #         else:
-    #             # page2 = browser.new_page()
-    #             url2 = "https://arsip-sda.pusair-pu.go.id/admin/archive/add"
-    #             input_page_detail(page, bundledict, item, url2)
-    #             # tes = page.locator("span[class='year']")
-    #             # tes.get_by_text("2018")
-    #             page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
-    #             submit = page.wait_for_selector("button[type='submit']")
-    #             try:
-    #                 submit.click()
-    #             except:
-    #                 time.sleep(1)
-    #                 submit.click()
-                
-    #             time.sleep(1)
-    #             itemtokenlist.append({"id": item['id'], "token":page.url.split("/")[-2]})
-    #             page.goto(url, wait_until="networkidle")
-        
-    #             # page.close()
-    #     page.close()            
 
     if request.method == "POST":
         bundle = get_object_or_404(Bundle, pk=pk)
-        # if not bundle.issync:
-        #     bundledict = {
-        #     "noberkas": str(bundle.bundle_number),
-        #     "thcipta": str(bundle.year_bundle),
-        #     "thtata": str(bundle.yeardate),
-        #     "klasifikasi": bundle.code,
-        #     "nobox": str(bundle.box.box_number),
-        #     "title": bundle.creator,
-        #     "uraian": bundle.description,
-        #     "rak": '1',
-        #     "box_token": bundle.box.token,
-        #     "jenisarsip": "Dinamis"}
-            
-        #     items = Item.objects.filter(bundle=bundle).order_by("item_number")
-        #     itemlist = []
-        #     for idx, item in enumerate(items):
-        #         title = item.title
-        #         if idx == 0:
-        #             title = item.title + "\n" + bundledict["uraian"] 
-        #         itemdict = {
-        #             "title": title,
-        #             "total": str(item.total),
-        #             "item_number": str(item.item_number),
-        #             "accestype": item.get_accesstype_display(),
-        #             "token": item.token,
-        #             "bentukarsip": 'Buku',
-        #             "ket": "COPY",
-        #             "id": item.id
-        #         }
-        #         itemlist.append(itemdict)
-        #     bundledict["items"] = itemlist
-        #     # print(bundledict)
-        #     try:
-        #         input_data(bundledict)
-        #         message = "Sinkronisasi Sukses"
-        #         bundle.issync = True
-        #         bundle.save()
-        #         for ditem in itemtokenlist:
-        #             updateitem = Item.objects.get(pk=ditem['id'])
-        #             updateitem.token = ditem['token']
-        #             updateitem.save()
-        #     except Exception as e:
-        #         message = "Sinkronisasi Gagal {}".format(str(e))    
-        # else:
-        #     message = "Sinkronisasi Gagal"
         bundle.syncstatus = 2
         bundle.save()
 
