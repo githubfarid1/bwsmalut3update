@@ -32,33 +32,35 @@ SKIP="information_schema
 another_one_db"
 
 # Get all databases
-DBS="$($MYSQL -h $MyHOST -u $MyUSER -p$MyPASS -Bse 'show databases')"
+# DBS="$($MYSQL -h $MyHOST -u $MyUSER -p$MyPASS -Bse 'show databases')"
 
 # Archive database dumps
-for db in $DBS
-do
-    skipdb=-1
-    if [ "$SKIP" != "" ];
-    then
-		for i in $SKIP
-		do
-			[ "$db" == "$i" ] && skipdb=1 || :
-		done
-    fi
+# for db in $DBS
+# do
+#     skipdb=-1
+#     if [ "$SKIP" != "" ];
+#     then
+# 		for i in $SKIP
+# 		do
+# 			[ "$db" == "$i" ] && skipdb=1 || :
+# 		done
+#     fi
  
-    if [ "$skipdb" == "-1" ] ; then
-    	FILE="$MBD/$db.sql"
-	$MYSQLDUMP -h $MyHOST -u $MyUSER -p$MyPASS $db > $FILE
-    fi
-done
+#     if [ "$skipdb" == "-1" ] ; then
+    # FILE="$MBD/$db.sql"
+	# $MYSQLDUMP -h $MyHOST -u $MyUSER -p$MyPASS $db > $FILE
+    # fi
+# done
+FILE="$MBD/$db.sql"
+$MYSQLDUMP -u $MyUSER -p$MyPASS $MyHOST > $FILE
 
 # Archive the directory, send mail and cleanup
 cd $DEST
 tar -cf $NOW.tar $NOW
 $GZIP -9 $NOW.tar
 
-echo "MySQL backup is completed! Backup name is $NOW.tar.gz" | mail -s "MySQL backup" $EMAIL
+# echo "MySQL backup is completed! Backup name is $NOW.tar.gz" | mail -s "MySQL backup" $EMAIL
 rm -rf $NOW
 
 # Remove old files
-find $DEST -mtime +$DAYS -exec rm -f {} \;
+# find $DEST -mtime +$DAYS -exec rm -f {} \;
