@@ -449,6 +449,7 @@ def add_item(request, bundle_id):
             item.bundle_id = bundle_id
             item.total = item.copy + item.original
             item.bundle_id = bundle_id
+            item.created_by = request.user
             # bundle = Bundle.objects.get(id=bundle_id)
             # item.codegen = "-".join([str(item.yeardate), str(bundle.box.box_number), str(bundle.bundle_number), str(item.item_number)])
             item.save()
@@ -1480,7 +1481,7 @@ def box_sync(request, pk):
         if prevbox:
             bundles = Bundle.objects.filter(box=prevbox)
             bundle_maxnumber = bundles.aggregate(Max("bundle_number"))['bundle_number__max']
-            bundle_maxid = Bundle.objects.get(bundle_number=bundle_maxnumber, yeardate=prevbox.yeardate).id
+            bundle_maxid = Bundle.objects.filter(bundle_number=bundle_maxnumber, yeardate=prevbox.yeardate).first().id
             item_maxnumber = Item.objects.filter(bundle_id=bundle_maxid).aggregate(Max("item_number"))['item_number__max']
             bundle_number = bundle_maxnumber+1
             item_number = item_maxnumber+1

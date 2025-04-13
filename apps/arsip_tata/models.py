@@ -2,6 +2,7 @@ from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 import os
 from django.conf import settings
+from django.contrib.auth.models import User
 
 class Year(models.Model):
     id = models.AutoField(primary_key=True)
@@ -123,6 +124,8 @@ class Item(models.Model):
         on_delete=models.CASCADE, 
         default=None
     )        
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
+        null=True, blank=True, on_delete=models.SET_NULL)
     # class Meta:
     #     unique_together = ('item_number', 'yeardate')    
 
@@ -130,8 +133,8 @@ class Item(models.Model):
         return f"{self.item_number}_{self.bundle.bundle_number}_{self.id}"
 
     def save(self, *args, **kwargs):
-            self.codegen = "-".join([str(self.yeardate), str(self.bundle.box.box_number), str(self.bundle.bundle_number),  str(self.item_number)])
-            super(Item, self).save(*args, **kwargs) # Call the "real" save() method.
+        self.codegen = "-".join([str(self.yeardate), str(self.bundle.box.box_number), str(self.bundle.bundle_number),  str(self.item_number)])
+        super(Item, self).save(*args, **kwargs) # Call the "real" save() method.
 
 class Customer(models.Model):
     def update_filename_photo(instance, filename):
