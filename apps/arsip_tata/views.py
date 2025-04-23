@@ -138,7 +138,10 @@ def stat_entry(request, year):
     userlist = []
     countlist = []
     colorlist= []
+    maxcount = 0
     for dt in data:
+        if dt["count"] > maxcount:
+            maxcount = dt["count"]
         userlist.append(dt['username'])
         countlist.append(dt['count'])
         colorlist.append("rgba(112, 185, 239, 1)")
@@ -147,6 +150,7 @@ def stat_entry(request, year):
         "userlist": userlist,
         "countlist": countlist,
         "colorlist": colorlist,
+        "maxcount": maxcount + 100
     }
     return render(request=request, template_name='arsip_tata/stat_entry.html', context=context)
 
