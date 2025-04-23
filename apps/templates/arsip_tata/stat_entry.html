@@ -35,7 +35,7 @@
     // jquery function
             var ctx = document.getElementById('chartseparate').getContext('2d');
             var myChart = new Chart(ctx, {
-                type: 'bar',
+                type: 'horizontalBar',
                 data: {
                     labels: {{ userlist|safe }}, //loop through queryset,
                     datasets: [{
