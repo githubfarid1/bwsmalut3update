@@ -48,10 +48,16 @@
                 },
                 options: {
                     scales: {
-                        x: {
-                            beginAtZero: true
-                        }
-                    },
+                        yAxes: [{
+                            id: 'A',
+                            type: 'linear',
+                            position: 'left',
+                            ticks: {
+                                max: 1000,
+                                min: 0
+                            }
+                          }]
+                      },
                     legend: {
                         display: false
                     }
