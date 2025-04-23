@@ -15,6 +15,7 @@ urlpatterns = [
     path(route='box/<int:pk>/edit', view=views.edit_box, name=prefix + "edit_box"),
     path(route='box/<int:pk>/remove', view=views.remove_box, name=prefix + 'remove_box'),
     path(route='box/<int:pk>/sync', view=views.box_sync, name=prefix + "box_sync"),
+    path(route='stat_entry/<int:year>', view=views.stat_entry, name=prefix + "stat_entry"),
 
 
     path(route='bundles/<int:year_date>/<str:box_number>', view=views.show_bundles, name=prefix + "show_bundles"),

@@ -20,13 +20,13 @@ from reportlab.lib.units import inch, mm
 from reportlab.platypus.tables import Table,TableStyle,colors
 from datetime import datetime, timedelta
 from django.template.defaultfilters import slugify
-from django.db.models import Q, Max
+from django.db.models import Q, Max, Count
 from reportlab.lib.enums import TA_JUSTIFY, TA_LEFT, TA_CENTER, TA_RIGHT
 from django.conf import settings
 from os.path import exists
 from django.views.decorators.http import require_http_methods
 from reportlab_qrcode import QRCodeImage
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User
 from django.contrib.auth.decorators import permission_required, user_passes_test
 from django.core.files.storage import FileSystemStorage
 import fitz
@@ -126,6 +126,31 @@ def show_boxes(request, year):
         'search': quote_plus(search)
     }
     return render(request=request, template_name='arsip_tata/show_box.html', context=context)
+
+def stat_entry(request, year):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    data = Item.objects.filter(created_by__isnull=False).values("created_by").annotate(count=Count('created_by'))
+    for idx, rec in enumerate(data):
+        username = User.objects.get(id=rec['created_by']).username
+        data[idx]['username'] = username
+    userlist = []
+    countlist = []
+    colorlist= []
+    for dt in data:
+        userlist.append(dt['username'])
+        countlist.append(dt['count'])
+        colorlist.append("rgba(112, 185, 239, 1)")
+
+    context = {
+        "userlist": userlist,
+        "countlist": countlist,
+        "colorlist": colorlist,
+    }
+    return render(request=request, template_name='arsip_tata/stat_entry.html', context=context)
+
+
 
 def show_boxes_old(request, year):
     if not request.user.is_authenticated:
