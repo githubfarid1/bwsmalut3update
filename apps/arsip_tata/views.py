@@ -131,7 +131,7 @@ def stat_entry(request, year):
     if not request.user.is_authenticated:
         return redirect('login')
 
-    data = Item.objects.filter(created_by__isnull=False).values("created_by").annotate(count=Count('created_by'))
+    data = Item.objects.filter(created_by__isnull=False, yeardata=year).values("created_by").annotate(count=Count('created_by'))
     for idx, rec in enumerate(data):
         username = User.objects.get(id=rec['created_by']).username
         data[idx]['username'] = username
