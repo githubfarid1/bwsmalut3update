@@ -53,7 +53,7 @@
                             type: 'linear',
                             position: 'left',
                             ticks: {
-                                max: maxcount,
+                                max: {{ maxcount|safe }},
                                 min: 0
                             }
                           }]

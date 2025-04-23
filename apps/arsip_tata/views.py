@@ -152,6 +152,7 @@ def stat_entry(request, year):
         "colorlist": colorlist,
         "maxcount": maxcount + 100
     }
+    # print(maxcount)
     return render(request=request, template_name='arsip_tata/stat_entry.html', context=context)
 
 
