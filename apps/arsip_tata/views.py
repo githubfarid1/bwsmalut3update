@@ -156,7 +156,7 @@ def statistics(request, year):
     maxcount_upload = 0
     for dt in data:
         if dt["count"] > maxcount_upload:
-            maxcount = dt["count"]
+            maxcount_upload = dt["count"]
         userlist_upload.append(dt['username'])
         countlist_upload.append(dt['count'])
         colorlist_upload.append("rgba(244, 204, 204, 1)")
