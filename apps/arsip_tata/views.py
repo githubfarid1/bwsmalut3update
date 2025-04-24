@@ -20,7 +20,7 @@ from reportlab.lib.units import inch, mm
 from reportlab.platypus.tables import Table,TableStyle,colors
 from datetime import datetime, timedelta
 from django.template.defaultfilters import slugify
-from django.db.models import Q, Max, Count
+from django.db.models import Q, Max, Count, Sum
 from reportlab.lib.enums import TA_JUSTIFY, TA_LEFT, TA_CENTER, TA_RIGHT
 from django.conf import settings
 from os.path import exists
@@ -127,11 +127,61 @@ def show_boxes(request, year):
     }
     return render(request=request, template_name='arsip_tata/show_box.html', context=context)
 
-def stat_entry(request, year):
+def statistics(request, year):
     if not request.user.is_authenticated:
         return redirect('login')
 
     data = Item.objects.filter(created_by__isnull=False, yeardate=year).values("created_by").annotate(count=Count('created_by'))
+    for idx, rec in enumerate(data):
+        username = User.objects.get(id=rec['created_by']).username
+        data[idx]['username'] = username
+    userlist = []
+    countlist = []
+    colorlist= []
+    maxcount = 0
+    for dt in data:
+        if dt["count"] > maxcount:
+            maxcount = dt["count"]
+        userlist.append(dt['username'])
+        countlist.append(dt['count'])
+        colorlist.append("rgba(112, 185, 239, 1)")
+
+    data = Item.objects.filter(uploaded_by__isnull=False, uploaded_date__year=year, page_count__isnull=False).values("uploaded_by").annotate(count=Sum('page_count'))
+    for idx, rec in enumerate(data):
+        username = User.objects.get(id=rec['uploaded_by']).username
+        data[idx]['username'] = username
+    userlist_upload = []
+    countlist_upload = []
+    colorlist_upload = []
+    maxcount_upload = 0
+    for dt in data:
+        if dt["count"] > maxcount_upload:
+            maxcount = dt["count"]
+        userlist_upload.append(dt['username'])
+        countlist_upload.append(dt['count'])
+        colorlist_upload.append("rgba(244, 204, 204, 1)")
+
+
+    context = {
+        "userlist": userlist,
+        "countlist": countlist,
+        "colorlist": colorlist,
+        "maxcount": maxcount + 100,
+        "userlist_upload": userlist_upload,
+        "countlist_upload": countlist_upload,
+        "colorlist_upload": colorlist_upload,
+        "maxcount_upload": maxcount_upload + 100
+
+    }
+    # print(maxcount)
+    return render(request=request, template_name='arsip_tata/statistics.html', context=context)
+
+
+def stat_upload(request, year):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    data = Item.objects.filter(uploaded_by__isnull=False, uploaded_date__year=year).values("uploaded_by").annotate(count=Sum('page_count'))
     for idx, rec in enumerate(data):
         username = User.objects.get(id=rec['created_by']).username
         data[idx]['username'] = username
@@ -153,8 +203,7 @@ def stat_entry(request, year):
         "maxcount": maxcount + 100
     }
     # print(maxcount)
-    return render(request=request, template_name='arsip_tata/stat_entry.html', context=context)
-
+    return render(request=request, template_name='arsip_tata/stat_upl.html', context=context)
 
 
 def show_boxes_old(request, year):
@@ -1478,11 +1527,14 @@ def item_upload_pdf(request):
             filename = f"{__package__.split('.')[1]}$${item.codegen}.pdf"
             upload = request.FILES.getlist('uploadfile')[0]
             tmppath = os.path.join(settings.MEDIA_ROOT, "tmpfiles", filename)
-            # pdfpath = os.path.join(settings.PDF_LOCATION, __package__.split('.')[1], filename)
             fss = FileSystemStorage()
             if exists(tmppath):
                 os.remove(tmppath)
             fss.save(tmppath, upload)
+            item = Item.objects.get(id=item_id)
+            item.uploaded_by = request.user
+            item.uploaded_date = datetime.now()
+            item.save()
 
             return HttpResponse(
                 status=204,
