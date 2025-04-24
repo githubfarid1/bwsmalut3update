@@ -131,6 +131,7 @@ class Item(models.Model):
         null=True, blank=True, on_delete=models.SET_NULL, related_name="uploaded_by")
 
     uploaded_date = models.DateTimeField(null=True, blank=True)
+    created_date = models.DateTimeField(null=True, blank=True)
 
     # class Meta:
     #     unique_together = ('item_number', 'yeardate')    

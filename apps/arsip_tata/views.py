@@ -529,6 +529,7 @@ def add_item(request, bundle_id):
             item.total = item.copy + item.original
             item.bundle_id = bundle_id
             item.created_by = request.user
+            item.created_date = datetime.now()
             # bundle = Bundle.objects.get(id=bundle_id)
             # item.codegen = "-".join([str(item.yeardate), str(bundle.box.box_number), str(bundle.bundle_number), str(item.item_number)])
             item.save()
