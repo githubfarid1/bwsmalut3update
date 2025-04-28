@@ -170,7 +170,7 @@ def statistics(request):
         doccount = Item.objects.extra(where=where).count()
         docentrydate.append(d.strftime('%d-%m-%Y'))
         docentry.append(doccount)
-        docentrycolor.append("rgba(112, 185, 239, 1)")
+        docentrycolor.append("rgba(244, 204, 204, 1)")
         if doccount > docentrymax:
             docentrymax = doccount
 
