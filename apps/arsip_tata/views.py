@@ -138,7 +138,6 @@ def statistics(request):
     procnotuploaded = notuploaded / totaldoc * 100
     colorlist.append("rgba(112, 185, 239, 1)")
     colorlist.append("rgba(244, 204, 204, 1)")
-    
     num_of_dates = 30
     start = datetime.now()
     date_list = [start.date() - timedelta(days=x) for x in range(num_of_dates)]
@@ -189,8 +188,8 @@ def statistics(request):
         "docentry": docentry,
         "docentrycolor": docentrycolor,
         "docentrydate": docentrydate,
-        "docscanmax": docscanmax + 100,
-        "docentrymax": docentrymax + 100,
+        "docscanmax": docscanmax + (docscanmax * 0.1),
+        "docentrymax": docentrymax + (docentrymax * 0.1),
 
     }
     # print(maxcount)
