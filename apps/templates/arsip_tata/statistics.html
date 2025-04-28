@@ -8,19 +8,32 @@
 <div class="container-fluid">
 
 <div class="row">
-  <div class="col-12 col-lg-6">
+  {% comment %} <div class="col-12 col-lg-6">
     <div class="card">
       <div class="card-body">
-        <h5 class="card-title">Rekap Entry Arsip (jumlah Dokumen)</h5>
-        <canvas id="chartentry" width="400" height="200"></canvas>
+        <h5 class="card-title">Rekap Dokumen Scan</h5>
+        <canvas id="chartscan" width="400" height="200"></canvas>
       </div>
     </div>
   </div>
-  <div class="col-12 col-lg-6">
+  <div class="col-12 col-lg-6"></div>
+  <p></p> {% endcomment %}
+
+  <div class="col-12 col-lg-12">
     <div class="card">
       <div class="card-body">
-        <h5 class="card-title">Rekap Upload Arsip (jumlah Halaman)</h5>
-        <canvas id="chartupload" width="400" height="200"></canvas>
+        <h5 class="card-title">Rekap Jumlah Entry pada 30 Hari Terakhir</h5>
+        <canvas id="chartentrydays" width="400" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <p></p>
+  <div class="col-12 col-lg-12">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Rekap Jumlah Halaman Scan pada 30 Hari Terakhir</h5>
+        <canvas id="chartscandays" width="400" height="200"></canvas>
       </div>
     </div>
   </div>
@@ -42,66 +55,92 @@
   <script src="{% static 'assets/vendors/coreui/chartjs/js/coreui-chartjs.js' %}"></script>
   <script>
     // jquery function
-            var ctx = document.getElementById('chartentry').getContext('2d');
-            var myChart = new Chart(ctx, {
-                type: 'horizontalBar',
-                data: {
-                    labels: {{ userlist|safe }}, //loop through queryset,
-                    datasets: [{
-                        label: '',
-                        data: {{ countlist|safe }},
-                        backgroundColor: {{ colorlist|safe }},
-                        borderColor:{{ colorlist|safe }},
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        xAxes: [{
-                            id: 'A',
-                            type: 'linear',
-                            position: 'left',
-                            ticks: {
-                                max: {{ maxcount|safe }},
-                                min: 0
-                            }
-                          }]
-                      },
-                    legend: {
-                        display: false
+        {% comment %} var ctx = document.getElementById('chartscan').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ["Sudah Scan =" + {{ uploaded }}, "Belum Scan =" + {{ notuploaded }}], //loop through queryset,
+                datasets: [{
+                    label: '',
+                    data: [{{ procuploaded }}, {{ procnotuploaded }}],
+                    backgroundColor: {{ colorlist|safe }},
+                    borderColor:{{ colorlist|safe }},
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
                     }
-                }
-            });
-            var ctx = document.getElementById('chartupload').getContext('2d');
-            var myChart = new Chart(ctx, {
-                type: 'horizontalBar',
-                data: {
-                    labels: {{ userlist_upload|safe }}, //loop through queryset,
-                    datasets: [{
-                        label: '',
-                        data: {{ countlist_upload|safe }},
-                        backgroundColor: {{ colorlist_upload|safe }},
-                        borderColor:{{ colorlist_upload|safe }},
-                        borderWidth: 1
-                    }]
                 },
-                options: {
-                    scales: {
-                        xAxes: [{
-                            id: 'A',
-                            type: 'linear',
-                            position: 'left',
-                            ticks: {
-                                max: {{ maxcount_upload|safe }},
-                                min: 0
-                            }
-                          }]
-                      },
-                    legend: {
-                        display: false
-                    }
+                legend: {
+                    display: true
                 }
-            });
+            }
+        }); {% endcomment %}
+        var ctx = document.getElementById('chartscandays').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {{ docdate|safe }}, //loop through queryset,
+                datasets: [{
+                    label: '',
+                    data: {{ docscan|safe }},
+                    backgroundColor: {{ doccolor|safe }},
+                    borderColor:{{ doccolor|safe }},
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        id: 'A',
+                        type: 'linear',
+                        position: 'left',
+                        ticks: {
+                            max: 4000,
+                            min: 0
+                        }
+                      }]
+                },
+                legend: {
+                    display: false
+                }
+            }
+        });
+
+        var ctx = document.getElementById('chartentrydays').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {{ docentrydate|safe }}, //loop through queryset,
+                datasets: [{
+                    label: '',
+                    data: {{ docentry|safe }},
+                    backgroundColor: {{ docentrycolor|safe }},
+                    borderColor:{{ docentrycolor|safe }},
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        id: 'A',
+                        type: 'linear',
+                        position: 'left',
+                        ticks: {
+                            max: 200,
+                            min: 0
+                        }
+                      }]
+                },
+                legend: {
+                    display: false
+                }
+            }
+        });
+
 
         </script>
     

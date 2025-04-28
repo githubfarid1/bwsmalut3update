@@ -32,7 +32,7 @@ from django.core.files.storage import FileSystemStorage
 import fitz
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from urllib.parse import unquote, quote, unquote_plus, quote_plus
-
+from django.utils import timezone
 # Create your views here.
 @csrf_exempt
 def year_list(request):
@@ -127,10 +127,74 @@ def show_boxes(request, year):
     }
     return render(request=request, template_name='arsip_tata/show_box.html', context=context)
 
-def statistics(request, year):
+def statistics(request):
     if not request.user.is_authenticated:
         return redirect('login')
+    colorlist = []
+    totaldoc = Item.objects.count()
+    uploaded = Item.objects.filter(page_count__isnull=True).count()
+    notuploaded = totaldoc - uploaded
+    procuploaded = uploaded / totaldoc * 100
+    procnotuploaded = notuploaded / totaldoc * 100
+    colorlist.append("rgba(112, 185, 239, 1)")
+    colorlist.append("rgba(244, 204, 204, 1)")
+    
+    num_of_dates = 30
+    start = datetime.now()
+    date_list = [start.date() - timedelta(days=x) for x in range(num_of_dates)]
+    date_list.sort()
+    docscan = []
+    doccolor = []
+    docdate = []
+    # print(date_list)
+    
+    for d in date_list:
+        pages = 0
+        where = ["YEAR(uploaded_date)=%(year)s AND MONTH(uploaded_date)=%(month)s AND DAY(uploaded_date)=%(day)s" % {"year":d.year, "month": d.month, "day": d.day}]
+        items = Item.objects.filter(page_count__isnull=False).extra(where=where)
+        # print(d.strftime('%d-%m-%Y'))
+        # print(items)
+        for item in items:
+            pages += item.page_count
+        docdate.append(d.strftime('%d-%m-%Y'))
+        docscan.append(pages)
+        doccolor.append("rgba(112, 185, 239, 1)")
 
+    docentry = []
+    docentrycolor = []
+    docentrydate = []
+    for d in date_list:
+        # pages = 0
+        where = ["YEAR(created_date)=%(year)s AND MONTH(created_date)=%(month)s AND DAY(created_date)=%(day)s" % {"year":d.year, "month": d.month, "day": d.day}]
+        doccount = Item.objects.extra(where=where).count()
+        docentrydate.append(d.strftime('%d-%m-%Y'))
+        docentry.append(doccount)
+        docentrycolor.append("rgba(112, 185, 239, 1)")
+
+
+    context = {
+        "totaldoc": totaldoc,
+        "uploaded": uploaded,
+        "notuploaded": notuploaded,
+        "procuploaded": f"{procuploaded:.3f}",
+        "procnotuploaded": f"{procnotuploaded:.3f}",
+        "colorlist": colorlist,
+        "docdate": docdate,
+        "docscan": docscan,
+        "doccolor": doccolor,
+        "docentry": docentry,
+        "docentrycolor": docentrycolor,
+        "docentrydate": docentrydate,
+
+    }
+    # print(maxcount)
+    return render(request=request, template_name='arsip_tata/statistics.html', context=context)
+
+
+def statistics_year(request, year):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
     data = Item.objects.filter(created_by__isnull=False, yeardate=year).values("created_by").annotate(count=Count('created_by'))
     for idx, rec in enumerate(data):
         username = User.objects.get(id=rec['created_by']).username
@@ -174,36 +238,9 @@ def statistics(request, year):
 
     }
     # print(maxcount)
-    return render(request=request, template_name='arsip_tata/statistics.html', context=context)
+    return render(request=request, template_name='arsip_tata/statistics_year.html', context=context)
 
 
-def stat_upload(request, year):
-    if not request.user.is_authenticated:
-        return redirect('login')
-
-    data = Item.objects.filter(uploaded_by__isnull=False, uploaded_date__year=year).values("uploaded_by").annotate(count=Sum('page_count'))
-    for idx, rec in enumerate(data):
-        username = User.objects.get(id=rec['created_by']).username
-        data[idx]['username'] = username
-    userlist = []
-    countlist = []
-    colorlist= []
-    maxcount = 0
-    for dt in data:
-        if dt["count"] > maxcount:
-            maxcount = dt["count"]
-        userlist.append(dt['username'])
-        countlist.append(dt['count'])
-        colorlist.append("rgba(112, 185, 239, 1)")
-
-    context = {
-        "userlist": userlist,
-        "countlist": countlist,
-        "colorlist": colorlist,
-        "maxcount": maxcount + 100
-    }
-    # print(maxcount)
-    return render(request=request, template_name='arsip_tata/stat_upl.html', context=context)
 
 
 def show_boxes_old(request, year):
