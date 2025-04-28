@@ -235,11 +235,11 @@ def statistics_year(request, year):
         "userlist": userlist,
         "countlist": countlist,
         "colorlist": colorlist,
-        "maxcount": maxcount + (maxcount*0.1),
+        "maxcount": maxcount + (maxcount*0.2),
         "userlist_upload": userlist_upload,
         "countlist_upload": countlist_upload,
         "colorlist_upload": colorlist_upload,
-        "maxcount_upload": maxcount_upload + (maxcount_upload*0.1)
+        "maxcount_upload": maxcount_upload + (maxcount_upload*0.2)
 
     }
     # print(maxcount)
