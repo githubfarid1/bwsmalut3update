@@ -147,7 +147,7 @@ def statistics(request):
     doccolor = []
     docdate = []
     # print(date_list)
-    
+    docscanmax = 100
     for d in date_list:
         pages = 0
         where = ["YEAR(uploaded_date)=%(year)s AND MONTH(uploaded_date)=%(month)s AND DAY(uploaded_date)=%(day)s" % {"year":d.year, "month": d.month, "day": d.day}]
@@ -159,10 +159,12 @@ def statistics(request):
         docdate.append(d.strftime('%d-%m-%Y'))
         docscan.append(pages)
         doccolor.append("rgba(112, 185, 239, 1)")
-
+        if pages > docscanmax:
+            docscanmax = pages
     docentry = []
     docentrycolor = []
     docentrydate = []
+    docentrymax = 100
     for d in date_list:
         # pages = 0
         where = ["YEAR(created_date)=%(year)s AND MONTH(created_date)=%(month)s AND DAY(created_date)=%(day)s" % {"year":d.year, "month": d.month, "day": d.day}]
@@ -170,6 +172,8 @@ def statistics(request):
         docentrydate.append(d.strftime('%d-%m-%Y'))
         docentry.append(doccount)
         docentrycolor.append("rgba(112, 185, 239, 1)")
+        if pages > docentrymax:
+            docentrymax = pages
 
 
     context = {
@@ -185,6 +189,8 @@ def statistics(request):
         "docentry": docentry,
         "docentrycolor": docentrycolor,
         "docentrydate": docentrydate,
+        "docscanmax": docscanmax + 100,
+        "docentrymax": docentrymax + 100,
 
     }
     # print(maxcount)
