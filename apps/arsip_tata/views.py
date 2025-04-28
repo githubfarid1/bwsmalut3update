@@ -157,7 +157,7 @@ def statistics(request):
             pages += item.page_count
         docdate.append(d.strftime('%d-%m-%Y'))
         docscan.append(pages)
-        doccolor.append("rgba(112, 185, 239, 1)")
+        doccolor.append("rgba(244, 204, 204, 1)")
         if pages > docscanmax:
             docscanmax = pages
     docentry = []
@@ -170,7 +170,7 @@ def statistics(request):
         doccount = Item.objects.extra(where=where).count()
         docentrydate.append(d.strftime('%d-%m-%Y'))
         docentry.append(doccount)
-        docentrycolor.append("rgba(244, 204, 204, 1)")
+        docentrycolor.append("rgba(112, 185, 239, 1)")
         if doccount > docentrymax:
             docentrymax = doccount
 
