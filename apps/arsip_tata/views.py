@@ -172,10 +172,10 @@ def statistics(request):
         docentrydate.append(d.strftime('%d-%m-%Y'))
         docentry.append(doccount)
         docentrycolor.append("rgba(112, 185, 239, 1)")
-        if pages > docentrymax:
-            docentrymax = pages
+        if doccount > docentrymax:
+            docentrymax = doccount
 
-
+    # print(docscanmax, docentrymax)
     context = {
         "totaldoc": totaldoc,
         "uploaded": uploaded,
