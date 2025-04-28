@@ -188,8 +188,8 @@ def statistics(request):
         "docentry": docentry,
         "docentrycolor": docentrycolor,
         "docentrydate": docentrydate,
-        "docscanmax": docscanmax + (docscanmax * 0.1),
-        "docentrymax": docentrymax + (docentrymax * 0.1),
+        "docscanmax": docscanmax + (docscanmax * 0.2),
+        "docentrymax": docentrymax + (docentrymax * 0.2),
 
     }
     # print(maxcount)
