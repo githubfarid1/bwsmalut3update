@@ -476,14 +476,14 @@ def edit_bundle(request, pk):
         form = BundleForm(request.POST, instance=bundle)
         if form.is_valid():
             bundle = form.save(commit=False)
-            bundle.syncstatus=1
+            bundle.syncstatus = 1
             bundle.save()
             return HttpResponse(
                 status=204,
                 headers={
                     'HX-Trigger': json.dumps({
                         "bundleListChanged": None,
-                        "showMessage": f"{bundle.bundle_number} updated."
+                        "showMessage": f"{bundle.bundle_number} updatedx."
                     })
                 }
             )
