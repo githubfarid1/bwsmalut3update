@@ -47,6 +47,7 @@ def parse():
         session = Session(engine)
         bundles = session.query(Bundle).filter(Bundle.syncstatus==2)
         print(bundles.count())
+        breakpoint()
         for bundle in bundles:
             bundledict = {
             "noberkas": str(bundle.bundle_number),
