@@ -483,7 +483,7 @@ def edit_bundle(request, pk):
                 headers={
                     'HX-Trigger': json.dumps({
                         "bundleListChanged": None,
-                        "showMessage": f"{bundle.bundle_number} updatedx."
+                        "showMessage": f"{bundle.bundle_number} updated."
                     })
                 }
             )
