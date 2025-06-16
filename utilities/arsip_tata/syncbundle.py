@@ -92,7 +92,7 @@ def parse():
             password = PUSAIR_PASSWORD
             RAK = '1 - Kelurahan Ngade'
             itemtokenlist = []
-            breakpoint()
+            # breakpoint()
             with sync_playwright() as playwright:
                 browser = playwright.chromium.launch(headless=True)
                 context = browser.new_context()
