@@ -1601,16 +1601,16 @@ def item_upload_pdf(request):
 def box_sync(request, pk):
     if request.method == "POST":
         box = get_object_or_404(Box, pk=pk)
-        
-        prevbox = Box.objects.get(box_number=str(int(box.box_number)-1), yeardate=box.yeardate)
-        if prevbox:
+        try:
+            prevbox = Box.objects.get(box_number=str(int(box.box_number)-1), yeardate=box.yeardate)
+            # if prevbox:
             bundles = Bundle.objects.filter(box=prevbox)
             bundle_maxnumber = bundles.aggregate(Max("bundle_number"))['bundle_number__max']
             bundle_maxid = Bundle.objects.filter(bundle_number=bundle_maxnumber, yeardate=prevbox.yeardate).first().id
             item_maxnumber = Item.objects.filter(bundle_id=bundle_maxid).aggregate(Max("item_number"))['item_number__max']
             bundle_number = bundle_maxnumber+1
             item_number = item_maxnumber+1
-        else:
+        except:
             bundle_number = 1
             item_number = 1
         bundles = Bundle.objects.filter(box=box)
