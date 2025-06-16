@@ -47,7 +47,7 @@ def parse():
         session = Session(engine)
         bundles = session.query(Bundle).filter(Bundle.syncstatus==2)
         print(bundles.count())
-        breakpoint()
+        # breakpoint()
         for bundle in bundles:
             bundledict = {
             "noberkas": str(bundle.bundle_number),
@@ -92,6 +92,7 @@ def parse():
             password = PUSAIR_PASSWORD
             RAK = '1 - Kelurahan Ngade'
             itemtokenlist = []
+            breakpoint()
             with sync_playwright() as playwright:
                 browser = playwright.chromium.launch(headless=True)
                 context = browser.new_context()
