@@ -1707,7 +1707,7 @@ class GenerateScriptDigitalizedView:
     def gencontext(self):
         if self.__request.GET.get("search"):
             query = self.__request.GET.get("search")
-            items = Item.objects.filter(Q(filesize__isnull=False, yeardate=self.year) & (Q(description__icontains=query)  | Q(bundle__title__icontains=query)))
+            items = Item.objects.filter(Q(filesize__isnull=False, yeardate=self.year) & (Q(title__icontains=query)  | Q(bundle__description__icontains=query)))
         else:
             items = Item.objects.filter(filesize__isnull=False, yeardate=self.year)
         datalist = []
