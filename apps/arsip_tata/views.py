@@ -1716,10 +1716,10 @@ class GenerateScriptDigitalizedView:
             # breakpoint()
             path = os.path.join(settings.PDF_LOCATION, __package__.split('.')[1], folder, "-".join([str(item.bundle.yeardate), str(item.bundle.box.box_number), str(item.bundle.bundle_number), str(item.item_number)]) + ".pdf")
             pdffound = False
-            coverfilename = ""
-            if exists(path):
-                pdffound = True
-                coverfilename = "{}_{}-{}-{}-{}.png".format(__package__.split('.')[1], item.bundle.yeardate, item.bundle.box.box_number, item.bundle.bundle_number, item.item_number)
+            # coverfilename = ""
+            # if exists(path):
+            #     pdffound = True
+            #     coverfilename = "{}_{}-{}-{}-{}.png".format(__package__.split('.')[1], item.bundle.yeardate, item.bundle.box.box_number, item.bundle.bundle_number, item.item_number)
             
             datalist.append({
                 "box_number": item.bundle.box.box_number,
@@ -1734,7 +1734,7 @@ class GenerateScriptDigitalizedView:
                 "row_number": ke + 1,
                 "pdffound": pdffound,
                 "doc_id": item.id,
-                "coverfilepath": os.path.join(settings.COVER_URL, coverfilename),
+                "coverfilepath": item.cover.url,
                 "filesize": item.filesize,
                 "pagecount": item.page_count,
                 "doc_uuid_id": item.id, #item.uuid_id,
