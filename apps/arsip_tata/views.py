@@ -1675,22 +1675,22 @@ def bundle_sync(request, pk):
 def digitalisasi(request, year):
     if not request.user.is_authenticated:
         return redirect('login')
-    # if request.method == 'POST':
-    #     datalist = get_data_digitalisasi()
-    #     # return HttpResponse(datalist)            
-    #     filename = f"data_{__package__.split('.')[1]}_dadigitalisasi.xlsx"
+    if request.method == 'POST':
+        datalist = get_data_digitalisasi(year)
+        # return HttpResponse(datalist)            
+        filename = f"data_{__package__.split('.')[1]}_dadigitalisasi_{year}.xlsx"
 
-    #     wb = Workbook()
-    #     wb.create_sheet("CONFIG")
-    #     sheet = wb["CONFIG"]
-    #     sheet['A1'].value = os.path.join("D:", "media") + "\\"
-    #     # wb.create_sheet("DATA SUDAH ALIHMEDIA")
-    #     sheet = wb.active
-    #     create_dadigital_xls(datalist=datalist, sheet=sheet)
-    #     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    #     response['Content-Disposition'] = 'attachment; filename={}'.format(filename)    
-    #     wb.save(response)
-    #     return response
+        wb = Workbook()
+        wb.create_sheet("CONFIG")
+        sheet = wb["CONFIG"]
+        sheet['A1'].value = os.path.join("D:", "media") + "\\"
+        # wb.create_sheet("DATA SUDAH ALIHMEDIA")
+        sheet = wb.active
+        create_dadigital_xls(datalist=datalist, sheet=sheet, year=year)
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename={}'.format(filename)    
+        wb.save(response)
+        return response
         
     gendata = GenerateScriptDigitalizedView(request, year=year)
     gendata.gencontext()
@@ -1760,3 +1760,198 @@ class GenerateScriptDigitalizedView:
     @property
     def year(self):
         return self.__year
+
+
+def get_data_digitalisasi(year):
+    datalist = []    
+    bundles = Bundle.objects.filter(yeardate=year)
+    for bundle in bundles:
+        items = Item.objects.filter(Q(bundle_id=bundle.id) & Q(filesize__isnull=False))
+        folder = str(bundle.yeardate)
+        # if docs.count() != 0:
+        data = []    
+        for item in items:
+            # filepath = os.path.join(settings.PDF_LOCATION, __package__.split('.')[1], folder, str(doc.bundle.box_number), str(doc.doc_number) + ".pdf")
+            filepath = os.path.join(settings.PDF_LOCATION, __package__.split('.')[1], folder, "-".join([str(item.bundle.yeardate), str(item.bundle.box.box_number), str(item.bundle.bundle_number), str(item.item_number)]) + ".pdf")
+            
+            infotime = os.stat(filepath).st_mtime
+            infodate = datetime.fromtimestamp(infotime).strftime('%d-%m-%Y')
+            
+            mdict = {
+                'description': item.title,
+                'doc_count':item.total,
+                'doc_type': "Buku", #item.doc_type,
+                'year': bundle.year_bundle,
+                'date_scan': infodate,
+                'doc_number': item.item_number,
+            }
+            data.append(mdict)
+        
+        if len(data) != 0:
+            datalist.append({'title': bundle.description, 'folder':folder, 'box_number': bundle.box.box_number, 'data': data})
+    return datalist
+
+def create_dadigital_xls(datalist, sheet, year):
+    centervh = Alignment(horizontal='center', vertical='center', wrap_text=True)
+    leftvh = Alignment(horizontal='left', vertical='center', wrap_text=True)
+    centerv = Alignment(vertical='center', wrap_text=True)
+    wraptxt = Alignment(wrap_text=True)
+
+    thin_border1 = Border(left=Side(style='thin'), 
+                        right=Side(style='thin'), 
+                        top=Side(style='thin'), 
+                        bottom=Side(style='thin'))
+    
+    thin_border2 = Border(bottom=Side(style='thin'),right=Side(style='thin'),left=Side(style='thin'))
+    thin_border3 = Border(top=Side(style='thin'), right=Side(style='thin'),left=Side(style='thin'))
+    thin_border4 = Border(right=Side(style='thin'),left=Side(style='thin'))
+    thin_border5 = Border(top=Side(style='thin'), bottom=Side(style='thin'))
+    thin_border6 = Border(top=Side(style='thin'))
+    thin_border7 = Border(left=Side(style='thin'), top=Side(style='thin'))
+    thin_border8 = Border(right=Side(style='thin'), top=Side(style='thin'))
+
+    
+
+
+    font_style1 = Font(name='Arial Narrow', size=10, bold=True)
+    font_style2 = Font(name='Arial', size=8.5)
+    font_style3 = Font(name='Arial', size=8.5, italic=True)
+    color1 = PatternFill(start_color="c6d5f7", fill_type = "solid")
+    # sheet.merge_cells('A1:G1')
+    # sheet.merge_cells('A2:G2')
+    aligncenter = Alignment(horizontal='center')
+    headerfont = Font(name='Arial Narrow', size=14, bold=True)
+    sheet['A1'] = f"DAFTAR ARSIP INAKTIF YANG DIALIH MEDIAKAN TAHUN PENATAAN {year}"
+    sheet['A1'].alignment = aligncenter
+    sheet['A1'].font = headerfont
+    sheet['A2'] = "UNIT PENGOLAH: BALAI WILAYAH SUNGAI MALUKU UTARA"
+    sheet['A2'].alignment = aligncenter
+    sheet['A2'].font = headerfont
+
+    sheet.title = "DATA SUDAH ALIHMEDIA"
+    sheet.column_dimensions['A'].width = 7
+    sheet.column_dimensions['B'].width = 80
+    sheet.column_dimensions['C'].width = 3
+    sheet.column_dimensions['D'].width = 7
+    sheet.column_dimensions['E'].width = 10
+    sheet.column_dimensions['F'].width = 15
+    sheet.column_dimensions['G'].width = 20
+    sheet.column_dimensions['H'].width = 10
+
+    sheet.merge_cells('A1:H1')
+    sheet.merge_cells('A2:H2')
+
+
+    for cell in sheet["7:7"]:
+        cell.alignment = centervh
+        cell.font = font_style1
+    sheet.merge_cells('A7:A8')
+    sheet.merge_cells('B7:B8')
+    sheet.merge_cells('C7:D8')
+    sheet.merge_cells('E7:E8')
+    sheet.merge_cells('F7:F8')
+    sheet.merge_cells('G7:G8')
+    sheet.merge_cells('H7:H8')
+
+    for i in range(1, 9):
+        sheet.cell(row=9, column=i).value = i
+        sheet.cell(row=9, column=i).alignment = centervh
+        sheet.cell(row=9, column=i).border = thin_border1
+        sheet.cell(row=9, column=i).font = Font(name='Arial Narrow', size=8, bold=True)
+        sheet.cell(row=7, column=i).fill = color1
+        sheet.cell(row=8, column=i).fill = color1
+        sheet.cell(row=9, column=i).fill = color1
+        
+    sheet.row_dimensions[9].height = 9
+    sheet.cell(row=7, column=1).value = "NOMOR"
+    sheet.cell(row=7, column=1).border = thin_border1
+    sheet.cell(row=8, column=1).border = thin_border1
+    
+    sheet.cell(row=7, column=2).value = "JENIS ARSIP"
+    sheet.cell(row=7, column=2).border = thin_border1
+    sheet.cell(row=8, column=2).border = thin_border1
+    
+    sheet.cell(row=7, column=3).value = "JUMLAH ARSIP"
+    sheet.cell(row=7, column=3).border = thin_border1
+    sheet.cell(row=8, column=3).border = thin_border1
+    sheet.cell(row=7, column=4).border = thin_border1
+    sheet.cell(row=8, column=4).border = thin_border1
+
+    sheet.cell(row=7, column=5).value = "KURUN WAKTU"
+    sheet.cell(row=7, column=5).border = thin_border1
+    sheet.cell(row=8, column=5).border = thin_border1
+
+    sheet.cell(row=7, column=6).value = "JENIS TINDAKAN ALIH MEDIA"
+    sheet.cell(row=7, column=6).border = thin_border1
+    sheet.cell(row=8, column=6).border = thin_border1
+
+    sheet.cell(row=7, column=7).value = "KETERANGAN WAKTU PELAKSANAAN"
+    sheet.cell(row=7, column=7).border = thin_border1
+    sheet.cell(row=8, column=7).border = thin_border1
+
+    sheet.cell(row=7, column=8).value = "LINK FILE"
+    sheet.cell(row=7, column=8).border = thin_border1
+    sheet.cell(row=8, column=8).border = thin_border1
+
+    i = 10
+    result = datalist
+    no = 0
+    for res in result:
+        # sheet['{}{}'.format('A', i)].border = thin_border7
+        # sheet['{}{}'.format('B', i)].border = thin_border6
+        # sheet['{}{}'.format('C', i)].border = thin_border6
+        # sheet['{}{}'.format('D', i)].border = thin_border6
+        # sheet['{}{}'.format('E', i)].border = thin_border6
+        # sheet['{}{}'.format('F', i)].border = thin_border6
+        # sheet['{}{}'.format('G', i)].border = thin_border6
+        # sheet['{}{}'.format('H', i)].border = thin_border8
+   
+        # sheet['{}{}'.format('B', i)].value = res["title"]
+        # sheet['{}{}'.format('B', i)].alignment = leftvh
+        # i += 1
+        for data in res['data']:
+            no += 1
+            sheet['{}{}'.format('A', i)].value = no
+
+            sheet['{}{}'.format('B', i)].value = " ".join([data["description"], res["title"]]).replace("\n","")
+            sheet['{}{}'.format('B', i)].alignment = leftvh
+            
+            sheet['{}{}'.format('C', i)].value = data["doc_count"]
+            sheet['{}{}'.format('C', i)].alignment = centervh
+            
+            sheet['{}{}'.format('D', i)].value = data["doc_type"]
+            sheet['{}{}'.format('D', i)].alignment = centervh
+            
+            sheet['{}{}'.format('E', i)].value = data["year"]
+            sheet['{}{}'.format('E', i)].alignment = centervh
+
+            sheet['{}{}'.format('F', i)].value = 'SCAN'
+            sheet['{}{}'.format('F', i)].alignment = centervh
+
+            sheet['{}{}'.format('G', i)].value = data["date_scan"]
+            sheet['{}{}'.format('G', i)].alignment = centervh
+            sheet['{}{}'.format('A', i)].border = thin_border3
+            sheet['{}{}'.format('B', i)].border = thin_border3
+            sheet['{}{}'.format('C', i)].border = thin_border3
+            sheet['{}{}'.format('D', i)].border = thin_border3
+            sheet['{}{}'.format('E', i)].border = thin_border3
+            sheet['{}{}'.format('F', i)].border = thin_border3
+            sheet['{}{}'.format('G', i)].border = thin_border3
+
+            filelocation = os.path.join(__package__.split('.')[1], res['folder'], str(res['box_number']), str(data['doc_number']) + ".pdf")
+            # sheet['{}{}'.format('H', i)].fill = color1
+            sheet['{}{}'.format('H', i)].value = '=HYPERLINK(CONCATENATE(CONFIG!A1, "{}")'.format(filelocation) + ', "LIHAT")'
+            sheet['{}{}'.format('H', i)].border = thin_border1
+            sheet['{}{}'.format('H', i)].font = Font(underline='single', bold=True, color="96251b")
+            sheet['{}{}'.format('H', i)].alignment = centervh
+            
+            
+            i += 1
+
+    sheet['{}{}'.format('A', i)].border = thin_border6
+    sheet['{}{}'.format('B', i)].border = thin_border6
+    sheet['{}{}'.format('C', i)].border = thin_border6
+    sheet['{}{}'.format('D', i)].border = thin_border6
+    sheet['{}{}'.format('E', i)].border = thin_border6
+    sheet['{}{}'.format('F', i)].border = thin_border6
+    sheet['{}{}'.format('G', i)].border = thin_border6
