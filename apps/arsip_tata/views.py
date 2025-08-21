@@ -1773,9 +1773,11 @@ def get_data_digitalisasi(year):
         for item in items:
             # filepath = os.path.join(settings.PDF_LOCATION, __package__.split('.')[1], folder, str(doc.bundle.box_number), str(doc.doc_number) + ".pdf")
             filepath = os.path.join(settings.PDF_LOCATION, __package__.split('.')[1], folder, "-".join([str(item.bundle.yeardate), str(item.bundle.box.box_number), str(item.bundle.bundle_number), str(item.item_number)]) + ".pdf")
-            
-            infotime = ""#os.stat(filepath).st_mtime
-            infodate = ""#datetime.fromtimestamp(infotime).strftime('%d-%m-%Y')
+            # infotime=""
+            infodate=""
+            if exists(filepath):
+                infotime = os.stat(filepath).st_mtime
+                infodate = datetime.fromtimestamp(infotime).strftime('%d-%m-%Y')
             
             mdict = {
                 'description': item.title,
