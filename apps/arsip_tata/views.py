@@ -1719,7 +1719,7 @@ class GenerateScriptDigitalizedView:
             coverfilename = ""
             if exists(path):
                 pdffound = True
-                coverfilename = "{}-{}-{}-{}-{}.png".format(__package__.split('.')[1], item.bundle.yeardate, item.bundle.box.box_number, item.bundle.bundle_number, item.item_number)
+                coverfilename = "{}_{}-{}-{}-{}.png".format(__package__.split('.')[1], item.bundle.yeardate, item.bundle.box.box_number, item.bundle.bundle_number, item.item_number)
             
             datalist.append({
                 "box_number": item.bundle.box.box_number,
