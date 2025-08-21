@@ -120,3 +120,6 @@ class SearchItemForm(forms.Form):
 
 class SearchBundleForm(forms.Form): 
     search = forms.CharField(label="Uraian Pekerjaan", max_length = 255, help_text = "", required=False) 
+
+class SearchDocByYear(forms.Form):
+    search = forms.CharField(label="Kata Kunci")

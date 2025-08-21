@@ -68,5 +68,7 @@ urlpatterns = [
     path(route='transret_form/<int:pk>', view=views.transret_form, name=prefix + 'transret_form'),
    path(route='search_item', view=views.search_item, name=prefix + "search_item"),
    
+    path(route='digitalisasi/<int:year>', view=views.digitalisasi, name=prefix + 'digitalisasi'),
+   
 
 ]

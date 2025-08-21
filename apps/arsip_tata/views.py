@@ -5,7 +5,7 @@ from django.http import HttpResponse, Http404, JsonResponse
 from .models import Year, Box, Bundle, Item, Customer, Trans, TransDetail
 from django.views.decorators.csrf import csrf_exempt
 import json
-from .forms import YearForm, BoxForm, BundleForm, ItemForm, CustomerForm, TransForm, AddTransDetailForm, EditTransDetailForm, SearchItemForm, SearchBundleForm
+from .forms import YearForm, BoxForm, BundleForm, ItemForm, CustomerForm, TransForm, AddTransDetailForm, EditTransDetailForm, SearchItemForm, SearchBundleForm, SearchDocByYear
 from django.views.decorators.http import require_POST
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Alignment, Font, PatternFill
@@ -1670,3 +1670,93 @@ def bundle_sync(request, pk):
         
     return render(request, 'arsip_tata/bundle_sync.html', {
     })
+
+
+def digitalisasi(request, year):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    # if request.method == 'POST':
+    #     datalist = get_data_digitalisasi()
+    #     # return HttpResponse(datalist)            
+    #     filename = f"data_{__package__.split('.')[1]}_dadigitalisasi.xlsx"
+
+    #     wb = Workbook()
+    #     wb.create_sheet("CONFIG")
+    #     sheet = wb["CONFIG"]
+    #     sheet['A1'].value = os.path.join("D:", "media") + "\\"
+    #     # wb.create_sheet("DATA SUDAH ALIHMEDIA")
+    #     sheet = wb.active
+    #     create_dadigital_xls(datalist=datalist, sheet=sheet)
+    #     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    #     response['Content-Disposition'] = 'attachment; filename={}'.format(filename)    
+    #     wb.save(response)
+    #     return response
+        
+    gendata = GenerateScriptDigitalizedView(request, year=year)
+    gendata.gencontext()
+    # print(gendata.context)
+    return render(request=request, 
+                  template_name=gendata.template_name, 
+                  context=gendata.context)
+
+class GenerateScriptDigitalizedView:
+    def __init__(self, request, year) -> None:
+        self.__year = year
+        self.__request = request
+
+    def gencontext(self):
+        if self.__request.GET.get("search"):
+            query = self.__request.GET.get("search")
+            items = Item.objects.filter(Q(filesize__isnull=False, yeardate=self.year) & (Q(description__icontains=query)  | Q(bundle__title__icontains=query)))
+        else:
+            items = Item.objects.filter(filesize__isnull=False, yeardate=self.year)
+        datalist = []
+        for ke, item in enumerate(items):
+            folder = str(item.bundle.yeardate)
+            # breakpoint()
+            path = os.path.join(settings.PDF_LOCATION, __package__.split('.')[1], folder, "-".join([str(item.bundle.yeardate), str(item.bundle.box.box_number), str(item.bundle.bundle_number), str(item.item_number)]) + ".pdf")
+            pdffound = False
+            coverfilename = ""
+            if exists(path):
+                pdffound = True
+                coverfilename = "{}-{}-{}-{}-{}.png".format(__package__.split('.')[1], item.bundle.yeardate, item.bundle.box.box_number, item.bundle.bundle_number, item.item_number)
+            
+            datalist.append({
+                "box_number": item.bundle.box.box_number,
+                "bundle_number": item.bundle.bundle_number,
+                "doc_number": item.item_number,
+                "bundle_code": item.bundle.code,
+                "bundle_title": item.bundle.description,
+                "bundle_year": item.bundle.year_bundle,
+                "doc_description": item.title,
+                "doc_count": item.total,
+                "bundle_orinot": "", #item.bundle.orinot,
+                "row_number": ke + 1,
+                "pdffound": pdffound,
+                "doc_id": item.id,
+                "coverfilepath": os.path.join(settings.COVER_URL, coverfilename),
+                "filesize": item.filesize,
+                "pagecount": item.page_count,
+                "doc_uuid_id": item.id, #item.uuid_id,
+                # "pdftmpfound": pdftmpfound,
+        })
+            
+
+        self.__template_name = "arsip_tata/datalist_digitalized.html"
+        if self.__request.method == 'POST':
+            pass
+        else:        
+            self.__context = {
+                                'appname': __package__.split('.')[1], 
+                                'data': datalist,
+                                'form': SearchDocByYear()
+                            }
+    @property
+    def context(self):
+        return self.__context
+    @property
+    def template_name(self):
+        return self.__template_name
+    @property
+    def year(self):
+        return self.__year
