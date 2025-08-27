@@ -1703,13 +1703,13 @@ class GenerateScriptDigitalizedView:
     def __init__(self, request, year) -> None:
         self.__year = year
         self.__request = request
-
+        
     def gencontext(self):
         if self.__request.GET.get("search"):
             query = self.__request.GET.get("search")
             items = Item.objects.filter(Q(filesize__isnull=False, yeardate=self.year) & (Q(title__icontains=query)  | Q(bundle__description__icontains=query)))
         else:
-            items = Item.objects.filter(filesize__isnull=False, yeardate=self.year)
+            items = Item.objects.filter(filesize__isnull=False, yeardate=self.year)[:100]
         datalist = []
         for ke, item in enumerate(items):
             folder = str(item.bundle.yeardate)
@@ -1740,7 +1740,6 @@ class GenerateScriptDigitalizedView:
                 "doc_uuid_id": item.id, #item.uuid_id,
                 # "pdftmpfound": pdftmpfound,
         })
-            
 
         self.__template_name = "arsip_tata/datalist_digitalized.html"
         if self.__request.method == 'POST':
@@ -1760,7 +1759,7 @@ class GenerateScriptDigitalizedView:
     @property
     def year(self):
         return self.__year
-
+    
 
 def get_data_digitalisasi(year):
     datalist = []    

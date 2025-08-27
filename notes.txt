@@ -1,0 +1,10 @@
+1.tambah report berkas yang masih dipinjam
+2. ada data items yang belum di syncronize (14 item):
+SELECT a.item_number, b.bundle_number, c.box_number, a.token FROM arsip_tata_item a, arsip_tata_bundle b, arsip_tata_box c WHERE a.bundle_id=b.id AND b.box_id=c.id AND  a.yeardate=2024 AND a.created_by_id IS NOT null
+atau:
+SELECT a.item_number, b.bundle_number, c.box_number, a.token FROM arsip_tata_item a, arsip_tata_bundle b, arsip_tata_box c WHERE a.bundle_id=b.id AND b.box_id=c.id AND  a.yeardate=2024 AND a.token IS NULL 
+
+3. ada data items yang sudah di scan yang filenya tidak bisa diambil data infotime nya (15 item). caranya dengan mendownload lalu filter "waktu pelaksanaan" yang kosong.
+
+
+1085
