@@ -1684,22 +1684,6 @@ def bundle_sync(request, pk):
 def digitalisasi(request, year):
     if not request.user.is_authenticated:
         return redirect('login')
-    # if request.method == 'POST':
-    #     datalist = get_data_digitalisasi(year)
-    #     # return HttpResponse(datalist)            
-    #     filename = f"data_{__package__.split('.')[1]}_dadigitalisasi_{year}.xlsx"
-
-    #     wb = Workbook()
-    #     wb.create_sheet("CONFIG")
-    #     sheet = wb["CONFIG"]
-    #     sheet['A1'].value = os.path.join("D:", "media") + "\\"
-    #     # wb.create_sheet("DATA SUDAH ALIHMEDIA")
-    #     sheet = wb.active
-    #     create_dadigital_xls(datalist=datalist, sheet=sheet, year=year)
-    #     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    #     response['Content-Disposition'] = 'attachment; filename={}'.format(filename)    
-    #     wb.save(response)
-    #     return response
         
     gendata = GenerateScriptDigitalizedView(request, year=year)
     gendata.gencontext()
@@ -1748,6 +1732,7 @@ class GenerateScriptDigitalizedView:
                 "pagecount": item.page_count,
                 "doc_uuid_id": item.id, #item.uuid_id,
                 # "pdftmpfound": pdftmpfound,
+                
         })
 
         self.__template_name = "arsip_tata/datalist_digitalized.html"
@@ -1757,6 +1742,7 @@ class GenerateScriptDigitalizedView:
             self.__context = {
                                 'appname': __package__.split('.')[1], 
                                 'data': datalist,
+                                'year': self.year,
                                 'form': SearchDocByYear()
                             }
     @property
@@ -1831,7 +1817,7 @@ def create_dadigital_xls(datalist, sheet, year):
     # sheet.merge_cells('A2:G2')
     aligncenter = Alignment(horizontal='center')
     headerfont = Font(name='Arial Narrow', size=14, bold=True)
-    sheet['A1'] = f"DAFTAR ARSIP INAKTIF YANG DIALIH MEDIAKAN TAHUN PENATAAN {year}"
+    sheet['A1'] = f"DAFTAR ARSIP INAKTIF YANG DIALIH MEDIAKAN PADA TAHUN {year}"
     sheet['A1'].alignment = aligncenter
     sheet['A1'].font = headerfont
     sheet['A2'] = "UNIT PENGOLAH: BALAI WILAYAH SUNGAI MALUKU UTARA"
