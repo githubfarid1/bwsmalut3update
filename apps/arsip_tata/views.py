@@ -1786,6 +1786,7 @@ def get_data_digitalisasi(year):
             'title': item.bundle.description,
             'folder': folder,
             'box_number': item.bundle.box.box_number,
+            'date_upload': item.uploaded_date.strftime('%d-%m-%Y'),
         }
         data.append(mdict)
         
@@ -1914,10 +1915,10 @@ def create_dadigital_xls(datalist, sheet, year):
         sheet['{}{}'.format('E', i)].value = res["year"]
         sheet['{}{}'.format('E', i)].alignment = centervh
 
-        sheet['{}{}'.format('F', i)].value = 'SCAN'
+        sheet['{}{}'.format('F', i)].value = res["date_scan"]#'SCAN'
         sheet['{}{}'.format('F', i)].alignment = centervh
 
-        sheet['{}{}'.format('G', i)].value = res["date_scan"]
+        sheet['{}{}'.format('G', i)].value = res["date_upload"]
         sheet['{}{}'.format('G', i)].alignment = centervh
         sheet['{}{}'.format('A', i)].border = thin_border3
         sheet['{}{}'.format('B', i)].border = thin_border3
