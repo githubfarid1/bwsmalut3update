@@ -18,16 +18,8 @@
 
 {% block content %}
 <div class="container-fluid">
-    <h4>Per Tahun Penataan</h4>
-    <div class="d-flex flex-row-reverse bd-highlight">
-        <div class="p-2 bd-highlight">
-            <button hx-get="{% url 'arsip_tata_add_year' %}" hx-target="#dialog" class="btn btn-sm btn-primary">
-                Tahun Penataan Baru
-            </button>
-        </div>
-    
-    </div>
-    <div class="row" hx-trigger="load, yearListChanged from:body" hx-get="{% url 'arsip_tata_year_list' %}" hx-target="this">
+    <h4>Digitalisasi</h4>
+    <div class="row" hx-trigger="load, yearListChanged from:body" hx-get="{% url 'arsip_tata_year_list_digital' %}" hx-target="this">
         <span class="visually-hidden">Loading...</span>
     </div>
     <!-- Placeholder for the modal -->

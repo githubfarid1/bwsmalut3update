@@ -11,8 +11,8 @@
   <div class="col-12 col-lg-12">
     <div class="card">
       <div class="card-body">
-        <h5 class="card-title">Rekap Entry Arsip (jumlah Dokumen)</h5>
-        <canvas id="chartentry" width="400" height="200"></canvas>
+        <h5 class="card-title">Rekap Upload Arsip (jumlah Halaman)</h5>
+        <canvas id="chartupload" width="400" height="200"></canvas>
       </div>
     </div>
   </div>
@@ -34,27 +34,27 @@
   <script src="{% static 'assets/vendors/coreui/chartjs/js/coreui-chartjs.js' %}"></script>
   <script>
     // jquery function
-            var ctx = document.getElementById('chartentry').getContext('2d');
+            var ctx = document.getElementById('chartupload').getContext('2d');
             var myChart = new Chart(ctx, {
-                type: 'horizontalBar',
+                type: 'bar',
                 data: {
-                    labels: {{ userlist|safe }}, //loop through queryset,
+                    labels: {{ userlist_upload|safe }}, //loop through queryset,
                     datasets: [{
                         label: '',
-                        data: {{ countlist|safe }},
-                        backgroundColor: {{ colorlist|safe }},
-                        borderColor:{{ colorlist|safe }},
+                        data: {{ countlist_upload|safe }},
+                        backgroundColor: {{ colorlist_upload|safe }},
+                        borderColor:{{ colorlist_upload|safe }},
                         borderWidth: 1
                     }]
                 },
                 options: {
                     scales: {
-                        xAxes: [{
+                        yAxes: [{
                             id: 'A',
                             type: 'linear',
                             position: 'left',
                             ticks: {
-                                max: {{ maxcount|safe }},
+                                max: {{ maxcount_upload|safe }},
                                 min: 0
                             }
                           }]

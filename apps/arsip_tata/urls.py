@@ -66,9 +66,13 @@ urlpatterns = [
     path(route='transretdetail_list/<int:trans_id>', view=views.transret_detail_list, name=prefix + "transret_detail_list"),
     path(route='transdetail/<int:pk>/edit', view=views.edit_transdetail, name=prefix + 'edit_transdetail'),
     path(route='transret_form/<int:pk>', view=views.transret_form, name=prefix + 'transret_form'),
-   path(route='search_item', view=views.search_item, name=prefix + "search_item"),
+    path(route='search_item', view=views.search_item, name=prefix + "search_item"),
    
     path(route='digitalisasi/<int:year>', view=views.digitalisasi, name=prefix + 'digitalisasi'),
+    
+    path(route='years_digital', view=views.show_year_digital , name=prefix + "show_year_digital"),
+    path(route='year_list_digital', view=views.year_list_digital, name=prefix + "year_list_digital"),
+    path(route='statistics_year_digital/<int:year>', view=views.statistics_year_digital, name=prefix + "statistics_year_digital"),
    
 
 ]

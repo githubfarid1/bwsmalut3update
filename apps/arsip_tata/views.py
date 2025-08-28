@@ -195,7 +195,6 @@ def statistics(request):
     # print(maxcount)
     return render(request=request, template_name='arsip_tata/statistics.html', context=context)
 
-
 def statistics_year(request, year):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -215,6 +214,23 @@ def statistics_year(request, year):
         countlist.append(dt['count'])
         colorlist.append("rgba(112, 185, 239, 1)")
 
+
+
+    context = {
+        "userlist": userlist,
+        "countlist": countlist,
+        "colorlist": colorlist,
+        "maxcount": maxcount + (maxcount*0.2),
+
+    }
+    # print(maxcount)
+    return render(request=request, template_name='arsip_tata/statistics_year.html', context=context)
+
+def statistics_year_digital(request, year):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+
     data = Item.objects.filter(uploaded_by__isnull=False, uploaded_date__year=year, page_count__isnull=False).values("uploaded_by").annotate(count=Sum('page_count'))
     for idx, rec in enumerate(data):
         username = User.objects.get(id=rec['uploaded_by']).username
@@ -232,10 +248,6 @@ def statistics_year(request, year):
 
 
     context = {
-        "userlist": userlist,
-        "countlist": countlist,
-        "colorlist": colorlist,
-        "maxcount": maxcount + (maxcount*0.2),
         "userlist_upload": userlist_upload,
         "countlist_upload": countlist_upload,
         "colorlist_upload": colorlist_upload,
@@ -243,10 +255,7 @@ def statistics_year(request, year):
 
     }
     # print(maxcount)
-    return render(request=request, template_name='arsip_tata/statistics_year.html', context=context)
-
-
-
+    return render(request=request, template_name='arsip_tata/statistics_year_digital.html', context=context)
 
 def show_boxes_old(request, year):
     if not request.user.is_authenticated:
@@ -1956,3 +1965,19 @@ def create_dadigital_xls(datalist, sheet, year):
     sheet['{}{}'.format('E', i)].border = thin_border6
     sheet['{}{}'.format('F', i)].border = thin_border6
     sheet['{}{}'.format('G', i)].border = thin_border6
+
+
+def year_list_digital(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    return render(request, 'arsip_tata/year_list_digital.html', {
+        'years': Year.objects.all(),
+    })
+    
+def show_year_digital(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    context = {
+    }
+    return render(request=request, template_name='arsip_tata/show_year_digital.html', context=context)
