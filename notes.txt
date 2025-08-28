@@ -7,4 +7,4 @@ SELECT a.item_number, b.bundle_number, c.box_number, a.token FROM arsip_tata_ite
 3. ada data items yang sudah di scan yang filenya tidak bisa diambil data infotime nya (15 item). caranya dengan mendownload lalu filter "waktu pelaksanaan" yang kosong.
 
 
-1085
+4. tambhkan doc_type (buku, gambar, dll) pada table item.

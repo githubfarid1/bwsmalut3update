@@ -1758,34 +1758,40 @@ class GenerateScriptDigitalizedView:
 
 def get_data_digitalisasi(year):
     datalist = []    
-    bundles = Bundle.objects.filter(yeardate=year)
-    for bundle in bundles:
-        items = Item.objects.filter(Q(bundle_id=bundle.id) & Q(filesize__isnull=False))
-        folder = str(bundle.yeardate)
-        # if docs.count() != 0:
-        data = []    
-        for item in items:
-            # filepath = os.path.join(settings.PDF_LOCATION, __package__.split('.')[1], folder, str(doc.bundle.box_number), str(doc.doc_number) + ".pdf")
-            filepath = os.path.join(settings.PDF_LOCATION, __package__.split('.')[1], folder, "-".join([str(item.bundle.yeardate), str(item.bundle.box.box_number), str(item.bundle.bundle_number), str(item.item_number)]) + ".pdf")
-            # infotime=""
-            infodate=""
-            if exists(filepath):
-                infotime = os.stat(filepath).st_mtime
-                infodate = datetime.fromtimestamp(infotime).strftime('%d-%m-%Y')
-            
-            mdict = {
-                'description': item.title,
-                'doc_count':item.total,
-                'doc_type': "Buku", #item.doc_type,
-                'year': bundle.year_bundle,
-                'date_scan': infodate,
-                'doc_number': item.item_number,
-            }
-            data.append(mdict)
+    # bundles = Bundle.objects.filter(yeardate=year)
+    # for bundle in bundles:
+        # items = Item.objects.filter(Q(bundle_id=bundle.id) & Q(filesize__isnull=False))
+    items = Item.objects.filter(uploaded_date__year=year)
+
+    
+    # if docs.count() != 0:
+    data = []    
+    for item in items:
+        folder = str(item.yeardate)
+        # filepath = os.path.join(settings.PDF_LOCATION, __package__.split('.')[1], folder, str(doc.bundle.box_number), str(doc.doc_number) + ".pdf")
+        filepath = os.path.join(settings.PDF_LOCATION, __package__.split('.')[1], folder, "-".join([str(item.bundle.yeardate), str(item.bundle.box.box_number), str(item.bundle.bundle_number), str(item.item_number)]) + ".pdf")
+        # infotime=""
+        infodate=""
+        if exists(filepath):
+            infotime = os.stat(filepath).st_mtime
+            infodate = datetime.fromtimestamp(infotime).strftime('%d-%m-%Y')
         
-        if len(data) != 0:
-            datalist.append({'title': bundle.description, 'folder':folder, 'box_number': bundle.box.box_number, 'data': data})
-    return datalist
+        mdict = {
+            'description': item.title,
+            'doc_count':item.total,
+            'doc_type': "Buku", #item.doc_type,
+            'year': item.bundle.year_bundle,
+            'date_scan': infodate,
+            'doc_number': item.item_number,
+            'title': item.bundle.description,
+            'folder': folder,
+            'box_number': item.bundle.box.box_number,
+        }
+        data.append(mdict)
+        
+        # if len(data) != 0:
+        #     datalist.append({'title': bundle.description, 'folder':folder, 'box_number': bundle.box.box_number, 'data': data})
+    return data
 
 def create_dadigital_xls(datalist, sheet, year):
     centervh = Alignment(horizontal='center', vertical='center', wrap_text=True)
@@ -1893,56 +1899,43 @@ def create_dadigital_xls(datalist, sheet, year):
     result = datalist
     no = 0
     for res in result:
-        # sheet['{}{}'.format('A', i)].border = thin_border7
-        # sheet['{}{}'.format('B', i)].border = thin_border6
-        # sheet['{}{}'.format('C', i)].border = thin_border6
-        # sheet['{}{}'.format('D', i)].border = thin_border6
-        # sheet['{}{}'.format('E', i)].border = thin_border6
-        # sheet['{}{}'.format('F', i)].border = thin_border6
-        # sheet['{}{}'.format('G', i)].border = thin_border6
-        # sheet['{}{}'.format('H', i)].border = thin_border8
-   
-        # sheet['{}{}'.format('B', i)].value = res["title"]
-        # sheet['{}{}'.format('B', i)].alignment = leftvh
-        # i += 1
-        for data in res['data']:
-            no += 1
-            sheet['{}{}'.format('A', i)].value = no
+        no += 1
+        sheet['{}{}'.format('A', i)].value = no
 
-            sheet['{}{}'.format('B', i)].value = " ".join([data["description"], res["title"]]).replace("\n","")
-            sheet['{}{}'.format('B', i)].alignment = leftvh
-            
-            sheet['{}{}'.format('C', i)].value = data["doc_count"]
-            sheet['{}{}'.format('C', i)].alignment = centervh
-            
-            sheet['{}{}'.format('D', i)].value = data["doc_type"]
-            sheet['{}{}'.format('D', i)].alignment = centervh
-            
-            sheet['{}{}'.format('E', i)].value = data["year"]
-            sheet['{}{}'.format('E', i)].alignment = centervh
+        sheet['{}{}'.format('B', i)].value = " ".join([res["description"], res["title"]]).replace("\n"," ")
+        sheet['{}{}'.format('B', i)].alignment = leftvh
+        
+        sheet['{}{}'.format('C', i)].value = res["doc_count"]
+        sheet['{}{}'.format('C', i)].alignment = centervh
+        
+        sheet['{}{}'.format('D', i)].value = res["doc_type"]
+        sheet['{}{}'.format('D', i)].alignment = centervh
+        
+        sheet['{}{}'.format('E', i)].value = res["year"]
+        sheet['{}{}'.format('E', i)].alignment = centervh
 
-            sheet['{}{}'.format('F', i)].value = 'SCAN'
-            sheet['{}{}'.format('F', i)].alignment = centervh
+        sheet['{}{}'.format('F', i)].value = 'SCAN'
+        sheet['{}{}'.format('F', i)].alignment = centervh
 
-            sheet['{}{}'.format('G', i)].value = data["date_scan"]
-            sheet['{}{}'.format('G', i)].alignment = centervh
-            sheet['{}{}'.format('A', i)].border = thin_border3
-            sheet['{}{}'.format('B', i)].border = thin_border3
-            sheet['{}{}'.format('C', i)].border = thin_border3
-            sheet['{}{}'.format('D', i)].border = thin_border3
-            sheet['{}{}'.format('E', i)].border = thin_border3
-            sheet['{}{}'.format('F', i)].border = thin_border3
-            sheet['{}{}'.format('G', i)].border = thin_border3
+        sheet['{}{}'.format('G', i)].value = res["date_scan"]
+        sheet['{}{}'.format('G', i)].alignment = centervh
+        sheet['{}{}'.format('A', i)].border = thin_border3
+        sheet['{}{}'.format('B', i)].border = thin_border3
+        sheet['{}{}'.format('C', i)].border = thin_border3
+        sheet['{}{}'.format('D', i)].border = thin_border3
+        sheet['{}{}'.format('E', i)].border = thin_border3
+        sheet['{}{}'.format('F', i)].border = thin_border3
+        sheet['{}{}'.format('G', i)].border = thin_border3
 
-            filelocation = os.path.join(__package__.split('.')[1], res['folder'], str(res['box_number']), str(data['doc_number']) + ".pdf")
-            # sheet['{}{}'.format('H', i)].fill = color1
-            sheet['{}{}'.format('H', i)].value = '=HYPERLINK(CONCATENATE(CONFIG!A1, "{}")'.format(filelocation) + ', "LIHAT")'
-            sheet['{}{}'.format('H', i)].border = thin_border1
-            sheet['{}{}'.format('H', i)].font = Font(underline='single', bold=True, color="96251b")
-            sheet['{}{}'.format('H', i)].alignment = centervh
-            
-            
-            i += 1
+        filelocation = os.path.join(__package__.split('.')[1], res['folder'], str(res['box_number']), str(res['doc_number']) + ".pdf")
+        # sheet['{}{}'.format('H', i)].fill = color1
+        sheet['{}{}'.format('H', i)].value = '=HYPERLINK(CONCATENATE(CONFIG!A1, "{}")'.format(filelocation) + ', "LIHAT")'
+        sheet['{}{}'.format('H', i)].border = thin_border1
+        sheet['{}{}'.format('H', i)].font = Font(underline='single', bold=True, color="96251b")
+        sheet['{}{}'.format('H', i)].alignment = centervh
+        
+        
+        i += 1
 
     sheet['{}{}'.format('A', i)].border = thin_border6
     sheet['{}{}'.format('B', i)].border = thin_border6
