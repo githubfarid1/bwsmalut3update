@@ -1684,22 +1684,22 @@ def bundle_sync(request, pk):
 def digitalisasi(request, year):
     if not request.user.is_authenticated:
         return redirect('login')
-    if request.method == 'POST':
-        datalist = get_data_digitalisasi(year)
-        # return HttpResponse(datalist)            
-        filename = f"data_{__package__.split('.')[1]}_dadigitalisasi_{year}.xlsx"
+    # if request.method == 'POST':
+    #     datalist = get_data_digitalisasi(year)
+    #     # return HttpResponse(datalist)            
+    #     filename = f"data_{__package__.split('.')[1]}_dadigitalisasi_{year}.xlsx"
 
-        wb = Workbook()
-        wb.create_sheet("CONFIG")
-        sheet = wb["CONFIG"]
-        sheet['A1'].value = os.path.join("D:", "media") + "\\"
-        # wb.create_sheet("DATA SUDAH ALIHMEDIA")
-        sheet = wb.active
-        create_dadigital_xls(datalist=datalist, sheet=sheet, year=year)
-        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-        response['Content-Disposition'] = 'attachment; filename={}'.format(filename)    
-        wb.save(response)
-        return response
+    #     wb = Workbook()
+    #     wb.create_sheet("CONFIG")
+    #     sheet = wb["CONFIG"]
+    #     sheet['A1'].value = os.path.join("D:", "media") + "\\"
+    #     # wb.create_sheet("DATA SUDAH ALIHMEDIA")
+    #     sheet = wb.active
+    #     create_dadigital_xls(datalist=datalist, sheet=sheet, year=year)
+    #     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    #     response['Content-Disposition'] = 'attachment; filename={}'.format(filename)    
+    #     wb.save(response)
+    #     return response
         
     gendata = GenerateScriptDigitalizedView(request, year=year)
     gendata.gencontext()
@@ -1981,3 +1981,20 @@ def show_year_digital(request):
     context = {
     }
     return render(request=request, template_name='arsip_tata/show_year_digital.html', context=context)
+
+def report_digitalisasi(request, year):
+    datalist = get_data_digitalisasi(year)
+    # return HttpResponse(datalist)            
+    filename = f"data_{__package__.split('.')[1]}_dadigitalisasi_{year}.xlsx"
+
+    wb = Workbook()
+    wb.create_sheet("CONFIG")
+    sheet = wb["CONFIG"]
+    sheet['A1'].value = os.path.join("D:", "media") + "\\"
+    # wb.create_sheet("DATA SUDAH ALIHMEDIA")
+    sheet = wb.active
+    create_dadigital_xls(datalist=datalist, sheet=sheet, year=year)
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename={}'.format(filename)    
+    wb.save(response)
+    return response

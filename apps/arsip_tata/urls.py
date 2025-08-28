@@ -73,6 +73,7 @@ urlpatterns = [
     path(route='years_digital', view=views.show_year_digital , name=prefix + "show_year_digital"),
     path(route='year_list_digital', view=views.year_list_digital, name=prefix + "year_list_digital"),
     path(route='statistics_year_digital/<int:year>', view=views.statistics_year_digital, name=prefix + "statistics_year_digital"),
-   
+     path(route='report_digitalisasi/<int:year>', view=views.report_digitalisasi, name=prefix + 'report_digitalisasi'),
+  
 
 ]
