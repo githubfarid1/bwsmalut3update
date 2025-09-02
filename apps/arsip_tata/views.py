@@ -1,7 +1,7 @@
 from django.shortcuts import render
 import os
 from django.shortcuts import render, get_object_or_404, redirect, get_list_or_404
-from django.http import HttpResponse, Http404, JsonResponse
+from django.http import HttpResponse, Http404, JsonResponse, FileResponse
 from .models import Year, Box, Bundle, Item, Customer, Trans, TransDetail
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -1261,7 +1261,7 @@ def trans_detail_list(request, trans_id):
     })
 
 @csrf_exempt
-def add_trans_detail(request, trans_id):
+def add_trans_detail_old(request, trans_id):
     if not request.user.is_authenticated:
         return redirect('login')
     if request.method == "POST":
@@ -1299,13 +1299,73 @@ def add_trans_detail(request, trans_id):
         'module': 'Tambah Data'
     })
 
+@csrf_exempt
+def add_trans_detail(request, trans_id):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    if request.method == "POST":
+        code = request.POST.get('code')
+        # form = AddTransDetailForm(request.POST)
+        try:
+            # year, box, bundle, item = code.split("-")
+            message = f"Kode item berkas {code} sukses"
+            item = Item.objects.get(codegen=code)
+            if item:
+                if item.total == 1:
+                    message = f"Kode item berkas {code} hanya ada 1, tidak boleh pinjam lebih dari 1 hari"
+                
+                td = TransDetail.objects.filter(item_id=item.id, date_return__isnull=True)
+                if td.count() != 0:
+                    message = f"Kode item berkas {code} sedang dipinjam"
+                else:
+                    td = TransDetail(item_id=item.id, trans_id=trans_id)
+                    td.save()
+                    message = f"Kode item berkas {code} tersimpan"
+        except:
+            message = f"Kode item berkas {code} tidak ada"
+        return HttpResponse(
+            status=204,
+            headers={
+                'HX-Trigger': json.dumps({
+                    "transListChanged": None,
+                    "showMessage": message
+                })
+            })
+    else:
+        form = AddTransDetailForm()
+    return render(request, 'arsip_tata/add_trans_detail_form.html', {
+        'form': form,
+        'module': 'Tambah Data'
+    })
+
+@csrf_exempt
+def customer_info(request, customer_id):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    customer = Customer.objects.get(id=customer_id)
+
+    return render(request, 'arsip_tata/customer_info.html', {
+        'data': customer,
+    })
+
+@csrf_exempt
+def item_info(request, item_id):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    item = Item.objects.get(id=item_id)
+
+    return render(request, 'arsip_tata/item_info.html', {
+        'data': item,
+    })
+
 # @ require_POST
 def remove_transdetail(request, pk):
     if request.method == "POST":
         trans = get_object_or_404(TransDetail, pk=pk)
         trans_id = trans.trans.id
         trans.delete()
-        return redirect('arsip_tata_show_trans_detail', trans_id=trans_id)
+        # return redirect('arsip_tata_show_trans_detail', trans_id=trans_id)
+        return redirect('arsip_tata_show_trans')
 
 def trans_form(request, pk):
     trans = Trans.objects.get(pk=pk)
@@ -1329,6 +1389,8 @@ def trans_form(request, pk):
     elements.append(Paragraph(f'Kode Peminjaman: <strong>{trans.codetrans}</strong>', styles['Normal']))
     elements.append(Spacer(1, 6))
     elements.append(Paragraph(f'Nama Peminjam: <strong>{trans.customer.name}</strong>', styles['Normal']))
+    elements.append(Spacer(1, 6))
+    elements.append(Paragraph(f'Satuan Kerja: <strong>{trans.customer.organization}</strong>', styles['Normal']))
     elements.append(Spacer(1, 6))
     elements.append(Paragraph(f'No WhatsApp: <strong>{trans.customer.phone_number}</strong>', styles['Normal']))
     elements.append(Spacer(1, 6))
@@ -1407,6 +1469,44 @@ def edit_transdetail(request, pk):
                 status=204,
                 headers={
                     'HX-Trigger': json.dumps({
+                        "transListChanged": None,
+                        "showMessage": f"{trans.id} updated."
+                    })
+                }
+            )
+    else:
+        if trans.date_return == None:
+            form = EditTransDetailForm(instance=trans)
+        else:
+            trans.date_return = None
+            trans.save()
+            return HttpResponse(
+                status=204,
+                headers={
+                    'HX-Trigger': json.dumps({
+                        "transListChanged": None,
+                        "showMessage": f"{trans.id} updated."
+                    })
+                }
+            )
+
+    return render(request, 'arsip_tata/edit_trans_detail_form.html', {
+        'form': form,
+        'transdetail': trans,
+        'module': 'Edit Data'
+    })
+
+
+def edit_transdetail_old(request, pk):
+    trans = get_object_or_404(TransDetail, pk=pk)
+    if request.method == "POST":
+        form = EditTransDetailForm(request.POST, instance=trans)
+        if form.is_valid():
+            form.save()
+            return HttpResponse(
+                status=204,
+                headers={
+                    'HX-Trigger': json.dumps({
                         "transretDetailListChanged": None,
                         "showMessage": f"{trans.id} updated."
                     })
@@ -1464,6 +1564,8 @@ def transret_form(request, pk):
     elements.append(Paragraph(f'Kode Peminjaman: <strong>{trans.codetrans}</strong>', styles['Normal']))
     elements.append(Spacer(1, 6))
     elements.append(Paragraph(f'Nama Peminjam: <strong>{trans.customer.name}</strong>', styles['Normal']))
+    elements.append(Spacer(1, 6))
+    elements.append(Paragraph(f'Satuan Kerja: <strong>{trans.customer.organization}</strong>', styles['Normal']))
     elements.append(Spacer(1, 6))
     elements.append(Paragraph(f'No WhatsApp: <strong>{trans.customer.phone_number}</strong>', styles['Normal']))
     elements.append(Spacer(1, 6))
@@ -1658,7 +1760,6 @@ def box_sync(request, pk):
     return render(request, 'arsip_tata/box_sync.html', {
     })
 
-
 @csrf_exempt
 @user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def bundle_sync(request, pk):
@@ -1680,7 +1781,6 @@ def bundle_sync(request, pk):
     return render(request, 'arsip_tata/bundle_sync.html', {
     })
 
-
 def digitalisasi(request, year):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -1700,9 +1800,9 @@ class GenerateScriptDigitalizedView:
     def gencontext(self):
         if self.__request.GET.get("search"):
             query = self.__request.GET.get("search")
-            items = Item.objects.filter(Q(filesize__isnull=False, yeardate=self.year) & (Q(title__icontains=query)  | Q(bundle__description__icontains=query)))
+            items = Item.objects.filter(Q(filesize__isnull=False, uploaded_date__year=self.year) & (Q(title__icontains=query)  | Q(bundle__description__icontains=query)))
         else:
-            items = Item.objects.filter(filesize__isnull=False, yeardate=self.year)[:100]
+            items = Item.objects.filter(filesize__isnull=False, uploaded_date__year=self.year)[:100]
         datalist = []
         for ke, item in enumerate(items):
             folder = str(item.bundle.yeardate)
@@ -1755,7 +1855,6 @@ class GenerateScriptDigitalizedView:
     def year(self):
         return self.__year
     
-
 def get_data_digitalisasi(year):
     datalist = []    
     # bundles = Bundle.objects.filter(yeardate=year)
@@ -1915,7 +2014,7 @@ def create_dadigital_xls(datalist, sheet, year):
         sheet['{}{}'.format('E', i)].value = res["year"]
         sheet['{}{}'.format('E', i)].alignment = centervh
 
-        sheet['{}{}'.format('F', i)].value = res["date_scan"]#'SCAN'
+        sheet['{}{}'.format('F', i)].value = 'SCAN'
         sheet['{}{}'.format('F', i)].alignment = centervh
 
         sheet['{}{}'.format('G', i)].value = res["date_upload"]
@@ -1945,7 +2044,6 @@ def create_dadigital_xls(datalist, sheet, year):
     sheet['{}{}'.format('E', i)].border = thin_border6
     sheet['{}{}'.format('F', i)].border = thin_border6
     sheet['{}{}'.format('G', i)].border = thin_border6
-
 
 def year_list_digital(request):
     if not request.user.is_authenticated:
@@ -1977,4 +2075,60 @@ def report_digitalisasi(request, year):
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = 'attachment; filename={}'.format(filename)    
     wb.save(response)
+    return response
+
+
+def transnotret_report(request):
+    pdf = io.BytesIO()
+    doc = SimpleDocTemplate(pdf, pagesize=A4)
+    styles = getSampleStyleSheet()
+    title = "Daftar Dokumen Keluar"
+
+    frame = Frame(doc.leftMargin, doc.bottomMargin, doc.width, doc.height)
+    template = PageTemplate(frames=[frame], id='mytemplate')
+
+    doc.addPageTemplates([template])
+    elements = []
+    elements.append(Paragraph(title, styles['Title']))
+    mydata = []
+    mydata.append(("No", "Judul Dokumen", "Tanggal", "Nama / Satker"))
+    c_width = [0.4*inch, 4*inch, 1*inch, 1.5*inch]
+    
+    style2 = getSampleStyleSheet()
+    style2 = style2["BodyText"]
+    style2.wordWrap = 'CJK'
+    today = datetime.today().strftime('%d %B %Y')
+    filename = f"dokumen_belum_kembali_{today.replace(' ', '_')}.pdf"
+    details = TransDetail.objects.filter(date_return__isnull=True)
+
+    no = 0
+    for detail in details:
+        if detail.date_return == None:  
+            no += 1
+            myset = (Paragraph(str(no), style2) , Paragraph(detail.item.title + "<br/>" + detail.item.bundle.description.replace("\n", "<br/>") + "<br/>" + "<strong>" + detail.item.codegen + "</strong>", style2), Paragraph(detail.trans.date_trans.strftime('%d %b %Y'), style2),  Paragraph(f"{detail.trans.customer.name} / {detail.trans.customer.organization}", style2))
+            mydata.append(myset)
+            
+
+    mytable = Table(mydata, colWidths=c_width, hAlign='LEFT')
+    mytable.setStyle(TableStyle([('BACKGROUND',(0,0),(-1,0),colors.lightblue),
+                       ('INNERGRID', (0,0), (-1,-1), 0.25, colors.red),
+                       ('FONTSIZE',(0,0),(-1,0),12),
+                       ('FONTSIZE',(0,1),(-1,-1),8),
+                       ('FONTNAME', (0,0), (-1,0), 'Courier-Bold'),
+                       ('ALIGN', (0,0), (-1,0), 'CENTER'),
+                       ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+                       ('VALIGN',(0,0),(-1,-1),'TOP'),
+                       ]))
+    elements.append(Spacer(1, 10))
+    elements.append(mytable)
+    elements.append(Spacer(1, 32))
+    rightal = ParagraphStyle(name="RightAl",alignment=TA_RIGHT)
+    elements.append(Paragraph(f'Ternate, {today}', rightal))
+    elements.append(Spacer(1, 32))
+    elements.append(Paragraph('(Petugas Arsip)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', rightal))
+
+    doc.build(elements)
+    pdf.seek(0)
+    response = HttpResponse(pdf.read(), content_type='application/pdf')
+    response['Content-Disposition'] = f'inline;filename={filename}'
     return response

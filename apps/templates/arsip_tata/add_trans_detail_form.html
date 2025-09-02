@@ -6,10 +6,11 @@
     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
   </div>
   <div class="modal-body">
-    <div class="mb-3">
-        <label for="{{ form.code.id_for_label }}" class="form-label">Kode Berkas Item</label>
+    <div class="input-group mb-3">
+        <label for="{{ form.code.id_for_label }}" class="form-label">Kode Item</label>
         {% render_field form.code class="form-control" placeholder="" %}
         <div class="invalid-feedback">{{ form.code.errors|first }}</div>
+         <a href="{% url 'arsip_tata_search_item' %}" target="_new"><button class="btn btn-warning" type="button">Cari..</button></a>
     </div>
 
 </div>
@@ -22,6 +23,7 @@
       Cancel
     </button>
     <button type="submit" class="btn btn-primary">Save</button>
+
   </div>
 </form>
 {% endwith %}

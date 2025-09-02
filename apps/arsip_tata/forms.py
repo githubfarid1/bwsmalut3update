@@ -85,7 +85,7 @@ class CustomerForm(forms.ModelForm):
     # photo = forms.CharField(widget=forms.FileInput(attrs={'capture': "user"}))
     class Meta:
         model = Customer
-        fields = ['name', 'phone_number', 'description', 'photo', 'idcard']
+        fields = ['name', 'phone_number', 'description', 'photo', 'idcard', 'organization']
 
     def clean_phone_number(self):
         cleaned_data = self.cleaned_data['phone_number']

@@ -1,18 +1,47 @@
 {% load static %}
   {% if trans %}
     {% for d in trans %}
-    <div class="col-12 col-lg-2 mt-3">
+    <div class="col-12 col-lg-3 mt-3">
       <div class="card border-primary mb-3">
         <button class="btn btn-primary btn-sm" hx-get="{% url 'arsip_tata_edit_trans' pk=d.pk %}" hx-target="#dialog">Edit</button>
+        <button class="btn btn-secondary btn-sm" hx-get="{% url 'arsip_tata_add_trans_detail' d.pk %}" hx-target="#dialog">Tambah Dokumen Pinjam</button>
+
+        <a href="{% url 'arsip_tata_trans_form' d.id %}" target="_new"><button class="btn btn-success btn-sm w-100">Cetak Form Pinjam</button></a>
+        <!--<a href="{% url 'arsip_tata_show_transret_detail' d.id %}" target="_new"><button class="btn btn-info btn-sm w-100">Form Kembali</button></a>-->
+        <button class="btn btn-secondary btn-sm" hx-get="{% url 'arsip_tata_show_transret_detail' d.id %}" hx-target="#dialog">Form Kembali</button>
+
+        <a href="{% url 'arsip_tata_transret_form' d.id %}" target="_new"><button class="btn btn-warning btn-sm w-100">Cetak Form Kembali</button></a>
+
+
         <div class="row no-gutters px-3 py-2">
-          <div class="col-lg-12 text-center">
-            <a href="{% url 'arsip_tata_show_trans_detail' d.pk %}"><img class="card-img border" src="{% static 'assets/icons/trans.png' %}" alt=""></a>
+          <div class="col-lg-12 text-left">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Nama: <button class="btn btn-secondary btn-sm" hx-get="{% url 'arsip_tata_customer_info' d.customer.id %}" hx-target="#dialog"><b>{{ d.customer.name }}</b></button></li>
+                <li class="list-group-item">Tgl Pinjam: <b>{{d.date_trans}}</b></li>
+                <li class="list-group-item">Jumlah Doc: <b>{{d.transdetail_set.count}} Item </b> <!--<button class="btn btn-success btn-sm" hx-get="{% url 'arsip_tata_add_trans_detail' d.pk %}" hx-target="#dialog">Add...</button>--></li>
+                {% for det in d.transdetail_set.all %}
+                <li class="list-group-item {% if det.date_return %} bg-light {% endif %}">
+                  {% if not det.date_return %}
+                  <form class="form-inline" action="{% url 'arsip_tata_remove_transdetail' det.id %}" method="post">
+                  {% csrf_token %}  
+                  <button type="submit" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="return confirm('Hapus file Item Berkas?')"></button>
+                  </form>
+                  {% else %}
+                  <p>Tgl Kembali: <b>{{ det.date_return }}</b> </p>  
+                  {% endif %}
+                  {{ det.item.title }} {{ det.item.bundle.description|slice:":50" }}...
+                  <button class="btn btn-info btn-sm" hx-get="{% url 'arsip_tata_item_info' det.item_id %}" hx-target="#dialog">Detail...</button>
+                </li>
+                {% endfor %}
+                <!--<li class="list-group-item">Status: </li>
+              </ul>-->            
+            <!--<a href="{% url 'arsip_tata_show_trans_detail' d.pk %}"><img class="card-img border" src="{% static 'assets/icons/trans.png' %}" alt=""></a>-->
           </div>
-          <div class="col-sm-12 mt-2 text-center">
+          <!--<div class="col-sm-12 mt-2 text-center">
               <h5>{{ d.codetrans }}<br/>
               {{ d.customer.name }} <br/> {{d.date_trans}}</h5>
               <p>{{d.transdetail_set.count}} item</p>
-          </div>
+          </div>-->
 
         </div>
 

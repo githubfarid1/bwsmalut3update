@@ -156,7 +156,8 @@ class Customer(models.Model):
 
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
-    phone_number = models.CharField(max_length=20, unique=True)
+    organization = models.CharField(max_length=255, null=True)
+    phone_number = models.CharField(max_length=20, blank=True)
     description = models.TextField(null=True, blank=True)
     photo = models.ImageField(upload_to=update_filename_photo, null=True, blank=True)
     idcard = models.ImageField(upload_to=update_filename_idcard, null=True, blank=True)
