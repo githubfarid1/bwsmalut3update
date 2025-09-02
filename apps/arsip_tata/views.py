@@ -1582,10 +1582,10 @@ def transret_form(request, pk):
     for idx, data in enumerate(detail):
         if data.date_return:
             date_return = data.date_return.strftime('%d %b %Y')
-        else:
-            date_return = ""
-        myset = (Paragraph(str(idx+1), style2) , Paragraph(data.item.codegen, style2), Paragraph(data.item.title + "<br/>" + data.item.bundle.description.replace("\n", "<br/>") , style2), Paragraph(date_return, style2))
-        mydata.append(myset)
+        # else:
+        #     date_return = ""
+            myset = (Paragraph(str(idx+1), style2) , Paragraph(data.item.codegen, style2), Paragraph(data.item.title + "<br/>" + data.item.bundle.description.replace("\n", "<br/>") , style2), Paragraph(date_return, style2))
+            mydata.append(myset)
 
     mytable = Table(mydata, colWidths=c_width, hAlign='LEFT')
     mytable.setStyle(TableStyle([('BACKGROUND',(0,0),(-1,0),colors.lightblue),
