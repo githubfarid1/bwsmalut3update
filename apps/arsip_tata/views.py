@@ -549,15 +549,15 @@ def item_download_pdf(request, pk):
     # print(path)
     if exists(path):
         doc = fitz.open(path)
-        for i in range(0, len(doc)):
-            try:
-                page = doc[i]
-                tw = fitz.TextWriter(page.rect, opacity=0.3)
-                tw.append((50, 100), "COPY")
-                page.clean_contents()
-                page.write_text(rect=page.rect, writers=tw)
-            except:
-                pass
+        # for i in range(0, len(doc)):
+        #     try:
+        #         page = doc[i]
+        #         tw = fitz.TextWriter(page.rect, opacity=0.3)
+        #         tw.append((50, 100), "COPY")
+        #         page.clean_contents()
+        #         page.write_text(rect=page.rect, writers=tw)
+        #     except:
+        #         pass
 
         doc.save("tmp.pdf")            
             
