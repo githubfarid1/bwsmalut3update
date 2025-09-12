@@ -4,7 +4,7 @@ from alihmedia_inactive.settings import *
 import datetime
 import glob
 import uuid
-FILE_COUNT = 14
+FILE_COUNT = 7
 def make_tarfile(output_filename, source_dir):
     with tarfile.open(output_filename, "w:gz") as tar:
         tar.add(source_dir, arcname=os.path.basename(source_dir))
