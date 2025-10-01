@@ -162,7 +162,8 @@ def parse():
                                 itemfound = True
                                 break
                     if itemfound:
-                        url = f"https://arsip-sda.pusair-pu.go.id/admin/archive/{token}/doc" 
+                        url = f"https://arsip-sda.pusair-pu.go.id/admin/archive/{token}/doc"
+                        print(f"update {token}")
                     else:
                         url = "https://arsip-sda.pusair-pu.go.id/admin/archive/add"
 
