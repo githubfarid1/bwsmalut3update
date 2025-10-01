@@ -93,19 +93,23 @@ def parse():
             RAK = '1 - Kelurahan Ngade'
             itemtokenlist = []
             # breakpoint()
+            user_data_dir = PLAYWRIGHT_PROFILE
             with sync_playwright() as playwright:
-                browser = playwright.chromium.launch(headless=True)
-                context = browser.new_context()
-                page = context.new_page()
-                url = "https://arsip-sda.pusair-pu.go.id/login"
-                page.goto(url, wait_until="networkidle")
-                page.fill('input[name="login"]', username)
-                page.fill('input[name="password"]', password)
-                page.click('text=Log in', timeout=20000)
+                # browser = playwright.chromium.launch(headless=True)
+                # context = browser.new_context()
+                # page = context.new_page()
+                browser = playwright.chromium.launch_persistent_context(headless=False, user_data_dir=user_data_dir)
+                page = browser.new_page()
+                # url = "https://arsip-sda.pusair-pu.go.id/login"
                 boxtoken = ""
                 if bundledict['box_token'] == "PROSES" or bundledict['box_token'] == "":
                     url = 'https://arsip-sda.pusair-pu.go.id/admin/archive/{}'.format(bundledict['thtata'])
-                    # breakpoint()
+                    page.goto(url, wait_until="networkidle")
+                    if page.get_by_role("textbox", name="Email or username").count() != 0:
+                        page.fill('input[name="login"]', username)
+                        page.fill('input[name="password"]', password)
+                        page.click('text=Log in', timeout=20000)
+                    
                     boxtoken = getboxtoken(page=page, nobox=bundledict['nobox'], url=url)
                     # breakpoint()
                     if boxtoken == "":
