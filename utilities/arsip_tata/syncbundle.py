@@ -98,7 +98,7 @@ def parse():
                 # browser = playwright.chromium.launch(headless=True)
                 # context = browser.new_context()
                 # page = context.new_page()
-                browser = playwright.chromium.launch_persistent_context(headless=False, user_data_dir=user_data_dir)
+                browser = playwright.chromium.launch_persistent_context(headless=True, user_data_dir=user_data_dir)
                 page = browser.new_page()
                 url = "https://arsip-sda.pusair-pu.go.id/admin/dashboard"
                 page.goto(url, wait_until="networkidle")
