@@ -16,7 +16,7 @@ from dbclass import Bundle, Base, Box, Item
 import time
 
 engine = create_engine('mysql+pymysql://{}:{}@localhost:{}/{}'.format(USER, PASSWORD, PORT, DBNAME) , echo=False)
-
+idletime = 30
 def getboxtoken(page, nobox, url):
     page.goto(url, wait_until="networkidle")
     page.wait_for_selector("ul.pagination")
@@ -203,7 +203,7 @@ def parse():
                 # breakpoint()  
                 session.query(Item).filter(Item.id==item['id']).update({'token': item_token, "issync": 1})
                 session.commit()
-        idletime = 30
+        
         print("Idle", idletime, "Seconds...")
         time.sleep(idletime)
                         
@@ -214,7 +214,7 @@ def main():
         try:
             parse()
         except:
-            # time.sleep(60)
+            time.sleep(idletime)
             continue
     
 if __name__ == '__main__':
