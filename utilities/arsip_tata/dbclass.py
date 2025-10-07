@@ -63,6 +63,6 @@ class Item(Base):
     page_count: Mapped[str] = mapped_column(SmallInteger, nullable=True)
     filesize: Mapped[int] = mapped_column(Integer, nullable=True)
     token: Mapped[str] = mapped_column(String(50))
-    # issync: Mapped[bool] =  mapped_column(bool)
+    issync: Mapped[int] = mapped_column(Integer, nullable=True)
     bundle = relationship("Bundle")
 

@@ -34,6 +34,14 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from urllib.parse import unquote, quote, unquote_plus, quote_plus
 from django.utils import timezone
 # Create your views here.
+
+def is_user_in_group(user, group_name):
+    try:
+        group = Group.objects.get(name=group_name)
+        return group in user.groups.all()
+    except Group.DoesNotExist:
+        return False
+    
 @csrf_exempt
 def year_list(request):
     if not request.user.is_authenticated:
@@ -271,6 +279,7 @@ def show_boxes_old(request, year):
 def box_list(request, year_id, page, search):
     if not request.user.is_authenticated:
         return redirect('login')
+    isadmin = is_user_in_group(request.user, 'admin')
     result = {}
     if search == "None":
         boxes = Box.objects.filter(year_id=year_id).order_by("id")
@@ -307,7 +316,7 @@ def box_list(request, year_id, page, search):
         if len(item_numbers) != 0:
             minitem = str(item_numbers[0])
             maxitem = str(item_numbers[-1])
-        recs.append({"pk": box.pk, "yeardate": box.year.yeardate, "box_number": box.box_number, "bundle_number": ", ".join(bundle_numbers),  "item_number": " - ".join([minitem, maxitem]), "year_bundle": ", ".join(list(set(bundle_years))), "notes": box.notes, "itemcount": len(item_numbers), "token": box.token})
+        recs.append({"pk": box.pk, "yeardate": box.year.yeardate, "box_number": box.box_number, "bundle_number": ", ".join(bundle_numbers),  "item_number": " - ".join([minitem, maxitem]), "year_bundle": ", ".join(list(set(bundle_years))), "notes": box.notes, "itemcount": len(item_numbers), "token": box.token, "isgen": box.isgen})
     result['data'] = recs
     
     result['has_other_pages'] = boxes.has_other_pages()
@@ -328,7 +337,8 @@ def box_list(request, year_id, page, search):
     return render(request, 'arsip_tata/box_list2.html', {
         'boxes': result,
         'form': SearchBundleForm(),
-        'search': search
+        'search': search,
+        'isadmin': isadmin
     })
 
 @csrf_exempt
@@ -468,7 +478,19 @@ def add_bundle(request, box_id):
                     })
                 })
     else:
+        
         box = Box.objects.get(id=box_id)
+        if box.token != None:
+            return HttpResponse(
+                status=204,
+                headers={
+                    'HX-Trigger': json.dumps({
+                        "bundleListChanged": None,
+                        "showMessage": "Tidak boleh tambah berkas karena nomor sudah di generate"
+                    })
+                })
+            
+        
         try:
             latest_bundle_number = Bundle.objects.filter(box__yeardate=box.yeardate).latest('bundle_number').bundle_number + 1
         except:
@@ -487,6 +509,8 @@ def edit_bundle(request, pk):
             bundle = form.save(commit=False)
             bundle.syncstatus = 1
             bundle.save()
+            if bundle.isgen:
+                Item.objects.filter(bundle_id=pk).update(issync=False)
             return HttpResponse(
                 status=204,
                 headers={
@@ -594,6 +618,16 @@ def add_item(request, bundle_id):
                 })
     else:
         bundle = Bundle.objects.get(id=bundle_id)
+        if bundle.box.token != None:
+            return HttpResponse(
+                status=204,
+                headers={
+                    'HX-Trigger': json.dumps({
+                        "itemListChanged": None,
+                        "showMessage": "Tidak boleh tambah berkas karena nomor sudah di generate"
+                    })
+                })
+            
         try:
             latest_item_number = Item.objects.filter(bundle__box__yeardate=bundle.box.yeardate).latest('item_number').item_number + 1
         except:
@@ -611,6 +645,8 @@ def edit_item(request, pk):
         if form.is_valid():
             itemsave = form.save(commit=False)
             itemsave.total = itemsave.copy + itemsave.original
+            if item.bundle.box.isgen:
+                item.issync = False
             # bundle = Bundle.objects.get(id=item.bundle_id)
             # itemsave.codegen = "-".join([str(itemsave.yeardate), str(item.bundle.box.box_number), str(item.bundle.bundle_number), str(itemsave.item_number)])
             itemsave.save()
@@ -1741,12 +1777,13 @@ def box_sync(request, pk):
                     item.item_number = item_number+itemcounter
                     itemcounter += 1
                     item.save()
-            box.token = 'PROSES'
+            # box.token = 'PROSES'
+            box.isgen = True
             box.save()
 
-            message = "Sinkronisasi akan segera di proses"
+            message = "Nomor Box, Berkas dan Item berhasil di generate"
         else:
-            message = "Sinkronisasi Gagal, Ada bundle yang kosong"
+            message = "Generate nomor Gagal, Ada berkas yang kosong"
         
         return HttpResponse(
             status=204,

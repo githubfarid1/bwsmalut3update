@@ -1,10 +1,10 @@
 import tarfile
 import os.path
-from alihmedia_inactive.settings import *
+from arsip_tata.settings import *
 import datetime
 import glob
 import uuid
-FILE_COUNT = 7
+FILE_COUNT = 4
 def make_tarfile(output_filename, source_dir):
     with tarfile.open(output_filename, "w:gz") as tar:
         tar.add(source_dir, arcname=os.path.basename(source_dir))

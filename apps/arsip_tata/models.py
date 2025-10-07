@@ -24,7 +24,7 @@ class Box(models.Model):
     )
     notes = models.TextField(null=True, blank=True)
     token = models.CharField(null=True, blank=True, max_length=50)
-    # issync =  models.BooleanField(default=False)
+    isgen =  models.BooleanField(default=False)
     year = models.ForeignKey(
         Year,
         db_column='year_id',
