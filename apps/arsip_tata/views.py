@@ -509,7 +509,7 @@ def edit_bundle(request, pk):
             bundle = form.save(commit=False)
             bundle.syncstatus = 1
             bundle.save()
-            if bundle.isgen:
+            if bundle.box.isgen:
                 Item.objects.filter(bundle_id=pk).update(issync=False)
             return HttpResponse(
                 status=204,
