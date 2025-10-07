@@ -203,25 +203,19 @@ def parse():
                 # breakpoint()  
                 session.query(Item).filter(Item.id==item['id']).update({'token': item_token, "issync": 1})
                 session.commit()
-        idletime = 60
+        idletime = 30
         print("Idle", idletime, "Seconds...")
         time.sleep(idletime)
-
-                
-                # else:
-                #     url = 'https://arsip-sda.pusair-pu.go.id/admin/archive/{}'.format(item['bundle']['thtata'])
-                #     page.goto(url, wait_until="networkidle")
-                #     boxtoken = getboxtoken(page=page, nobox=item['bundle']['nobox'], url=url)
                         
 
                     
-# def main():
-#     while True:
-#         try:
-#             parse()
-#         except:
-#             time.sleep(60)
-#             continue
+def main():
+    while True:
+        try:
+            parse()
+        except:
+            # time.sleep(60)
+            continue
     
 if __name__ == '__main__':
-    parse()
+    main()
