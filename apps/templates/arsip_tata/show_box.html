@@ -20,7 +20,7 @@
 <div class="container-fluid">
   <div class="row">
     <div class="col-lg-10">
-      <h4>Tahun Penataan: <strong>{{ year_date }}</strong> {% if synccount > 0 %}| {{ synccount }} records is synchronizing..{% endif %}</h4>
+      <h4>Tahun Penataan: <strong>{{ year_date }}</strong>{% if synccount > 0 %}<small> ✩ {{ synccount }} records is synchronizing..</small>{% endif %}</h4>
     </div>
     <div class="col-lg-2">
       <button hx-get="{% url 'arsip_tata_add_box' year_id %}" hx-target="#dialog" class="btn btn-sm btn-success float-end">
