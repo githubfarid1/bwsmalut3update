@@ -128,7 +128,7 @@ def show_boxes(request, year):
         search = request.GET.get("search")
     else:
         search = "None"
-    synccount = Item.objects.filter(issync=False, yeardate=yearint)    
+    synccount = Item.objects.filter(issync=False, yeardate=yearint, bundle__box__isgen=True)    
     context = {
         'year_id': year.id,
         'year_date': year.yeardate,
@@ -1763,7 +1763,7 @@ def item_upload_pdf(request):
     })
 
 @csrf_exempt
-@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
+# @user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def box_sync(request, pk):
     if request.method == "POST":
         box = get_object_or_404(Box, pk=pk)
@@ -1812,7 +1812,18 @@ def box_sync(request, pk):
                     "showMessage": message
                 })
             })
-        
+    else:
+        isadmin = is_user_in_group(request.user, 'admin')
+        if not isadmin:
+            return HttpResponse(
+                status=204,
+                headers={
+                    'HX-Trigger': json.dumps({
+                        "boxListChanged": None,
+                        "showMessage": "Hanya admin yang boleh generate nomor"
+                    })
+                })
+                
     return render(request, 'arsip_tata/box_sync.html', {
     })
 

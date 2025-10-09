@@ -53,7 +53,8 @@ def getboxtoken(page, nobox, url):
 def parse():
     while True:
         session = Session(engine)
-        items = session.query(Item).filter(Item.issync==0)
+        # breakpoint()
+        items = session.query(Item).filter(Item.issync==0).join(Bundle).join(Box).filter(Box.isgen==1)
         print(items.count())
         # breakpoint()
         itemlist = []

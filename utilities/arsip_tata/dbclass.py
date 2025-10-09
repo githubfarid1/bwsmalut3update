@@ -28,7 +28,7 @@ class Box(Base):
     box_number: Mapped[str] = mapped_column(String(10))
     yeardate: Mapped[int] = mapped_column(SmallInteger)
     token: Mapped[str] = mapped_column(String(50))
-    # issync: Mapped[bool] =  mapped_column(bool)
+    isgen: Mapped[int] =  mapped_column(SmallInteger)
 
     year = relationship("Year")
 

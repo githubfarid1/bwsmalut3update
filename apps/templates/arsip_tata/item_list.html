@@ -2,7 +2,7 @@
   {% if items %}
     {% for d in items %}
     <div class="col-12 col-lg-2 mt-3">
-      <div class="card border-primary mb-1 {% if not d.issync %} bg-secondary {% endif %}">
+      <div class="card border-primary mb-1 {% if not d.issync %} {% if d.bundle.box.isgen %} bg-secondary {% else %} bg-danger {% endif %} {% endif %}">
         <button class="btn btn-primary btn-sm" hx-get="{% url 'arsip_tata_edit_item' pk=d.pk %}" hx-target="#dialog">Edit</button>
         <div class="row no-gutters px-1 py-1">
           <div class="col-lg-12 mt-1 text-center">
