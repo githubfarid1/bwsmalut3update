@@ -223,6 +223,7 @@ def main():
         except Exception as e:
             with open(LOG_FILE, "a") as file:
                 file.write(str(e))
+                file.write(f"{USER}, {PASSWORD}, {PORT}, {DBNAME}")
             time.sleep(idletime)
             continue
     
