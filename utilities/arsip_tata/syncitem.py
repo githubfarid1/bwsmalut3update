@@ -14,7 +14,14 @@ import sys
 from settings import *
 from dbclass import Bundle, Base, Box, Item
 import time
+# import logging
 
+# logging.basicConfig(
+#     level=logging.DEBUG,
+#     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+#     filename=LOG_FILE,
+#     filemode='a' # 'a' for append, 'w' for overwrite
+# )
 engine = create_engine('mysql+pymysql://{}:{}@localhost:{}/{}'.format(USER, PASSWORD, PORT, DBNAME) , echo=False)
 idletime = 30
 def getboxtoken(page, nobox, url):
@@ -213,7 +220,9 @@ def main():
     while True:
         try:
             parse()
-        except:
+        except Exception as e:
+            with open(LOG_FILE, "a") as file:
+                file.write(str(e))
             time.sleep(idletime)
             continue
     
