@@ -103,7 +103,7 @@ def parse():
 
         user_data_dir = PLAYWRIGHT_PROFILE
         with sync_playwright() as playwright:
-            browser = playwright.firefox.launch_persistent_context(headless=PLAYWRIGHT_HEADLESS, user_data_dir=user_data_dir)
+            browser = playwright.chromium.launch_persistent_context(headless=PLAYWRIGHT_HEADLESS, user_data_dir=user_data_dir)
             page = browser.new_page()
             url = "https://arsip-sda.pusair-pu.go.id/admin/dashboard"
             page.goto(url, wait_until="networkidle")
@@ -223,7 +223,7 @@ def main():
         except Exception as e:
             with open(LOG_FILE, "a") as file:
                 file.write(str(e))
-                file.write(f"{USER}, {PASSWORD}, {PORT}, {DBNAME}")
+                # file.write(f"{USER}, {PASSWORD}, {PORT}, {DBNAME}")
             time.sleep(idletime)
             continue
     
