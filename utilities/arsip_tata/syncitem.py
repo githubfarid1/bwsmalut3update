@@ -103,7 +103,7 @@ def parse():
 
         user_data_dir = PLAYWRIGHT_PROFILE
         with sync_playwright() as playwright:
-            browser = playwright.chromium.launch_persistent_context(headless=PLAYWRIGHT_HEADLESS, user_data_dir=user_data_dir)
+            browser = playwright.firefox.launch_persistent_context(headless=PLAYWRIGHT_HEADLESS, user_data_dir=user_data_dir)
             page = browser.new_page()
             url = "https://arsip-sda.pusair-pu.go.id/admin/dashboard"
             page.goto(url, wait_until="networkidle")
