@@ -116,7 +116,8 @@ def parse():
                 # breakpoint()
                 box = session.get(Box, item['bundle']['boxid'])
                 boxtoken = box.token
-                if boxtoken == "":
+                # breakpoint()
+                if boxtoken == None:
                     # if boxtoken == "":
                     url = "https://arsip-sda.pusair-pu.go.id/admin/master/box"
                     page.goto(url, wait_until="networkidle")
