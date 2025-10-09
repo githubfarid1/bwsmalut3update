@@ -118,6 +118,7 @@ def remove_year(request, pk):
 def show_boxes(request, year):
     if not request.user.is_authenticated:
         return redirect('login')
+    yearint = year
     year = Year.objects.get(yeardate=year)
     if request.GET.get("page"):
         page = request.GET.get("page")
@@ -126,12 +127,14 @@ def show_boxes(request, year):
     if request.GET.get("search"):
         search = request.GET.get("search")
     else:
-        search = "None"    
+        search = "None"
+    synccount = Item.objects.filter(issync=False, yeardate=yearint)    
     context = {
         'year_id': year.id,
         'year_date': year.yeardate,
         'page': page,
-        'search': quote_plus(search)
+        'search': quote_plus(search),
+        'synccount': synccount.count()
     }
     return render(request=request, template_name='arsip_tata/show_box.html', context=context)
 
@@ -393,6 +396,17 @@ def add_box(request, year_id):
                 })
     else:
         year = Year.objects.get(id=year_id)
+        checkyear = Year.objects.filter(yeardate__gt=year.yeardate)
+        if checkyear.count() > 0:
+            return HttpResponse(
+                status=204,
+                headers={
+                    'HX-Trigger': json.dumps({
+                        "boxListChanged": None,
+                        "showMessage": f"Tahun penataan {year.yeardate} sudah dikunci"
+                    })
+                })
+            
         form = BoxForm(initial={'yeardate': year.yeardate})
     return render(request, 'arsip_tata/box_form.html', {
         'form': form,
@@ -970,12 +984,14 @@ def label_perbox(request, year, box_number):
     yearbundle = ""
     code = ""
     bundle_years = []
+    codes = []
     if len(bundles) != 0:
         yearbundle = str(bundles[0].year_bundle)
         code = str(bundles[0].code)
     for bundle in bundles:
         bundle_numbers.append(str(bundle.bundle_number))
         bundle_years.append(str(bundle.year_bundle))
+        codes.append(str(bundle.code))
         items = Item.objects.filter(bundle_id=bundle.id).all()
         item_numbers = []
         for item in items:
@@ -1005,6 +1021,9 @@ def label_perbox(request, year, box_number):
     stylesample = getSampleStyleSheet()
     style2 = stylesample["Heading1"]
     style2.wordWrap = 'CJK'
+    style3 = stylesample["Heading2"]
+    style3.wordWrap = 'CJK'
+
     filename = f"boxlabel_{year}_{box_number}.pdf"
     myset = (Paragraph("Tahun Penataan {}".format(year), stylesample["Italic"]), Paragraph("", style2), QRCodeImage(f"{settings.DOMAIN}/arsip_tata/search_qrcode/{year}/{box_number}", size=25 * mm), )
     mydata.append(myset)
@@ -1012,7 +1031,7 @@ def label_perbox(request, year, box_number):
     mydata.append(myset)
     myset = (Paragraph("NO. BERKAS", style2), Paragraph(":", style2), Paragraph(", ".join(bundle_numbers), style2))
     mydata.append(myset)
-    myset = (Paragraph("KODE", style2), Paragraph(":", style2), Paragraph(code, style2))
+    myset = (Paragraph("KODE", style2), Paragraph(":", style2), Paragraph(", ".join(list(set(codes))), style3))
     mydata.append(myset)
     myset = (Paragraph("NO. ITEM", style2), Paragraph(":", style2), Paragraph(f"{minitem} - {maxitem}", style2))
     mydata.append(myset)
