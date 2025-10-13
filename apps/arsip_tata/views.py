@@ -376,7 +376,7 @@ def box_list_old(request, year_id):
         'boxes': result,
     })
 
-@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
+# @user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def add_box(request, year_id):
     if request.method == "POST":
         form = BoxForm(request.POST)
