@@ -412,7 +412,7 @@ def add_box(request, year_id):
         'form': form,
     })
 
-@user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
+# @user_passes_test(lambda user: Group.objects.get(name='admin') in user.groups.all())
 def edit_box(request, pk):
     box = get_object_or_404(Box, pk=pk)
     if request.method == "POST":
@@ -440,15 +440,25 @@ def edit_box(request, pk):
 @require_http_methods(['DELETE'])
 def remove_box(request, pk):
     box = get_object_or_404(Box, pk=pk)
-    box.delete()
-    return HttpResponse(
-        status=204,
-        headers={
-            'HX-Trigger': json.dumps({
-                "boxListChanged": None,
-                "showMessage": f"{box.box_number} deleted."
+    if box.isgen == True:
+        return HttpResponse(
+            status=204,
+            headers={
+                'HX-Trigger': json.dumps({
+                    "boxListChanged": None,
+                    "showMessage": f"box nomor {box.box_number} Tidak bisa dihapus karena sudah di generate"
+                })
             })
-        })
+    else:
+        box.delete()
+        return HttpResponse(
+            status=204,
+            headers={
+                'HX-Trigger': json.dumps({
+                    "boxListChanged": None,
+                    "showMessage": f"{box.box_number} deleted."
+                })
+            })
 
 def show_bundles(request, year_date, box_number):
     if not request.user.is_authenticated:
@@ -494,7 +504,7 @@ def add_bundle(request, box_id):
     else:
         
         box = Box.objects.get(id=box_id)
-        if box.token != None:
+        if box.isgen == True:
             return HttpResponse(
                 status=204,
                 headers={
@@ -545,15 +555,25 @@ def edit_bundle(request, pk):
 @require_http_methods(['DELETE'])
 def remove_bundle(request, pk):
     bundle = get_object_or_404(Bundle, pk=pk)
-    bundle.delete()
-    return HttpResponse(
-        status=204,
-        headers={
-            'HX-Trigger': json.dumps({
-                "bundleListChanged": None,
-                "showMessage": f"{bundle.bundle_number} deleted."
+    if bundle.box.isgen == True:
+        return HttpResponse(
+            status=204,
+            headers={
+                'HX-Trigger': json.dumps({
+                    "bundleListChanged": None,
+                    "showMessage": f"bundle nomor {bundle.bundle_number} Tidak bisa dihapus karena sudah di generate"
+                })
             })
-        })
+    else:    
+        bundle.delete()
+        return HttpResponse(
+            status=204,
+            headers={
+                'HX-Trigger': json.dumps({
+                    "bundleListChanged": None,
+                    "showMessage": f"{bundle.bundle_number} deleted."
+                })
+            })
 
 def show_items(request, bundle_id):
     if not request.user.is_authenticated:
@@ -632,7 +652,7 @@ def add_item(request, bundle_id):
                 })
     else:
         bundle = Bundle.objects.get(id=bundle_id)
-        if bundle.box.token != None:
+        if bundle.box.isgen == True:
             return HttpResponse(
                 status=204,
                 headers={
@@ -684,15 +704,25 @@ def edit_item(request, pk):
 @require_http_methods(['DELETE'])
 def remove_item(request, pk):
     item = get_object_or_404(Item, pk=pk)
-    item.delete()
-    return HttpResponse(
-        status=204,
-        headers={
-            'HX-Trigger': json.dumps({
-                "itemListChanged": None,
-                "showMessage": f"{item.item_number} deleted."
+    if item.bundle.box.isgen == True:
+        return HttpResponse(
+            status=204,
+            headers={
+                'HX-Trigger': json.dumps({
+                    "itemListChanged": None,
+                    "showMessage": f"bundle nomor {item.item_number} Tidak bisa dihapus karena sudah di generate"
+                })
             })
-        })
+    else:
+        item.delete()
+        return HttpResponse(
+            status=204,
+            headers={
+                'HX-Trigger': json.dumps({
+                    "itemListChanged": None,
+                    "showMessage": f"{item.item_number} deleted."
+                })
+            })
 
 def create_xls(datalist, sheet, year):
     # wb = Workbook()
