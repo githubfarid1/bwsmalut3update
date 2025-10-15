@@ -3,6 +3,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 import os
 from django.conf import settings
 from django.contrib.auth.models import User
+import uuid
 
 class Year(models.Model):
     id = models.AutoField(primary_key=True)
@@ -202,3 +203,41 @@ class TransDetail(models.Model):
 
     def __str__(self) -> str:
         return f"{self.item.title}_{self.date_return}"
+
+class Package(models.Model):
+    def update_filename_photo(instance, filename):
+        ext = filename.split("/")[-1].split(".")[-1]
+        format =  "photo_" + str(instance.id) + "." + ext
+        return os.path.join(settings.ARSIP_TATA_PACKAGE_LOCATION, format)
+    
+    id = models.AutoField(primary_key=True)
+    uuid_id = models.UUIDField(default=uuid.uuid4, editable=False)
+    packnumber = models.CharField(max_length=30, null=True)
+    date_send = models.DateField(null=True)
+    name = models.CharField(max_length=255, null=True)
+    position = models.CharField(max_length=255, null=True)
+    organization = models.CharField(max_length=255, null=True)
+    address= models.CharField(max_length=255, null=True)
+    count = models.PositiveSmallIntegerField(validators=[MinValueValidator(1)], null=True)
+    photo = models.ImageField(upload_to=update_filename_photo, null=True, blank=True)
+    def __str__(self) -> str:
+        return f"{self.packnumber}_{self.organization}"
+
+class PackageItem(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255)
+    docnumber = models.CharField(max_length=30, null=True)
+    docyear = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(2023), MaxValueValidator(2050)], null=True
+    )
+    count = models.PositiveSmallIntegerField(validators=[MinValueValidator(1)])
+    package = models.ForeignKey(
+        Package,
+        db_column='package_id',
+        on_delete=models.CASCADE, 
+        default=None
+    )        
+    def __str__(self) -> str:
+        return f"{self.docnumber}"
+
+    

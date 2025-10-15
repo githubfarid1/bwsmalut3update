@@ -1,0 +1,32 @@
+{% extends "layouts/base_anonymous.html" %} {% load static %}
+{% block title %} | Form Pengiriman Dokumen {% endblock %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="container-fluid px-4">
+  <h3 class="text-center">Form Pengiriman Dokumen</h3>
+  <form action="" method="POST">
+    <div class="row border">  
+        {% csrf_token %}
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+        {% for field in form %}
+            <div class="col-md-12 p-2">{{field|as_crispy_field}}</div>
+        {%endfor%}
+        {% comment %} {{form|crispy}} {% endcomment %}
+        <input type="hidden" name="next" value="{{ request.GET.next }}">
+        <button type="submit" class="btn btn-primary mt-2">Submit</button>
+
+        </div>
+        <div class="col-md-3"></div>
+
+    </div>  
+  </form>
+        <button hx-get="{% url 'arsip_tata_add_packageitem' '1' %}" hx-target="#dialog" class="btn btn-sm btn-primary">
+                Tambah Dokumen
+          </button>
+     
+  </div>
+
+{% endblock %}

@@ -2,10 +2,10 @@ from django.shortcuts import render
 import os
 from django.shortcuts import render, get_object_or_404, redirect, get_list_or_404
 from django.http import HttpResponse, Http404, JsonResponse, FileResponse
-from .models import Year, Box, Bundle, Item, Customer, Trans, TransDetail
+from .models import Year, Box, Bundle, Item, Customer, Trans, TransDetail, Package, PackageItem
 from django.views.decorators.csrf import csrf_exempt
 import json
-from .forms import YearForm, BoxForm, BundleForm, ItemForm, CustomerForm, TransForm, AddTransDetailForm, EditTransDetailForm, SearchItemForm, SearchBundleForm, SearchDocByYear
+from .forms import YearForm, BoxForm, BundleForm, ItemForm, CustomerForm, TransForm, AddTransDetailForm, EditTransDetailForm, SearchItemForm, SearchBundleForm, SearchDocByYear, PackageForm, PackageItemForm
 from django.views.decorators.http import require_POST
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Alignment, Font, PatternFill
@@ -33,6 +33,8 @@ import fitz
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from urllib.parse import unquote, quote, unquote_plus, quote_plus
 from django.utils import timezone
+from django.contrib import messages
+
 # Create your views here.
 
 def is_user_in_group(user, group_name):
@@ -2229,3 +2231,64 @@ def transnotret_report(request):
     response = HttpResponse(pdf.read(), content_type='application/pdf')
     response['Content-Disposition'] = f'inline;filename={filename}'
     return response
+
+def show_package(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    context = {
+    }
+    return render(request=request, template_name='arsip_tata/show_package.html', context=context)
+
+def package_list(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    return render(request, 'arsip_tata/package_list.html', {
+        'trans': Package.objects.all().order_by("-id"),
+    })
+
+def add_package(request):
+    package = Package.objects.create()
+    return HttpResponse(
+        status=204,
+        headers={
+            'HX-Trigger': json.dumps({
+                "packageListChanged": None,
+                "showMessage": f"{package.uuid_id} added."
+            })
+        })
+
+def edit_package(request, uuid_id):
+    package = Package.objects.get(uuid_id=uuid_id)
+    updateForm=PackageForm(instance=package)
+    if request.method=='POST':
+        docAdd=PackageForm(request.POST,instance=package)
+        if docAdd.is_valid():
+            docAdd.save()
+            messages.success(request, 'Data has been updated.')
+            # next = request.POST.get('next', '/')
+            # return redirect(next)
+    return render(request,'arsip_tata/edit_package.html',{
+        'form':updateForm,
+        'item':package})
+
+def add_packageitem(request, package_id):
+    if request.method == "POST":
+        form = PackageItemForm(request.POST)
+        # if form.is_valid():
+        #     year = form.save()
+        #     return HttpResponse(
+        #         status=204,
+        #         headers={
+        #             'HX-Trigger': json.dumps({
+        #                 "yearListChanged": None,
+        #                 "showMessage": f"{year.yeardate} added."
+        #             })
+        #         })
+    else:
+        print("tess")
+        form = PackageItemForm()
+    return render(request, 'arsip_tata/package_item_form.html', {
+        'form': form,
+        # 'module': 'Tambah Data'
+    })

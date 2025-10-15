@@ -78,5 +78,10 @@ urlpatterns = [
     path(route='item_info/<int:item_id>', view=views.item_info, name=prefix + 'item_info'),
     path(route='transnotret_report', view=views.transnotret_report, name=prefix + 'transnotret_report'),
 
+    path(route='package', view=views.show_package, name=prefix + "show_package"),
+    path(route='package_list', view=views.package_list, name=prefix + "package_list"),
+    path(route='add_package', view=views.add_package, name=prefix + "add_package"),
+    path(route='edit_package/<str:uuid_id>', view=views.edit_package, name=prefix + 'edit_package'),
+    path(route='add_packageitem/<int:package_id>', view=views.add_packageitem, name=prefix + "add_packageitem"),
 
 ]

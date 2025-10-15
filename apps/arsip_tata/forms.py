@@ -1,8 +1,9 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import Year, Box, Bundle, Item, Bundlecode, Customer, Trans, TransDetail
+from .models import Year, Box, Bundle, Item, Bundlecode, Customer, Trans, TransDetail, Package, PackageItem
 from django.core.exceptions import NON_FIELD_ERRORS
 import re
+# from django.forms import ModelForm
 
 class YearForm(forms.ModelForm):
     class Meta:
@@ -123,3 +124,38 @@ class SearchBundleForm(forms.Form):
 
 class SearchDocByYear(forms.Form):
     search = forms.CharField(label="Kata Kunci")
+    
+
+class PackageForm(forms.ModelForm):
+    date_send = forms.DateField(widget=forms.TextInput(attrs={'class': 'form-control', 'type':'date'}))
+    class Meta:
+        model=Package
+        fields=('packnumber', 'date_send', 'count', 'name', 'position', 'organization', 'address')
+        # widgets = {
+        #     'name': forms.Textarea(attrs={'cols': 80, 'rows': 4}),
+        #     'save_location': forms.Textarea(attrs={'cols': 80, 'rows': 4}),
+
+        # }
+        
+        labels = {
+            'name': 'Nama Pengirim',
+            'packnumber': 'Nomor Dokumen',
+            'date_send': 'Tanggal Pelaksanaan',
+            'organization': 'Unit Kerja',
+            'position': 'Jabatan',
+            'address': 'Alamat',
+            'count': 'Jumlah Box/Paket'
+
+        }
+
+class PackageItemForm(forms.ModelForm):
+    class Meta:
+        model = PackageItem
+        fields = ['name', 'docnumber', 'docyear', 'count']
+        labels = {
+            'name': 'Nama Dokumen/Arsip',
+            'docnumber': 'Nomor Dokumen',
+            'docyear': 'Tahun',
+            'count': 'Jumlah'
+
+        }

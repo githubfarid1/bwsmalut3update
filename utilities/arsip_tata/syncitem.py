@@ -95,7 +95,7 @@ def parse():
                 "bundle": bundledict
             }
             itemlist.append(itemdict)
-            
+        session.close()    
         username = PUSAIR_USER
         password = PUSAIR_PASSWORD
         RAK = '1 - Kelurahan Ngade'
@@ -115,6 +115,7 @@ def parse():
             
             for item in itemlist:
                 # breakpoint()
+                session = Session(engine)
                 box = session.get(Box, item['bundle']['boxid'])
                 boxtoken = box.token
                 # breakpoint()
@@ -215,7 +216,7 @@ def parse():
         
         print("Idle", idletime, "Seconds...")
         time.sleep(idletime)
-                        
+        session.close()                
 
                     
 def main():
