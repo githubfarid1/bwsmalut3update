@@ -127,18 +127,12 @@ class SearchDocByYear(forms.Form):
     
 
 class PackageForm(forms.ModelForm):
-    date_send = forms.DateField(widget=forms.TextInput(attrs={'class': 'form-control', 'type':'date'}))
     class Meta:
         model=Package
         fields=('packnumber', 'date_send', 'count', 'name', 'position', 'organization', 'address')
-        # widgets = {
-        #     'name': forms.Textarea(attrs={'cols': 80, 'rows': 4}),
-        #     'save_location': forms.Textarea(attrs={'cols': 80, 'rows': 4}),
-
-        # }
         
         labels = {
-            'name': 'Nama Pengirim',
+            'name': 'Nama',
             'packnumber': 'Nomor Dokumen',
             'date_send': 'Tanggal Pelaksanaan',
             'organization': 'Unit Kerja',
@@ -146,6 +140,12 @@ class PackageForm(forms.ModelForm):
             'address': 'Alamat',
             'count': 'Jumlah Box/Paket'
 
+        }
+        widgets = {
+            'date_send': forms.TextInput(attrs={
+                'class': 'form-control',
+                'type': 'date',
+            }),
         }
 
 class PackageItemForm(forms.ModelForm):

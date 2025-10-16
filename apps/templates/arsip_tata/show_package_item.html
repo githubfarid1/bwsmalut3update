@@ -1,7 +1,7 @@
-{% extends "layouts/base.html" %} {% load static %}
+{% extends "layouts/base_anonymous.html" %} {% load static %}
 {% load crispy_forms_tags %}
 
-{% block title %} | Form Item {% endblock %}
+{% block title %} | Form Pengiriman Dokumen {% endblock %}
 {% block stylesheets %}
     <link href="{% static 'assets/vendors/coreui/icons/css/free.min.css' %}" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/style.css' %}" />
@@ -20,39 +20,34 @@
 <div class="container-fluid">
   <div class="row">
     <div class="col-lg-2">
-      <h4>Tahun: <strong>{{ bundle.box.yeardate }}</strong></h4>
     </div>
-    <div class="col-lg-1">
-      <h4>Box: <strong>{{ bundle.box.box_number }}</strong></h4>
-    </div>
-    <div class="col-lg-5">
-        <div style="border:1px solid black;height:100px;overflow:scroll;">
-            <p>No. Berkas: <strong>{{ bundle.bundle_number }}</strong> | Kode: <strong>{{ bundle.code }}</strong> | Tahun Arsip: <strong>{{ bundle.year_bundle }}</strong>
-            <br/>
-            Index: <strong>{{ bundle.creator }}</strong><br/>
-            Uraian: <strong>{{ bundle.description|linebreaksbr}}</strong><br/>
+    <div class="col-lg-8">
+        <div style="border:1px solid black;height:250px;overflow:scroll;background:ghostwhite;text-indent:20px;">
+            <p></p>
+            <h4>Nomor Dokumen: <strong>{{ package.name }}</strong></h4>
+            <h4>Tanggal Pelaksanaan: <strong>{{ package.date_send|date:"d M Y" }}</strong></h4>
+            <h4>Nama: <strong>{{ package.name }}</strong></h4>
+            <h4>Jabatan: <strong>{{ package.position }}</strong></h4>
+            <h4>Unit Kerja: <strong>{{ package.organization}}</strong></h4>
+            <h4>Alamat: <strong>{{ package.address}}</strong></h4>
             
-            </p>
+            
         </div>
     </div>
-    <div class="col-lg-2"></div>    
     <div class="col-lg-2">
-      <button hx-get="{% url 'arsip_tata_add_item' bundle.id %}" hx-target="#dialog" class="btn btn-sm btn-success float-end">
-        Item Baru
+      <button hx-get="{% url 'arsip_tata_add_packageitem' package.id%}" hx-target="#dialog" class="btn btn-sm btn-success float-end">
+        Tambah Dokumen
       </button>
     </div>
   </div>
 
-  <div class="row" hx-trigger="load, itemListChanged from:body" hx-get="{% url 'arsip_tata_item_list' bundle.id %}" hx-target="this">
+  <div class="row" hx-trigger="load, packageItemListChanged from:body" hx-get="{% url 'arsip_tata_package_item_list' package.id %}" hx-target="this">
     <span class="visually-hidden">Loading...</span>
   </div>
   <!-- Placeholder for the modal -->
   <div id="modal" class="modal fade">
     <div id="dialog" class="modal-dialog" hx-target="this"></div>
   </div>
-  <button hx-get="{% url 'arsip_tata_add_item' bundle.id %}" hx-target="#dialog" class="btn btn-sm btn-success float-end">
-    Item Baru
-  </button>
 
   <!-- Empty toast to show the message -->
   <div class="toast-container position-fixed top-0 end-0 p-3">

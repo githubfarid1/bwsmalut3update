@@ -2248,47 +2248,75 @@ def package_list(request):
     })
 
 def add_package(request):
-    package = Package.objects.create()
-    return HttpResponse(
-        status=204,
-        headers={
-            'HX-Trigger': json.dumps({
-                "packageListChanged": None,
-                "showMessage": f"{package.uuid_id} added."
-            })
+    if request.method == "POST":
+        form=PackageForm(request.POST)
+        if form.is_valid():
+            packageform = form.save()
+            package = Package.objects.get(id=packageform.id)
+            messages.success(request, 'Data Pengirim sudah disimpan, Tambahkan nama-nama dokumen yang akan disertakan')
+            return redirect('arsip_tata_show_package_items', package.uuid_id)
+        else:
+            messages.error(request, 'Isian Salah')
+    else:
+        form = PackageForm()
+        # package = Package.objects.create()
+        # return HttpResponse(
+        #     status=204,
+        #     headers={
+        #         'HX-Trigger': json.dumps({
+        #             "packageListChanged": None,
+        #             "showMessage": f"{package.uuid_id} added."
+        #         })
+        #     })
+    return render(request, 'arsip_tata/package_form.html', {
+            'form': form,
         })
 
-def edit_package(request, uuid_id):
+def show_package_items(request, uuid_id):
     package = Package.objects.get(uuid_id=uuid_id)
-    updateForm=PackageForm(instance=package)
-    if request.method=='POST':
-        docAdd=PackageForm(request.POST,instance=package)
-        if docAdd.is_valid():
-            docAdd.save()
-            messages.success(request, 'Data has been updated.')
-            # next = request.POST.get('next', '/')
-            # return redirect(next)
-    return render(request,'arsip_tata/edit_package.html',{
-        'form':updateForm,
-        'item':package})
+    context = {
+        'package': package,
+    }
+    return render(request=request, template_name='arsip_tata/show_package_item.html', context=context)
+    
 
 def add_packageitem(request, package_id):
     if request.method == "POST":
         form = PackageItemForm(request.POST)
-        # if form.is_valid():
-        #     year = form.save()
-        #     return HttpResponse(
-        #         status=204,
-        #         headers={
-        #             'HX-Trigger': json.dumps({
-        #                 "yearListChanged": None,
-        #                 "showMessage": f"{year.yeardate} added."
-        #             })
-        #         })
+        if form.is_valid():
+            packageitem = form.save(commit=False)
+            packageitem.package_id=package_id
+            packageitem.save()
+            return HttpResponse(
+                status=204,
+                headers={
+                    'HX-Trigger': json.dumps({
+                        "packageItemListChanged": None,
+                        "showMessage": f"{packageitem.name} berhasil disimpan."
+                    })
+                })
     else:
-        print("tess")
+        # print("tess")
         form = PackageItemForm()
     return render(request, 'arsip_tata/package_item_form.html', {
         'form': form,
         # 'module': 'Tambah Data'
     })
+
+def package_item_list(request, package_id):
+    package_items = PackageItem.objects.filter(package_id=package_id)
+    return render(request, 'arsip_tata/package_item_list.html', {
+        'items': package_items,
+    })
+
+def remove_package_item(request, pk):
+    item = get_object_or_404(PackageItem, pk=pk)
+    item.delete()
+    return HttpResponse(
+        status=204,
+        headers={
+            'HX-Trigger': json.dumps({
+                "packageItemListChanged": None,
+                "showMessage": f"{item.name} berhasil dihapus."
+            })
+        })

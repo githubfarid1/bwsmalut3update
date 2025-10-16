@@ -1,0 +1,18 @@
+{% load static %}
+  {% if items %}
+    {% for d in items %}
+    <div class="col-12 col-lg-2 mt-3">
+        <div class="card border-primary mb-1 bg-light">
+            <button class="btn btn-danger btn-sm" hx-get="{% url 'arsip_tata_remove_package_item' d.id %}" >Hapus</button>
+            <div class="row no-gutters px-1 py-1">
+                <div class="col-sm-12 mt-1 text-center">
+                    <p>{{ d.name }}</p>
+                    <p>{{ d.docnumber }}</p>
+                    <p>{{ d.docyear }}</p>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% endif %}

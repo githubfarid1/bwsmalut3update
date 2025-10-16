@@ -80,8 +80,10 @@ urlpatterns = [
 
     path(route='package', view=views.show_package, name=prefix + "show_package"),
     path(route='package_list', view=views.package_list, name=prefix + "package_list"),
-    path(route='add_package', view=views.add_package, name=prefix + "add_package"),
-    path(route='edit_package/<str:uuid_id>', view=views.edit_package, name=prefix + 'edit_package'),
+    path(route='add-package', view=views.add_package, name=prefix + "add_package"),
+    # path(route='edit_package/<str:uuid_id>', view=views.edit_package, name=prefix + 'edit_package'),
     path(route='add_packageitem/<int:package_id>', view=views.add_packageitem, name=prefix + "add_packageitem"),
-
+    path(route='package-items/<str:uuid_id>', view=views.show_package_items, name=prefix + "show_package_items"),
+    path(route='package_item_list/<int:package_id>', view=views.package_item_list, name=prefix + "package_item_list"),
+    path(route='package_item/<int:pk>/remove', view=views.remove_package_item, name=prefix + 'remove_package_item'),
 ]

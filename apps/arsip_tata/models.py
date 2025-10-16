@@ -228,7 +228,7 @@ class PackageItem(models.Model):
     name = models.CharField(max_length=255)
     docnumber = models.CharField(max_length=30, null=True)
     docyear = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(2023), MaxValueValidator(2050)], null=True
+        validators=[MinValueValidator(1970), MaxValueValidator(2050)], null=True
     )
     count = models.PositiveSmallIntegerField(validators=[MinValueValidator(1)])
     package = models.ForeignKey(
