@@ -2469,13 +2469,13 @@ def package_download_pdf(request, pk):
 
     package = Package.objects.get(id=pk)
     
-    path = os.path.join(settings.PDF_LOCATION, __package__.split('.')[1], "package_pdf", str(package.uuid_id) + ".pdf")
+    path = os.path.join(settings.PDF_LOCATION, __package__.split('.')[1], "package_pdf", str(package.uuid_id).replace("-","") + ".pdf")
     if exists(path):
         doc = fitz.open(path)
         doc.save("tmp.pdf")            
         filename = f"{__package__.split('.')[1]}_{package.id}.pdf"
         with open("tmp.pdf", 'rb') as pdf:
             response = HttpResponse(pdf.read(), content_type='application/pdf')
-            response['Content-Disposition'] = f'attachment;filename={filename}'
+            response['Content-Disposition'] = f'inline;filename={filename}'
             return response
     raise Http404
