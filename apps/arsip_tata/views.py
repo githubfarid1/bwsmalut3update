@@ -2270,7 +2270,7 @@ def remove_package(request, pk):
             messages.info(request, "Data berhasil dihapus")
             package.delete()
         else:
-            messages.error(request, "Data Tidak bisa dihapus karena sudah di pakai")
+            messages.error(request, "Data Tidak bisa dihapus karena file sudah diupload")
         return redirect('arsip_tata_show_package')
 
 def show_package_items(request, uuid_id):
