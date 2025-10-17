@@ -1930,6 +1930,7 @@ class GenerateScriptDigitalizedView:
                 "filesize": item.filesize,
                 "pagecount": item.page_count,
                 "doc_uuid_id": item.id, #item.uuid_id,
+                "yeardate": item.yeardate,
                 # "pdftmpfound": pdftmpfound,
                 
         })
