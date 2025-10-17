@@ -20,14 +20,6 @@
 <div class="container-fluid">
     <h3 class="text-center">Form Penerimaan Arsip</h3>
 
-    <div class="d-flex flex-row-reverse bd-highlight">
-        <div class="p-2 bd-highlight">
-            <button hx-get="{% url 'arsip_tata_add_package' %}" hx-target="#dialog" class="btn btn-sm btn-primary">
-                Generate Form Baru
-            </button>
-        </div>
-    
-    </div>
     <div class="row" hx-trigger="load, packageListChanged from:body" hx-get="{% url 'arsip_tata_package_list' %}" hx-target="this">
         <span class="visually-hidden">Loading...</span>
     </div>

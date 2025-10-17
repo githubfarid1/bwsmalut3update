@@ -3,20 +3,28 @@
     {% for d in trans %}
     <div class="col-12 col-lg-3 mt-3">
       <div class="card border-primary mb-3">
-        <button class="btn btn-primary btn-sm" hx-get="" hx-target="#dialog">Edit</button>
-        <button class="btn btn-secondary btn-sm" hx-get="" hx-target="#dialog">Tambah Dokumen Pinjam</button>
-
-        <a href="{% url 'arsip_tata_trans_form' d.id %}" target="_new"><button class="btn btn-success btn-sm w-100">Cetak Form Pinjam</button></a>
-        <!--<a href="{% url 'arsip_tata_show_transret_detail' d.id %}" target="_new"><button class="btn btn-info btn-sm w-100">Form Kembali</button></a>-->
-        <button class="btn btn-secondary btn-sm" hx-get="" hx-target="#dialog">Form Kembali</button>
-
-        <a href="" target="_new"><button class="btn btn-warning btn-sm w-100">Cetak Form Kembali</button></a>
-
+        <a href="{% url 'arsip_tata_package_form' d.id %}" target="_new"><button class="btn btn-sm btn-info w-100">Cetak Form PDF</button></a>
+        <form class="form-inline" action="{% url 'arsip_tata_remove_package' d.id %}" method="post">
+        {% csrf_token %}  
+        <button type="submit" class="btn btn-sm btn-danger w-100" data-bs-dismiss="modal" aria-label="Close" onclick="return confirm('Hapus Form Penerimaan?')">Hapus Form</button>
+        </form>
 
         <div class="row no-gutters px-3 py-2">
           <div class="col-lg-12 text-left">
             <ul class="list-group list-group-flush">
-                <li class="list-group-item">Nama: <button class="btn btn-secondary btn-sm" hx-get="" hx-target="#dialog"><b>{{ d.customer.name }}</b></button></li>
+                <li class="list-group-item">Nama: {{ d.name }}</li>
+                <li class="list-group-item">Jabatan: {{ d.position }}</li>
+                <li class="list-group-item">Satuan Kerja: {{ d.organization }}</li>
+                <li class="list-group-item">Tanggal Kirim: {{ d.date_send|date:"d F Y" }}</li>
+            </ul>
+          </div>
+        </div>
+          <div class="row no-gutters">
+          <div class="col-lg-12">
+            <a hx-get="{% url 'arsip_tata_package_upload_pdf' %}?package_id={{ d.pk }}" hx-target="#dialog"><button class="w-100 btn btn-sm btn-warning">Upload</button></a>
+          </div>
+          <div class="col-lg-12">
+            <a href="" target="_new"><button class="w-100 btn btn-sm btn-success">Download</button></a>
           </div>
 
         </div>

@@ -86,4 +86,8 @@ urlpatterns = [
     path(route='package-items/<str:uuid_id>', view=views.show_package_items, name=prefix + "show_package_items"),
     path(route='package_item_list/<int:package_id>', view=views.package_item_list, name=prefix + "package_item_list"),
     path(route='package_item/<int:pk>/remove', view=views.remove_package_item, name=prefix + 'remove_package_item'),
+    path(route='package_form/<int:pk>', view=views.package_form, name=prefix + 'package_form'),
+    path(route='package/<int:pk>/remove', view=views.remove_package, name=prefix + 'remove_package'),
+    path(route='package_upload_pdf', view=views.package_upload_pdf, name=prefix + "package_upload_pdf"),
+
 ]

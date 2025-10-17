@@ -1,7 +1,6 @@
-from sqlalchemy import Column, Integer, String, SmallInteger, Text, CHAR
+from sqlalchemy import Column, Integer, String, SmallInteger, Text, CHAR, Date
 from sqlalchemy.orm import  DeclarativeBase,  relationship
 from sqlalchemy import ForeignKey
-from sqlalchemy import String
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
@@ -65,4 +64,18 @@ class Item(Base):
     token: Mapped[str] = mapped_column(String(50))
     issync: Mapped[int] = mapped_column(Integer, nullable=True)
     bundle = relationship("Bundle")
+
+class Package(Base):
+    __tablename__ = TABLE_PREFIX + "package"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    uuid_id: Mapped[str] = mapped_column(String(40))
+    packnumber: Mapped[str] = mapped_column(String(30))
+    date_send = Column(Date, nullable=True)
+    name: Mapped[str] = mapped_column(String(255))
+    position: Mapped[str] = mapped_column(String(255))
+    organization: Mapped[str] = mapped_column(String(255))
+    address:Mapped[str] = mapped_column(String(255))
+    count: Mapped[int] = mapped_column(SmallInteger)
+    photo = Column(String, nullable=True)
+    islock: Mapped[int] = mapped_column(Integer, nullable=True)
 

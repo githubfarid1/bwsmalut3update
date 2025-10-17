@@ -5,7 +5,7 @@ import os
 import fitz
 from os.path import exists
 from settings import *
-from dbclass import Box, Item, Bundle
+from dbclass import Box, Item, Bundle, Package
 import argparse
 import sys
 import pathlib
@@ -44,26 +44,16 @@ session = Session()
 tmppdfs = pathlib.Path(TMPPDF_LOCATION)
 for pdf in list(tmppdfs.iterdir()):
     filename = pathlib.Path(pdf).name
-    if filename[:len(APP_NAME)] != APP_NAME:
+    if filename[:len(APP_NAME + "_package")] != APP_NAME + "_package":
         continue
-    gencode = filename.replace(".pdf", "").replace(APP_NAME + "$$", "")
-    result = session.query(Item).filter(Item.codegen == gencode).first()
-    if not result:
-        continue
-    year = gencode.split("-")[0]
+    package_id = filename.replace(".pdf", "").replace(APP_NAME + "_package$$", "")
+    result = session.get(Package, package_id)
+    # year = gencode.split("-")[0]
     if not exists(os.path.join(PDF_LOCATION, APP_NAME)):
         os.mkdir(os.path.join(PDF_LOCATION, APP_NAME))
 
-    if not exists(os.path.join(PDF_LOCATION, APP_NAME, year)):
-        os.mkdir(os.path.join(PDF_LOCATION, APP_NAME, year))
-    path = os.path.join(PDF_LOCATION, APP_NAME, year, gencode + ".pdf")
+    if not exists(os.path.join(PDF_LOCATION, APP_NAME, "package_pdf")):
+        os.mkdir(os.path.join(PDF_LOCATION, APP_NAME, "package_pdf"))
+    path = os.path.join(PDF_LOCATION, APP_NAME, "package_pdf",  result.uuid_id + ".pdf")
     print("File",pathlib.Path(pdf).name, "Dipindah Ke: " + path)
-    shutil.move(pdf, os.path.join(PDF_LOCATION, APP_NAME, year, gencode + ".pdf"))
-    coverfilename = "{}_{}.png".format(APP_NAME, gencode)
-    generatecover(pdffile=path, coverfilename=coverfilename)
-    filesize = get_size(path, "kb")
-    pagecount = get_page_count(pdffile=path)
-
-    session.query(Item).filter(Item.id == result.id).update({Item.filesize: filesize, Item.page_count: pagecount, Item.cover: os.path.join(COVER_URL, coverfilename)})
-    session.commit()
-
+    shutil.move(pdf, path)

@@ -18,27 +18,27 @@
 
 {% block content %}
 <div class="container-fluid">
-  <div class="row">
-    <div class="col-lg-2">
+    <div style="border:1px solid black;height:250px;overflow:scroll;background:ghostwhite;text-indent:20px;">
+        <p></p>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item"><h4>Nomor Dokumen: <strong>{{ package.packnumber }}</strong></h4></li>
+          <li class="list-group-item"><h4>Tanggal Pelaksanaan: <strong>{{ package.date_send|date:"d F Y" }}</strong></h4></li>
+          <li class="list-group-item"><h4>Nama: <strong>{{ package.name }}</strong></h4></li>
+          <li class="list-group-item"><h4>Jabatan: <strong>{{ package.position }}</strong></h4></li>
+          <li class="list-group-item"><h4>Unit Kerja: <strong>{{ package.organization}}</strong></h4></li>
+          <li class="list-group-item"><h4>Alamat: <strong>{{ package.address}}</strong></h4></li>
+        </ul>
     </div>
-    <div class="col-lg-8">
-        <div style="border:1px solid black;height:250px;overflow:scroll;background:ghostwhite;text-indent:20px;">
-            <p></p>
-            <h4>Nomor Dokumen: <strong>{{ package.name }}</strong></h4>
-            <h4>Tanggal Pelaksanaan: <strong>{{ package.date_send|date:"d M Y" }}</strong></h4>
-            <h4>Nama: <strong>{{ package.name }}</strong></h4>
-            <h4>Jabatan: <strong>{{ package.position }}</strong></h4>
-            <h4>Unit Kerja: <strong>{{ package.organization}}</strong></h4>
-            <h4>Alamat: <strong>{{ package.address}}</strong></h4>
-            
-            
-        </div>
-    </div>
-    <div class="col-lg-2">
-      <button hx-get="{% url 'arsip_tata_add_packageitem' package.id%}" hx-target="#dialog" class="btn btn-sm btn-success float-end">
-        Tambah Dokumen
-      </button>
-    </div>
+    <p></p>
+    <div class="d-flex flex-row-reverse bd-highlight">
+      <div class="p-2 bd-highlight">
+        <button hx-get="{% url 'arsip_tata_add_packageitem' package.id%}" hx-target="#dialog" class="btn btn-sm btn-success">
+          Tambah Dokumen
+        </button>
+        <a href="{% url 'arsip_tata_package_form' package.id %}" target="_new"><button class="btn btn-sm btn-info">Cetak Form PDF</button></a>
+      </div>
+    <p></p>
+
   </div>
 
   <div class="row" hx-trigger="load, packageItemListChanged from:body" hx-get="{% url 'arsip_tata_package_item_list' package.id %}" hx-target="this">

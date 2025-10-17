@@ -129,8 +129,8 @@ class SearchDocByYear(forms.Form):
 class PackageForm(forms.ModelForm):
     class Meta:
         model=Package
-        fields=('packnumber', 'date_send', 'count', 'name', 'position', 'organization', 'address')
-        
+        # fields=('packnumber', 'date_send', 'count', 'name', 'position', 'organization', 'address')
+        fields=('packnumber', 'date_send', 'name', 'position', 'organization', 'address')
         labels = {
             'name': 'Nama',
             'packnumber': 'Nomor Dokumen',

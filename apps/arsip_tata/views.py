@@ -609,15 +609,15 @@ def item_download_pdf(request, pk):
     # print(path)
     if exists(path):
         doc = fitz.open(path)
-        # for i in range(0, len(doc)):
-        #     try:
-        #         page = doc[i]
-        #         tw = fitz.TextWriter(page.rect, opacity=0.3)
-        #         tw.append((50, 100), "COPY")
-        #         page.clean_contents()
-        #         page.write_text(rect=page.rect, writers=tw)
-        #     except:
-        #         pass
+        for i in range(0, len(doc)):
+            try:
+                page = doc[i]
+                tw = fitz.TextWriter(page.rect, opacity=0.3)
+                tw.append((50, 100), "COPY")
+                page.clean_contents()
+                page.write_text(rect=page.rect, writers=tw)
+            except:
+                pass
 
         doc.save("tmp.pdf")            
             
@@ -1782,7 +1782,7 @@ def item_upload_pdf(request):
                 headers={
                     'HX-Trigger': json.dumps({
                         "movieListChanged": None,
-                        "showMessage": 'Upload File Sukses, tunggu beberapa saat kemudian refresh halaman'
+                        "showMessage": 'Upload File Sukses, tunggu beberapa saat, kemudian refresh halaman'
                     })
                 })
     else:
@@ -2253,24 +2253,25 @@ def add_package(request):
         if form.is_valid():
             packageform = form.save()
             package = Package.objects.get(id=packageform.id)
-            messages.success(request, 'Data Pengirim sudah disimpan, Tambahkan nama-nama dokumen yang akan disertakan')
+            # messages.success(request, 'Data Pengirim sudah disimpan, Tambahkan nama-nama dokumen yang akan disertakan')
             return redirect('arsip_tata_show_package_items', package.uuid_id)
         else:
             messages.error(request, 'Isian Salah')
     else:
         form = PackageForm()
-        # package = Package.objects.create()
-        # return HttpResponse(
-        #     status=204,
-        #     headers={
-        #         'HX-Trigger': json.dumps({
-        #             "packageListChanged": None,
-        #             "showMessage": f"{package.uuid_id} added."
-        #         })
-        #     })
     return render(request, 'arsip_tata/package_form.html', {
             'form': form,
         })
+
+def remove_package(request, pk):
+    if request.method == "POST":
+        package = get_object_or_404(Package, pk=pk)
+        if not package.islock:
+            messages.info(request, "Data berhasil dihapus")
+            package.delete()
+        else:
+            messages.error(request, "Data Tidak bisa dihapus karena sudah di pakai")
+        return redirect('arsip_tata_show_package')
 
 def show_package_items(request, uuid_id):
     package = Package.objects.get(uuid_id=uuid_id)
@@ -2320,3 +2321,164 @@ def remove_package_item(request, pk):
                 "showMessage": f"{item.name} berhasil dihapus."
             })
         })
+
+def package_form(request, pk):
+    package = Package.objects.get(pk=pk)
+    detail = package.packageitem_set.all()
+    pdf = io.BytesIO()
+    doc = SimpleDocTemplate(pdf, pagesize=A4)
+    date1 = package.date_send
+    date1show = date1.strftime('%d %B %Y')
+    styles = getSampleStyleSheet()
+    title = "BERITA ACARA SERAH TERIMA DOKUMEN / ARSIP"
+    days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Ahad']
+    frame = Frame(doc.leftMargin, doc.bottomMargin, doc.width, doc.height)
+    template = PageTemplate(frames=[frame], id='mytemplate')
+
+    doc.addPageTemplates([template])
+    elements = []
+    elements.append(Paragraph(f"<strong>{title}</strong>", ParagraphStyle(name='Title',fontSize=16,leading=22,alignment=TA_CENTER, spaceAfter=6)))
+    elements.append(Spacer(1, 12))
+    elements.append(Paragraph(f'Nomor: <strong>{package.packnumber}</strong>', styles['Normal']))
+    elements.append(Spacer(1, 6))
+    elements.append(Paragraph(f'Pada hari ini, <strong>{days[date1.weekday()]}</strong>, tanggal <strong>{date1.day}</strong> bulan <strong>{date1.strftime("%B")}</strong> tahun <strong>{date1.year}</strong>, telah dilaksanakan serah terima dokumen/arsip dari Satuan Kerja kepada Unit Pengolah Arsip BWS Maluku Utara sebagai berikut:', styles['Normal']))
+    elements.append(Spacer(1, 6))
+    elements.append(Paragraph('I. PIHAK YANG MENYERAHKAN', styles['Heading3']))
+    # elements.append(Spacer(1, 6))
+    elements.append(Paragraph(f'Nama: <strong>{package.name}</strong>', styles['Normal']))
+    elements.append(Spacer(1, 6))
+    elements.append(Paragraph(f'Jabatan: <strong>{package.position}</strong>', styles['Normal']))
+    elements.append(Spacer(1, 6))
+    elements.append(Paragraph(f'Unit Kerja: <strong>{package.organization}</strong>', styles['Normal']))
+    elements.append(Spacer(1, 6))
+    elements.append(Paragraph(f'Alamat: <strong>{package.address}</strong>', styles['Normal']))
+    elements.append(Paragraph('II. PIHAK YANG MENERIMA', styles['Heading3']))
+    # elements.append(Spacer(1, 6))
+    elements.append(Paragraph(f'Nama: ...........................................', styles['Normal']))
+    elements.append(Spacer(1, 6))
+    elements.append(Paragraph(f'Jabatan: ........................................', styles['Normal']))
+    elements.append(Spacer(1, 6))
+    elements.append(Paragraph(f'Unit Pengolah Arsip: .....................', styles['Normal']))
+    elements.append(Spacer(1, 6))
+    elements.append(Paragraph(f'Alamat: .........................................', styles['Normal']))
+    elements.append(Spacer(1, 6))
+    elements.append(Paragraph('III. DAFTAR DOKUMEN / ARSIP YANG DI SERAHKAN', styles['Heading3']))
+    # elements.append(Spacer(1, 6))
+    
+    mydata = []
+    mydata.append(("No", "Nama Dokumen / Arsip", "No Doc", "Tahun", "Jml", "Keterangan"))
+    # c_width = [0.4*inch, 1*inch, 5*inch]
+    c_width = [0.3*inch, 3.0*inch, 1*inch, 0.5*inch, 0.5*inch, 1.5*inch]
+    
+    style2 = getSampleStyleSheet()
+    style2 = style2["BodyText"]
+    style2.wordWrap = 'CJK'
+    filename = f"form_terima_{package.uuid_id}.pdf"
+    for idx, data in enumerate(detail):
+        myset = (Paragraph(str(idx+1), style2) , Paragraph(str(data.name), style2), Paragraph(data.docnumber, style2), Paragraph(str(data.docyear), style2), Paragraph(str(data.count), style2), Paragraph("............................", style2))
+        mydata.append(myset)
+    
+    mytable = Table(mydata, colWidths=c_width, hAlign='LEFT')
+    mytable.setStyle(TableStyle([('BACKGROUND',(0,0),(-1,0),colors.lightgrey),
+                       ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
+                       ('FONTSIZE',(0,0),(-1,0),12),
+                       ('FONTSIZE',(0,1),(-1,-1),8),
+                       ('FONTNAME', (0,0), (-1,0), 'Courier-Bold'),
+                       ('ALIGN', (0,0), (-1,0), 'CENTER'),
+                       ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+                       ('VALIGN',(0,0),(-1,-1),'TOP'),
+                       ]))
+    elements.append(Spacer(1, 10))
+    elements.append(mytable)
+    elements.append(Spacer(1, 6))
+    
+    elements.append(Paragraph('Jumlah Total: ...........', styles['Normal']))
+    elements.append(Spacer(1, 6))
+    elements.append(Paragraph('IV. PERNYATAAN', styles['Heading3']))
+    # elements.append(Spacer(1, 6))
+    elements.append(Paragraph('Dengan ditandatanganinya Berita Acara ini, kedua belah pihak menyatakan bahwa dokumen/arsip sebagaimana tercantum di atas telah diserahkan dan diterima dengan baik, lengkap, dan sesuai dengan daftar.', styles['Normal']))
+    elements.append(Spacer(1, 6))
+    elements.append(Paragraph('V. PENUTUP', styles['Heading3']))
+    # elements.append(Spacer(1, 6))
+    elements.append(Paragraph('Berita Acara Serah Terima Dokumen/Arsip ini dibuat dalam rangkap 2 (dua) asli, masing-masing mempunyai kekuatan hukum yang sama, untuk dipergunakan sebagaimana mestinya.', styles['Normal']))
+    elements.append(Spacer(1, 6))
+    elements.append(Paragraph('VI. TANDA TANGAN', styles['Heading3']))
+    # elements.append(Spacer(1, 6))
+    mydata = []
+    mydata.append((Paragraph("Pihak yang Menyerahkan", style2), Paragraph("Pihak yang Menerima", style2)))
+    mydata.append((Spacer(1, 6),Spacer(1, 6)))
+    mydata.append((Paragraph("(.............................................)", style2), Paragraph("(.............................................)", style2)))
+    mydata.append((Paragraph(f"Nama: {package.name}", style2), Paragraph(f"Nama: .............................", style2)))
+    mydata.append((Paragraph(f"Jabatan: {package.position}", style2), Paragraph("Jabatan: ..........................", style2)))
+    mydata.append((Paragraph(f"Tanggal: {date1show}", style2), Paragraph("Tanggal: ..........................", style2)))
+    mydata.append((Spacer(1, 6),Spacer(1, 6)))
+    
+    mydata.append((Paragraph("Mengetahui,", style2), ""))
+    mydata.append((Paragraph("Atasan Langsung", style2), ""))
+    mydata.append((Spacer(1, 6),Spacer(1, 6)))
+    mydata.append((Paragraph("(.............................................)", style2), ""))
+    mydata.append((Paragraph(f"Nama: .............................", style2), ""))
+    mydata.append((Paragraph("Jabatan: ..........................", style2), ""))
+    mydata.append((Paragraph("Tanggal: ..........................", style2), ""))
+
+
+
+    c_width = [3.0*inch, 3.0*inch]
+    mytable = Table(mydata, colWidths=c_width, hAlign='LEFT')
+    elements.append(mytable)
+
+    doc.build(elements)
+    pdf.seek(0)
+    response = HttpResponse(pdf.read(), content_type='application/pdf')
+    response['Content-Disposition'] = f'inline;filename={filename}'
+    return response
+
+@csrf_exempt
+def package_upload_pdf(request):
+    if request.method == "POST":
+        if request.FILES:
+            package_id = request.POST.get("package_id")
+            package = Package.objects.get(id=package_id)
+            filename = f"{__package__.split('.')[1]}_package$${package_id}.pdf"
+            upload = request.FILES.getlist('uploadfile')[0]
+            tmppath = os.path.join(settings.MEDIA_ROOT, "tmpfiles", filename)
+            fss = FileSystemStorage()
+            if exists(tmppath):
+                os.remove(tmppath)
+            fss.save(tmppath, upload)
+            package.islock = True
+            package.save()
+            return HttpResponse(
+                status=204,
+                headers={
+                    'HX-Trigger': json.dumps({
+                        "packageListChanged": None,
+                        "showMessage": 'Upload File Sukses'
+                    })
+                })
+    else:
+        package_id = request.GET.get("package_id")
+    return render(request, 'arsip_tata/package_upload_pdf.html', {
+        'package_id': package_id,
+    })
+
+def package_download_pdf(request, pk):
+    
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    package = Package.objects.get(id=pk)
+    
+    path = os.path.join(settings.PDF_LOCATION, __package__.split('.')[1], "package_pdf", package.uuid_id + ".pdf")
+    if exists(path):
+        doc = fitz.open(path)
+
+        doc.save("tmp.pdf")            
+            
+        filename = f"{__package__.split('.')[1]}_{package.id}.pdf"
+        # with open(path, 'rb') as pdf:
+        with open("tmp.pdf", 'rb') as pdf:
+            response = HttpResponse(pdf.read(), content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment;filename={filename}'
+            return response
+    raise Http404

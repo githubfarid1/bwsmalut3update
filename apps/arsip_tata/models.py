@@ -118,7 +118,7 @@ class Item(models.Model):
     filesize = models.IntegerField(null=True)
     page_count = models.SmallIntegerField(null=True)
     token = models.CharField(null=True, blank=True, max_length=50)
-    issync =  models.BooleanField(default=False)
+    issync = models.BooleanField(default=False)
     bundle = models.ForeignKey(
         Bundle,
         db_column='bundle_id',
@@ -220,6 +220,8 @@ class Package(models.Model):
     address= models.CharField(max_length=255, null=True)
     count = models.PositiveSmallIntegerField(validators=[MinValueValidator(1)], null=True)
     photo = models.ImageField(upload_to=update_filename_photo, null=True, blank=True)
+    islock = models.BooleanField(default=False)
+     
     def __str__(self) -> str:
         return f"{self.packnumber}_{self.organization}"
 
