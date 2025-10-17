@@ -34,6 +34,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from urllib.parse import unquote, quote, unquote_plus, quote_plus
 from django.utils import timezone
 from django.contrib import messages
+from .genview import GenerateScriptView
 
 # Create your views here.
 
@@ -1885,6 +1886,7 @@ def digitalisasi(request, year):
         return redirect('login')
         
     gendata = GenerateScriptDigitalizedView(request, year=year)
+    
     gendata.gencontext()
     # print(gendata.context)
     return render(request=request, 
@@ -2480,3 +2482,14 @@ def package_download_pdf(request, pk):
             response['Content-Disposition'] = f'inline;filename={filename}'
             return response
     raise Http404
+
+def search_document(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+        
+    gendata = GenerateScriptView(request=request, form=SearchDocByYear(), template_name="arsip_tata/search_document.html")
+    
+    gendata.gencontext()
+    return render(request=request, 
+                  template_name=gendata.template_name, 
+                  context=gendata.context)
