@@ -24,7 +24,7 @@
             <a hx-get="{% url 'arsip_tata_package_upload_pdf' %}?package_id={{ d.pk }}" hx-target="#dialog"><button class="w-100 btn btn-sm btn-warning">Upload</button></a>
           </div>
           <div class="col-lg-12">
-            <a href="" target="_new"><button class="w-100 btn btn-sm btn-success">Download</button></a>
+            <a href="{% url 'arsip_tata_package_download_pdf' d.pk %}" target="_new"><button class="w-100 btn btn-sm btn-success">Download</button></a>
           </div>
 
         </div>

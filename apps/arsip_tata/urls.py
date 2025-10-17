@@ -89,5 +89,6 @@ urlpatterns = [
     path(route='package_form/<int:pk>', view=views.package_form, name=prefix + 'package_form'),
     path(route='package/<int:pk>/remove', view=views.remove_package, name=prefix + 'remove_package'),
     path(route='package_upload_pdf', view=views.package_upload_pdf, name=prefix + "package_upload_pdf"),
+    path(route='package_download_pdf/<int:pk>', view=views.package_download_pdf, name=prefix + "package_download_pdf"),
 
 ]
