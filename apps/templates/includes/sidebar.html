@@ -1,9 +1,9 @@
 
 {% load static %}
 <div class="sidebar sidebar-dark sidebar-fixed" id="sidebar">
-  <div class="sidebar-brand d-none d-md-flex">
-    <a class="sidebar-brand-full" href=""><img src="{% static 'logo/bws.jpg' %}" alt="BWS Maluku Utara" width="50px" height="45px"></a>
-    <img class="sidebar-brand-narrow" src="{% static 'logo/bws.jpg' %}" alt="BWS Maluku Utara" width="50" height="46">
+  <div class="sidebar-brand d-none d-md-flex bg-white">
+    <a class="sidebar-brand-full" href=""><img src="{% static 'logo/bws.jpg' %}" alt="BWS Maluku Utara" width="220px" height="65px"></a>
+    <img class="sidebar-brand-narrow" src="{% static 'logo/bws-small.jpg' %}" alt="BWS Maluku Utara" width="50" height="46">
   </div>
   <ul class="sidebar-nav" data-coreui="navigation" data-simplebar="">
       <li class="nav-title">Arsip Dinamis</li>
@@ -118,8 +118,8 @@
             <use xlink:href="{% static 'assets/vendors/coreui/icons/svg/free.svg' %}#cil-cursor"></use>
           </svg> SATKER BALAI</a>
           <ul class="nav-group-items">
-            <li class="nav-item"><a class="nav-link" href="{% url 'fm_balai_add_department' %}"><span class="nav-icon"></span> Tambah PPK</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'fm_balai_department_list' %}"><span class="nav-icon"></span> Daftar PPK</a></li>
+            <li class="nav-item"><a class="nav-link" href=""><span class="nav-icon"></span> Tambah PPK</a></li>
+            <li class="nav-item"><a class="nav-link" href=""><span class="nav-icon"></span> Daftar PPK</a></li>
 
           </ul>
         </li>
