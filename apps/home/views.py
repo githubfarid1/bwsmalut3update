@@ -9,7 +9,7 @@ from django.shortcuts import render, redirect
 @login_required(login_url="/login/")
 def index(request):
     # return redirect("arsip_inaktif_statistics_year")
-    return redirect("arsip_tata_statistics")
+    return redirect("arsip_tata_search_document")
     context = {'segment': 'index'}
     html_template = loader.get_template('home/index.html')
     return HttpResponse(html_template.render(context, request))

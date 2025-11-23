@@ -16,7 +16,7 @@ class GenerateScriptView:
             query = self.__request.GET.get("search")
             items = Item.objects.filter(Q(title__icontains=query)  | Q(bundle__description__icontains=query))
         else:
-            items = Item.objects.all().order_by("-uploaded_date")[:100]
+            items = Item.objects.all().order_by("-uploaded_date")[:50]
         datalist = []
         for ke, item in enumerate(items):
             folder = str(item.bundle.yeardate)

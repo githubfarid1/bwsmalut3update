@@ -1165,13 +1165,45 @@ def label_perbundle(request, pk):
     return response
 
 def search_qrcode(request, year, box_number):
-    if not request.user.is_authenticated:
-        res = Box.objects.get(box_number=box_number, yeardate=year)
-        return render(request=request, template_name='arsip_tata/search_qrcode.html', context={'datalist': res})
-    else:
+    # if not request.user.is_authenticated:
+    #     res = Box.objects.get(box_number=box_number, yeardate=year)
+        
+    #     return render(request=request, template_name='arsip_tata/search_qrcode.html', context={'datalist': res})
+    # else:
         # TODO: ADD MORE FEATURE FOR LOGIN USER
         res = Box.objects.get(box_number=box_number, yeardate=year)
-        return render(request=request, template_name='arsip_tata/search_qrcode.html', context={'datalist': res})
+        # breakpoint()
+        bundle_data = []
+        for bundle in res.bundle_set.all():
+            bundledict = {
+                "bundle_number": bundle.bundle_number,
+                "code": bundle.code,
+                "creator": bundle.creator,
+                "description": bundle.description,
+                "year_bundle": bundle.year_bundle,
+                "items": []
+            }
+            for item in bundle.item_set.all():
+                tran = TransDetail.objects.filter(item_id=item.id, date_return__isnull=True)
+                status = "Ada"
+                if tran.count() > 0:
+                    status = "Dipinjam"
+                itemdict = {
+                    "item_number": item.item_number,
+                    "title": item.title,
+                    "status": status,
+                    "total": item.total,
+                }
+                
+                bundledict["items"].append(itemdict)
+            bundle_data.append(bundledict)
+        datalist = {
+            "yeardate": res.yeardate,
+            "box_number": res.box_number,
+            "bundles": bundle_data
+        }
+        # print(data)    
+        return render(request=request, template_name='arsip_tata/search_qrcode_ext.html', context={'datalist': datalist})
         
 def show_customers(request):
     if not request.user.is_authenticated:

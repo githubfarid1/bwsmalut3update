@@ -1,0 +1,61 @@
+{% extends "layouts/base_anonymous.html" %} {% load static %}
+{% block title %} | Cari Item Berkas {% endblock %}
+{% block stylesheets %}
+    <link rel="stylesheet" href=
+    "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" />
+{% endblock stylesheets %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="container-fluid">
+  {%if datalist %}
+  <h5>Tahun Penataan: {{ datalist.yeardate }}</h5>
+  <h5>No. Box: {{ datalist.box_number }}</h5>
+  <p></p>
+  <section class="mx-4 mt-2">
+    {% for bundle in datalist.bundles %}
+        <table class="table align-middle mb-0 bg-white">
+            <tr>
+                <th><h6>No. Berkas</th><th>:</th><th><i>{{ bundle.bundle_number }}</i></h6></th>
+            </tr>
+            <tr>
+                <th><h6>Kode</th><th>:</th><th><i>{{ bundle.code }}</i></h6></th>
+            </tr>
+            <tr>    
+                <th><h6>Index/Judul</th><th>:</th><th><i>{{ bundle.creator }}</i></h6></th>
+            </tr>
+            <tr>
+                <th><h6>Pekerjaan</th><th>:</th><th><i>{{ bundle.description }}</i></h6></th>
+            </tr>
+            <tr>
+                <th><h6>Tahun</th><th>:</th><th><i>{{ bundle.year_bundle }}</i></h6></th>
+            </tr>
+        <table class="table align-middle mb-0 bg-white table-bordered">
+        <thead class="table-warning">
+            <tr>
+                <th>ITEM</th>
+                <th>URAIAN MASALAH KEGIATAN</th>
+                <th>JML</th>
+                <th>STATUS</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in bundle.items %}
+            <tr>
+                <td>{{ item.item_number }}</td>
+                <td>{{ item.title }}</td>
+                <td>{{ item.total }}</td>
+                <td>{{ item.status }}</td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br/><br/>
+    {% endfor %}
+</section>
+  {% endif %}
+  
+</div>
+{% endblock content %}

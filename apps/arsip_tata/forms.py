@@ -116,7 +116,7 @@ class EditTransDetailForm(forms.ModelForm):
         fields = ['date_return']
 
 class SearchItemForm(forms.Form): 
-    title = forms.CharField(label="Judul", max_length = 255, help_text = "", required=False) 
+    # title = forms.CharField(label="Judul", max_length = 255, help_text = "", required=False) 
     description = forms.CharField(label="Uraian Pekerjaan", max_length = 255, help_text = "", required=False) 
 
 class SearchBundleForm(forms.Form): 
