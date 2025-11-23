@@ -31,7 +31,9 @@
   {% else %}
     <tr class="table-warning">
   {% endif %}
-        <td>{{ d.box_number }} {% if isadmin %} <b>{{ d.pk }}</b> {% endif %}</td>
+        <!--<td>{{ d.box_number }} {% if isadmin %} <b>{{ d.pk }}</b> {% endif %}</td>-->
+        <td>{{ d.box_number }}</td>
+
         <td>{{ d.bundle_number }}</td>
         <td>{{ d.item_number }}</td>
         <td>{{ d.itemcount }}</td>

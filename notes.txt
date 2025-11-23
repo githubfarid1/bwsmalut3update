@@ -8,3 +8,12 @@ SELECT a.item_number, b.bundle_number, c.box_number, a.token FROM arsip_tata_ite
 
 
 4. tambhkan doc_type (buku, gambar, dll) pada table item.
+
+
+Proses Searching:
+1. Pertama kita login ke aplikasi dengan alamat:
+https://arsip.bwsmalut.my.id
+pada tampilan awal kita akan melihat daftar dokumen yang sudah diinput ke aplikasi earsip kami. dokumen yang sudah ada di scanning dalam format PDF ditandai dengan adanya gambar sample depan dokumen, sedangkan yang belum discan tidak ada gambarnya.
+untuk melihat cover depan kita cukup mengklik gambar tersebut.
+untuk melakukan download kita cukup menekan tombol download.
+2. 
