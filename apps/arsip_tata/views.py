@@ -35,7 +35,7 @@ from urllib.parse import unquote, quote, unquote_plus, quote_plus
 from django.utils import timezone
 from django.contrib import messages
 from .genview import GenerateScriptView
-
+import zipfile
 # Create your views here.
 
 def is_user_in_group(user, group_name):
@@ -2525,3 +2525,17 @@ def search_document(request):
     return render(request=request, 
                   template_name=gendata.template_name, 
                   context=gendata.context)
+
+def package_download_letter(request):
+    
+    path = os.path.join(settings.STATICFILES_DIRS[0], "files", "maklumat_penyerahan_dokumen_arsip.pdf")
+    if exists(path):
+        doc = fitz.open(path)
+        doc.save("tmp.pdf")            
+        filename = "maklumat_penyerahan_dokumen_arsip.pdf"
+        with open("tmp.pdf", 'rb') as pdf:
+            response = HttpResponse(pdf.read(), content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment;filename={filename}'
+            return response
+    raise Http404
+    

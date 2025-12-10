@@ -6,6 +6,7 @@
 
 <div class="container-fluid px-4">
   <h3 class="text-center">Form Pengiriman Dokumen</h3>
+
   <form action="" method="POST">
     <div class="row border">  
         {% csrf_token %}
@@ -16,9 +17,17 @@
         {%endfor%}
         {% comment %} {{form|crispy}} {% endcomment %}
         <input type="hidden" name="next" value="{{ request.GET.next }}">
-        <button type="submit" class="btn btn-primary mt-2">Submit</button>
+        <div class="row">
+          <div class="col-md-6">
+            <button type="submit" class="btn btn-primary mt-2">Submit</button>
+          </div>
+          <div class="col-md-6">
+            <a href="{% url 'arsip_tata_package_download_letter' %}" target="_new"><button type="button" class="btn btn-warning mt-2" style="float: right;">Maklumat</button></a>
+          </div>
+          
 
         </div>
+        
         <div class="col-md-3"></div>
 
     </div>  

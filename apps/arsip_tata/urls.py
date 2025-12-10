@@ -91,5 +91,5 @@ urlpatterns = [
     path(route='package_upload_pdf', view=views.package_upload_pdf, name=prefix + "package_upload_pdf"),
     path(route='package_download_pdf/<int:pk>', view=views.package_download_pdf, name=prefix + "package_download_pdf"),
     path(route='search_document', view=views.search_document, name=prefix + 'search_document'),
-
+    path(route='package_download_letter', view=views.package_download_letter, name=prefix + "package_download_letter"),
 ]

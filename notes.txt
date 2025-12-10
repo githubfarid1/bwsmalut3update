@@ -16,4 +16,17 @@ https://arsip.bwsmalut.my.id
 pada tampilan awal kita akan melihat daftar dokumen yang sudah diinput ke aplikasi earsip kami. dokumen yang sudah ada di scanning dalam format PDF ditandai dengan adanya gambar sample depan dokumen, sedangkan yang belum discan tidak ada gambarnya.
 untuk melihat cover depan kita cukup mengklik gambar tersebut.
 untuk melakukan download kita cukup menekan tombol download.
-2. 
+
+Untuk proses sinkronsasi dengan aplikasi e-Arsip milik SDA maka akan dilakukan secara otomatis setelah input data dan generate kode di aplikasi earsip kami. 
+Untuk melihat hasil sinkronisasi yang sudah ada, kita hanya perlu menekan tombol e-arsip sda ini. 
+tombol ini mengarahkan kita ke aplikasi e-arsip milik SDA.
+Kalau kita lihat, data yang ada di e-Arsip kami sama dengan data yang sudah ada di e-arsip SDA. 
+Perbedaannya ada pada struktur datanya dan visualisasi dari data yang sudah di scan di aplikasi kami tampil lebih menarik.
+
+Untuk proses peminjaman arsip ini, saya akan memperlihatkan secara singkat saja. 
+pertama, ini menu untuk penambahan data peminjam, 
+kemudian ini adalah form peminjaman dokumen...
+kemudian ini daftar dokumen yang sedang dipinjam
+
+Untuk proses pengiriman dokumen ke gedung arsip, masing-masing satker harus terlebih dahulu mengisi form online di aplikasi e-arsip kami dan kemudian dengan aplikasi ini dicetak daftar dokumen yang akan dikirim tersebut. daftar dokumen ini berfungsi sebagai surat pengantar. setelah dibubuhi tanda tangan yang diperlukan.
+kemudian dokumen-dokumen ini dibawa ke gedung arsip bws beserta surat pengantar tersebut... 
