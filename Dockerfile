@@ -11,8 +11,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# running migrations
-RUN python manage.py migrate
+# collect static files
+RUN python manage.py collectstatic --noinput 2>/dev/null || true
 
 # gunicorn
 CMD ["gunicorn", "--config", "gunicorn-cfg.py", "core.wsgi"]
