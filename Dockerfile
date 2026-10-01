@@ -11,6 +11,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+# create settings.py from sample if not exists
+RUN if [ ! -f core/settings.py ]; then cp core/settings.py.sample core/settings.py; fi
+
 # collect static files
 RUN python manage.py collectstatic --noinput 2>/dev/null || true
 
