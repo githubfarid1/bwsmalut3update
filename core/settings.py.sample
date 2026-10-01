@@ -47,6 +47,10 @@ INSTALLED_APPS = [
     # 'apps.file_explorer',
     'apps.fm_pjpa',
     'apps.fm_pjsa',
+    'apps.fm_opsda',
+    'apps.fm_balai',
+    'apps.arsip_tata',
+    'apps.alihmedia_utilities',
     'taggit',
 
 ]
