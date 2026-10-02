@@ -14,8 +14,8 @@ COPY . .
 # create settings.py from sample if not exists
 RUN if [ ! -f core/settings.py ]; then cp core/settings.py.sample core/settings.py; fi
 
-# collect static files
-RUN python manage.py collectstatic --noinput 2>/dev/null || true
+# entrypoint script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-# gunicorn
-CMD ["gunicorn", "--config", "gunicorn-cfg.py", "core.wsgi"]
+ENTRYPOINT ["/entrypoint.sh"]

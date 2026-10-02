@@ -1,0 +1,23 @@
+services:
+  app:
+    build: .
+    volumes:
+      - pdf_data:/home/farid/pdfs
+      - fm_data:/home/farid/fms
+      - media_data:/app/media
+    env_file:
+      - .env
+    restart: unless-stopped
+    ports:
+      - "8001:5005"
+    networks:
+      - dokploy-network
+
+networks:
+  dokploy-network:
+    external: true
+
+volumes:
+  pdf_data:
+  fm_data:
+  media_data:
