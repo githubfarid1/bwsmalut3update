@@ -9,7 +9,7 @@ services:
       - .env
     restart: unless-stopped
     ports:
-      - "8001:5005"
+      - "8005:5005"
     networks:
       - dokploy-network
 
