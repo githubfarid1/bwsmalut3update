@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'apps.arsip_tata',
     'apps.alihmedia_utilities',
     'taggit',
+    'widget_tweaks',
 
 ]
 SITE_ID = 1
